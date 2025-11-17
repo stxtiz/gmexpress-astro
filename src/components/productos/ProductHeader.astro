@@ -67,50 +67,52 @@ const { searchPlaceholder = "Buscar productos..." } = Astro.props;
 </header>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('search-input');
-    
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("search-input");
+
     // Función para normalizar texto (quitar acentos)
     const normalizeText = (text: string): string => {
       return text
         .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
         .trim();
     };
-    
+
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
+      searchInput.addEventListener("input", (e) => {
         const searchTerm = normalizeText((e.target as HTMLInputElement).value);
-        
+
         // Buscar tanto productos como servicios
-        const productCards = document.querySelectorAll('[data-product]');
-        const serviceCards = document.querySelectorAll('[data-service]');
+        const productCards = document.querySelectorAll("[data-product]");
+        const serviceCards = document.querySelectorAll("[data-service]");
         const allCards = [...productCards, ...serviceCards];
-        
+
         let visibleCount = 0;
-        
+
         allCards.forEach((card) => {
-          const nameElement = card.querySelector('[data-product-name], [data-service-name]');
-          const name = normalizeText(nameElement?.textContent || '');
-          
-          if (searchTerm === '' || name.includes(searchTerm)) {
-            (card as HTMLElement).style.display = '';
+          const nameElement = card.querySelector(
+            "[data-product-name], [data-service-name]",
+          );
+          const name = normalizeText(nameElement?.textContent || "");
+
+          if (searchTerm === "" || name.includes(searchTerm)) {
+            (card as HTMLElement).style.display = "";
             visibleCount++;
           } else {
-            (card as HTMLElement).style.display = 'none';
+            (card as HTMLElement).style.display = "none";
           }
         });
-        
+
         // Mostrar mensaje si no hay resultados
-        let noResultsMsg = document.getElementById('no-results-message');
-        const gridContainer = document.querySelector('.grid');
-        
-        if (visibleCount === 0 && searchTerm !== '') {
+        let noResultsMsg = document.getElementById("no-results-message");
+        const gridContainer = document.querySelector(".grid");
+
+        if (visibleCount === 0 && searchTerm !== "") {
           if (!noResultsMsg && gridContainer) {
-            noResultsMsg = document.createElement('div');
-            noResultsMsg.id = 'no-results-message';
-            noResultsMsg.className = 'col-span-full text-center py-12';
+            noResultsMsg = document.createElement("div");
+            noResultsMsg.id = "no-results-message";
+            noResultsMsg.className = "col-span-full text-center py-12";
             noResultsMsg.innerHTML = `
               <span class="material-symbols-outlined text-6xl text-text-light/30 dark:text-text-dark/30">search_off</span>
               <p class="mt-4 text-text-light/60 dark:text-text-dark/60">No se encontraron resultados para "${(e.target as HTMLInputElement).value}"</p>
