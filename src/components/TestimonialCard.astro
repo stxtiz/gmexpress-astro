@@ -1,0 +1,27 @@
+---
+interface Props {
+  text: string;
+  name: string;
+  role: string;
+  avatar: string;
+}
+
+const { text, name, role, avatar } = Astro.props;
+---
+
+<div
+  class="flex w-96 flex-shrink-0 flex-col gap-4 rounded-lg border border-slate-200 dark:border-slate-800 p-6 bg-background-light dark:bg-background-dark text-left"
+>
+  <p class="text-slate-600 dark:text-slate-400">{text}</p>
+  <div class="flex items-center gap-4">
+    <div
+      class="w-12 h-12 rounded-full bg-cover bg-center"
+      style={`background-image: url('${avatar}')`}
+    >
+    </div>
+    <div>
+      <p class="font-bold text-secondary dark:text-white">{name}</p>
+      <p class="text-sm text-slate-500">{role}</p>
+    </div>
+  </div>
+</div>

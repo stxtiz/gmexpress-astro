@@ -1,0 +1,158 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Hero from "../components/Hero.astro";
+import ProductCard from "../components/ProductCard.astro";
+import FeatureCard from "../components/FeatureCard.astro";
+import TestimonialCarousel from "../components/TestimonialCarousel.astro";
+import "../styles/global.css";
+
+const products = [
+  {
+    title: "Desayuno Completo",
+    description: "Desayuno completo con variedad de sabores dulces y salados.",
+    image: "/images/products/desayuno.jpg",
+  },
+  {
+    title: "Jugos Naturales",
+    description: "Jugos 100% naturales, sin azúcares añadidos.",
+    image: "/images/products/jugos.jpg",
+  },
+  {
+    title: "Almuerzo Hipocalórico",
+    description: "Preparación baja en calorías, rica en proteínas y omega-3.",
+    image: "/images/products/hipocalorico.jpg",
+  },
+  {
+    title: "Lasagna de Verduras",
+    description:
+      "Deliciosa lasagna hecha con capas de verduras frescas y queso.",
+    image: "/images/products/Lasagna de verduras.png",
+  },
+];
+
+const features = [
+  {
+    icon: "spa",
+    title: "Calidad Garantizada",
+    description:
+      "Todos nuestros productos pasan por rigurosos controles de calidad para asegurar que recibas solo lo mejor.",
+  },
+  {
+    icon: "local_shipping",
+    title: "Despacho Rápido",
+    description:
+      "Nuestro sistema logístico asegura que tus pedidos lleguen en buen estado y a tiempo.",
+  },
+  {
+    icon: "star",
+    title: "Calidad Superior",
+    description:
+      "Trabajamos con proveedores confiables para ofrecerte productos frescos y de alta calidad.",
+  },
+];
+---
+
+<Layout title="GMEXPRESS - Inicio">
+  <Header />
+
+  <main class="flex-1">
+    <Hero />
+
+    <!-- Productos -->
+    <section class="w-full py-10 md:py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-10">
+        <h2
+          class="text-2xl font-bold tracking-tight px-4 pb-5 pt-5 text-secondary dark:text-text-dark"
+        >
+          Nuestros Productos Destacados
+        </h2>
+        <div
+          class="flex overflow-x-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div class="flex items-stretch p-4 gap-4">
+            {products.map((product) => <ProductCard {...product} />)}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Por qué elegir GMExpress -->
+    <section class="w-full py-10 md:py-16 bg-white dark:bg-slate-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-10">
+        <div class="flex flex-col gap-10 px-4 py-10 @container">
+          <div class="flex flex-col gap-4 text-center items-center">
+            <h2
+              class="text-3xl font-bold tracking-tight text-secondary dark:text-text-dark max-w-2xl"
+            >
+              ¿Por qué Elegir GMEXPRESS?
+            </h2>
+            <p class="text-base text-slate-600 dark:text-slate-400 max-w-2xl">
+              Nos comprometemos con la calidad, la logística eficiente y un
+              servicio al cliente excepcional para satisfacer tus necesidades.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-0">
+            {features.map((feature) => <FeatureCard {...feature} />)}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nuestra Historia -->
+    <section class="w-full py-10 md:py-20 lg:py-24">
+      <div class="max-w-7xl mx-auto px-4 sm:px-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div
+            class="w-full aspect-[4/3] rounded-xl bg-cover bg-center"
+            data-alt="The professional and friendly GMExpress team posing together in their modern facility."
+            style="background-image: url('https://gmexpress.cl/wp-content/uploads/2023/09/Imagen-1.jpg');"
+          >
+          </div>
+          <div class="flex flex-col gap-4">
+            <h2
+              class="text-3xl font-bold tracking-tight text-secondary dark:text-text-dark"
+            >
+              Conoce Nuestra Historia
+            </h2>
+            <p class="text-base text-slate-600 dark:text-slate-400">
+              GM-Express empresa chilena de Servicios de Alimentación, formada
+              por un equipo de profesionales 100% comprometidos que día a día
+              trabaja orientando sus acciones para asegurar y promover el
+              bienestar nutricional mejorando la experiencia y calidad de vida
+              de sus clientes. Ofrecemos soluciones personalizadas y rápida
+              capacidad de respuesta a la mejor relación Precio | Calidad del
+              mercado. Para GM-Express tú eres lo más importante.
+            </p>
+            <button
+              class="flex mt-4 w-fit cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-colors"
+            >
+              <span class="truncate">Conoce más</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonios -->
+    <section class="w-full py-10 md:py-16 bg-white dark:bg-slate-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-10">
+        <div class="flex flex-col gap-10 px-4 py-10 text-center items-center">
+          <div class="flex flex-col gap-4">
+            <h2 class="text-3xl font-bold text-secondary dark:text-text-dark">
+              Lo que dicen nuestros clientes
+            </h2>
+            <p class="text-base text-slate-600 dark:text-slate-400 max-w-2xl">
+              La confianza de quienes nos eligen es nuestro mayor orgullo y
+              motivación.
+            </p>
+          </div>
+          <TestimonialCarousel />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

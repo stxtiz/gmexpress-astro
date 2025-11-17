@@ -1,0 +1,52 @@
+---
+interface Props {
+  name: string;
+  price: string;
+  image: string;
+  alt: string;
+  description: string;
+}
+
+const { name, price, image, alt, description } = Astro.props;
+---
+
+<div
+  class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+  data-product
+>
+  <div class="relative">
+    <img
+      class="aspect-square w-full object-cover"
+      src={image}
+      alt={alt}
+      data-alt={alt}
+    />
+  </div>
+  <div class="p-4 flex flex-col grow">
+    <h3
+      class="text-lg font-bold text-text-light dark:text-text-dark grow"
+      data-product-name
+    >
+      {name}
+    </h3>
+    <p class="mt-1 text-sm text-text-light/80 dark:text-text-dark/80">
+      {description}
+    </p>
+    <p class="mt-2 text-xl font-bold text-primary" data-product-price>
+      {price}
+    </p>
+    <div class="mt-4 flex flex-col gap-2">
+      <button
+        class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary/10 text-primary text-sm font-bold tracking-wide hover:bg-primary/20 transition-colors"
+        data-add-to-cart
+      >
+        Añadir al Carrito
+      </button>
+      <button
+        class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 border border-primary text-primary text-sm font-bold tracking-wide hover:bg-primary/10 transition-colors"
+      >
+        Ver más
+      </button>
+    </div>
+  </div>
+</div>

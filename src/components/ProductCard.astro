@@ -1,0 +1,31 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  image: string;
+}
+
+const { title, description, image } = Astro.props;
+---
+
+<div
+  class="flex h-full w-64 flex-shrink-0 flex-col gap-4 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700"
+>
+  <div
+    class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-t-lg"
+    data-alt={title}
+    style={`background-image: url('${image}');`}
+  >
+  </div>
+  <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
+    <div>
+      <p class="font-medium text-secondary dark:text-text-dark">{title}</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">{description}</p>
+    </div>
+    <button
+      class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary/10 text-primary text-sm font-bold tracking-wide hover:bg-primary/20 transition-colors"
+    >
+      <span class="truncate">Ver más</span>
+    </button>
+  </div>
+</div>

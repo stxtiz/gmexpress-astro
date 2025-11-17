@@ -1,0 +1,262 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ProductHeader from "../components/productos/ProductHeader.astro";
+import ProductFooter from "../components/productos/ProductFooter.astro";
+import CategoryFilter from "../components/productos/CategoryFilter.astro";
+import ProductGrid from "../components/productos/ProductGrid.astro";
+import Pagination from "../components/productos/Pagination.astro";
+import "../styles/global.css";
+---
+
+<Layout title="GMExpress - Descubre Nuestros Productos">
+  <div class="productos-page">
+    <ProductHeader />
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+      <!-- Título y Descripción -->
+      <div class="mb-8 text-center">
+        <p
+          class="text-4xl md:text-5xl font-black tracking-tighter text-text-light dark:text-white"
+        >
+          Descubre Nuestros Productos
+        </p>
+        <p
+          class="mt-2 text-text-light/80 dark:text-text-dark/80 max-w-2xl mx-auto"
+        >
+          Explora una deliciosa variedad de platos preparados con los
+          ingredientes más frescos.
+        </p>
+      </div>
+
+      <!-- Filtros de Categoría -->
+      <CategoryFilter />
+
+      <!-- Grid de Productos -->
+      <ProductGrid />
+
+      <!-- Paginación -->
+      <Pagination />
+    </main>
+
+    <!-- Mockup Carrito lateral -->
+    <div
+      id="cart-panel"
+      class="fixed inset-y-0 right-0 z-50 w-full max-w-md translate-x-full bg-background-light dark:bg-background-dark shadow-2xl border-l border-border-light dark:border-border-dark transition-transform duration-300 flex flex-col"
+    >
+      <div
+        class="flex items-center justify-between px-4 py-3 border-b border-border-light dark:border-border-dark"
+      >
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary"
+            >shopping_cart</span
+          >
+          <h2 class="text-lg font-bold text-text-light dark:text-text-dark">
+            Carrito
+          </h2>
+        </div>
+        <button
+          id="cart-close"
+          class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-card-light dark:hover:bg-card-dark"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div
+        id="cart-items"
+        class="flex-1 overflow-y-auto px-4 py-3 space-y-3 text-sm"
+      >
+        <!-- Items agregados por JS para mockup -->
+      </div>
+
+      <div
+        class="border-t border-border-light dark:border-border-dark px-4 py-4 space-y-2"
+      >
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-text-light/60 dark:text-text-dark/60"
+            >Subtotal</span
+          >
+          <span id="cart-subtotal" class="font-medium text-text-light/80 dark:text-text-dark/80">$0</span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-text-light/60 dark:text-text-dark/60"
+            >IVA (19%)</span
+          >
+          <span id="cart-iva" class="font-medium text-text-light/80 dark:text-text-dark/80">$0</span>
+        </div>
+        <div class="flex items-center justify-between text-sm pt-2 border-t border-border-light/50 dark:border-border-dark/50">
+          <span class="text-text-light dark:text-text-dark font-semibold"
+            >Total</span
+          >
+          <span id="cart-total" class="font-bold text-primary text-lg">$0</span>
+        </div>
+        <button
+          class="mt-2 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-secondary text-white text-sm font-bold tracking-wide hover:bg-secondary/90 transition-colors"
+        >
+          Ir al pago
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const cartPanel = document.getElementById("cart-panel");
+      const cartClose = document.getElementById("cart-close");
+      const cartItems = document.getElementById("cart-items");
+      const cartSubtotal = document.getElementById("cart-subtotal");
+      const cartIva = document.getElementById("cart-iva");
+      const cartTotal = document.getElementById("cart-total");
+
+      // Datos mockup del carrito
+      let mockCart = [];
+
+      const formatPrice = (value) => value.trim();
+
+      const openCart = () => {
+        cartPanel?.classList.add("translate-x-0");
+        cartPanel?.classList.remove("translate-x-full");
+      };
+
+      const closeCart = () => {
+        cartPanel?.classList.add("translate-x-full");
+        cartPanel?.classList.remove("translate-x-0");
+      };
+
+      const updateCartDisplay = () => {
+        if (!cartItems || !cartTotal || !cartSubtotal || !cartIva) return;
+
+        // Limpiar carrito
+        cartItems.innerHTML = "";
+
+        if (mockCart.length === 0) {
+          cartItems.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-8 text-center">
+              <span class="material-symbols-outlined text-6xl text-text-light/30 dark:text-text-dark/30">shopping_cart</span>
+              <p class="mt-3 text-sm text-text-light/60 dark:text-text-dark/60">Tu carrito está vacío</p>
+            </div>
+          `;
+          cartSubtotal.textContent = "$0";
+          cartIva.textContent = "$0";
+          cartTotal.textContent = "$0";
+          return;
+        }
+
+        // Renderizar items
+        mockCart.forEach((product, index) => {
+          const item = document.createElement("div");
+          item.className =
+            "flex items-start justify-between gap-2 rounded-lg bg-card-light dark:bg-card-dark px-3 py-2";
+          item.innerHTML = `
+            <div class="flex-1">
+              <p class="font-medium text-text-light dark:text-text-dark">${product.name}</p>
+              <p class="text-xs text-text-light/70 dark:text-text-dark/70">Cantidad: ${product.quantity}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-primary">${formatPrice(product.price)}</span>
+              <button 
+                data-remove-item="${index}"
+                class="text-text-light/50 dark:text-text-dark/50 hover:text-red-500 transition-colors"
+              >
+                <span class="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+          `;
+          cartItems.appendChild(item);
+        });
+
+        // Calcular subtotal
+        const subtotal = mockCart.reduce((sum, item) => {
+          const priceNum = parseFloat(item.price.replace(/[^0-9]/g, ""));
+          return sum + priceNum * item.quantity;
+        }, 0);
+        
+        // Calcular IVA (19%) y total
+        const iva = subtotal * 0.19;
+        const total = subtotal + iva;
+        
+        cartSubtotal.textContent = `$${subtotal.toLocaleString('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        cartIva.textContent = `$${iva.toLocaleString('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        cartTotal.textContent = `$${total.toLocaleString('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      };
+
+      // Evento para cerrar carrito
+      cartClose?.addEventListener("click", closeCart);
+
+      // Evento global para todos los clicks
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+
+        // Abrir carrito desde el botón del header
+        if (target.closest("[data-cart-toggle]")) {
+          openCart();
+          return;
+        }
+
+        // Remover item del carrito
+        const removeBtn = target.closest("[data-remove-item]");
+        if (removeBtn) {
+          const index = parseInt(removeBtn.getAttribute("data-remove-item") || "0");
+          mockCart.splice(index, 1);
+          updateCartDisplay();
+          return;
+        }
+
+        // Agregar al carrito
+        if (
+          target.closest("[data-add-to-cart]") &&
+          target.closest("[data-product]")
+        ) {
+          const card = target.closest("[data-product]");
+          const nameEl = card.querySelector("[data-product-name]");
+          const priceEl = card.querySelector("[data-product-price]");
+
+          const name = nameEl?.textContent ?? "Producto";
+          const price = priceEl?.textContent ?? "$0";
+
+          // Buscar si el producto ya existe
+          const existingIndex = mockCart.findIndex((item) => item.name === name);
+          
+          if (existingIndex >= 0) {
+            // Incrementar cantidad
+            mockCart[existingIndex].quantity += 1;
+          } else {
+            // Agregar nuevo producto
+            mockCart.push({
+              name,
+              price,
+              quantity: 1,
+            });
+          }
+
+          updateCartDisplay();
+          openCart();
+        }
+      });
+
+      // Inicializar carrito con productos de ejemplo (mockup)
+      mockCart = [
+        { name: "Hamburguesa Clásica", price: "$8.990", quantity: 2 },
+        { name: "Pizza Margarita", price: "$12.500", quantity: 1 },
+        { name: "Ensalada César", price: "$6.990", quantity: 1 },
+      ];
+      updateCartDisplay();
+    </script>
+
+    <ProductFooter />
+  </div>
+</Layout>
+
+<style>
+  :global(.productos-page) {
+    --primary-color: #8bc34a;
+    --secondary-color: #0a2342;
+    --background-light: #ffffff;
+    --background-dark: #0a2342;
+    --text-light: #0a2342;
+    --text-dark: #ffffff;
+    --card-light: #f7fafc;
+    --card-dark: #123456;
+    --border-light: #e2e8f0;
+    --border-dark: #2a4a6d;
+  }
+</style>

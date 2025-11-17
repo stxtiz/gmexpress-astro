@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/container-queries";
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap");
+
+:root {
+  --primary-color: #79c043;
+  --secondary-color: #1a2e3d;
+  --accent-color: #f39c12;
+  --background-light: #f8f9fa;
+  --background-dark: #101922;
+  --text-light: #333333;
+  --text-dark: #f8f9fa;
+  --card-light: #f7fafc;
+  --card-dark: #123456;
+  --border-light: #e2e8f0;
+  --border-dark: #2a4a6d;
+}
+
+@theme {
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
+  --color-accent: var(--accent-color);
+  --color-background-light: var(--background-light);
+  --color-background-dark: var(--background-dark);
+  --color-text-light: var(--text-light);
+  --color-text-dark: var(--text-dark);
+  --color-card-light: var(--card-light);
+  --color-card-dark: var(--card-dark);
+  --color-border-light: var(--border-light);
+  --color-border-dark: var(--border-dark);
+  --font-family-display: Inter, sans-serif;
+  --radius-default: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+@keyframes scroll {
+  to {
+    transform: translate(calc(-50% - 0.75rem));
+  }
+}
+
+@layer utilities {
+  .animate-scroll {
+    animation: scroll 40s linear infinite;
+  }
+}

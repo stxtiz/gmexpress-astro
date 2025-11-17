@@ -1,0 +1,25 @@
+---
+const categories = [
+  { name: "Todos", active: true },
+  { name: "Platos Principales", active: false },
+  { name: "Bebidas", active: false },
+  { name: "Postres", active: false },
+  { name: "Aperitivos", active: false },
+];
+---
+
+<div class="mb-8 flex items-center justify-center flex-wrap gap-2">
+  {
+    categories.map((category) => (
+      <button
+        class={
+          category.active
+            ? "flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary pl-4 pr-4 text-white"
+            : "flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-light dark:bg-card-dark pl-4 pr-4 border border-border-light dark:border-border-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary/50 text-text-light dark:text-text-dark"
+        }
+      >
+        <p class="text-sm font-medium">{category.name}</p>
+      </button>
+    ))
+  }
+</div>
