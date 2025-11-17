@@ -2,242 +2,176 @@
 <html class="light" lang="es"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>GMExpress - Descubre Nuestros Productos</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<title>GMExpress - Servicios de Alimentación</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <style type="text/tailwindcss">
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        :root {
-            --primary: #8bc34a;--secondary: #0a2342;--background-light: #ffffff;--background-dark: #0a2342;
-            --text-light: #0a2342;
-            --text-dark: #ffffff;
-            --card-light: #f7fafc;
-            --card-dark: #123456;
-            --border-light: #e2e8f0;
-            --border-dark: #2a4a6d;
-        }
-    </style>
-<script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "primary": "var(--primary)",
-              "secondary": "var(--secondary)",
-              "background-light": "var(--background-light)",
-              "background-dark": "var(--background-dark)",
-              "text-light": "var(--text-light)",
-              "text-dark": "var(--text-dark)",
-              "card-light": "var(--card-light)",
-              "card-dark": "var(--card-dark)",
-              "border-light": "var(--border-light)",
-              "border-dark": "var(--border-dark)",
-            },
-            fontFamily: {
-              "display": ["Inter", "sans-serif"]
-            },
-            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
-          },
-        },
+    @layer utilities {
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
       }
-    </script>
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#4CAF50",
+            "primary-dark": "#0B192E",
+            "background-light": "#FFFFFF",
+            "background-dark": "#0B192E",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
-<div class="relative flex h-auto min-h-screen w-full flex-col">
-<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-border-light dark:border-border-dark">
-<div class="container mx-auto px-4">
-<div class="flex h-20 items-center justify-between">
-<div class="flex items-center gap-8">
-<a class="flex items-center gap-2 text-text-light dark:text-text-dark" href="#">
-<img alt="GMExpress Logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHPhkX6YiLj4GxfSai9gy5BXQgZgKrzqEgOFI6EDlQZoUjkxEfMdc9WArGBBlPwGxDxrYLpBBjwJy3Z4iWQOSiOM7YnkkSDN2h51GLKx1En5wvwpe4qwJdZMTMe2bDjiBnpdNVQmzJFi3PQ9gjz_9Sl0swolF8ravFFhD1i9-Hanx-sVs15vty_4-ozTwFubGcxN6qB4T1qedxm1YZ0cBX_dBlpb4rXxfWStHl8a_sQ3cGR0ImG5xm_xBFXFEZoNF8H7Xy8tXJRWk"/>
-</a>
-<nav class="hidden md:flex items-center gap-6">
-<a class="text-sm font-medium hover:text-primary" href="#">Categorías</a>
-<a class="text-sm font-medium hover:text-primary" href="#">Ofertas</a>
-<a class="text-sm font-medium hover:text-primary" href="#">Sobre Nosotros</a>
-</nav>
+<body class="bg-background-light dark:bg-background-dark font-display text-primary-dark dark:text-slate-300">
+<div class="relative flex min-h-screen w-full flex-col">
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-sm px-4 sm:px-10 py-3">
+<div class="flex items-center gap-2 text-primary-dark dark:text-slate-50">
+<img alt="GMExpress Logo" class="h-14 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-bb5W-KAsMHPLBbhZMUVNQJuZLWlbYObkHBtHPhL8_dNwicMW4zuBOT5fNuY9XbgClQqiibuUlKRb6500ZZfFpEzEqCGjXqxmniPfauskVvkLESb2p3iLMnlb2yBx5uQPQHavsYJgPILIMiGzc7XoU3Xg6fZktgo09tklg9aNlZZ4dxM7bmmOwfwZcTwsiSNk4NdRblhfJ6NUQ9huQcoFVQYV5E3tMpwRetc_sKidecDKdhUaUPEqkU_ZPTNgDayOGR-XnBjjDhs"/>
 </div>
-<div class="flex flex-1 justify-end gap-3 items-center">
-<div class="hidden sm:flex relative max-w-xs w-full">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-light/60 dark:text-text-dark/60">search</span>
-<input class="form-input w-full rounded-full border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark h-10 pl-10 pr-4 placeholder:text-text-light/60 dark:placeholder:text-text-dark/60 focus:ring-primary focus:border-primary text-sm" placeholder="Buscar productos..." type="search"/>
+<div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<div class="flex items-center gap-9">
+<a class="text-primary-dark dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#">Inicio</a>
+<a class="text-primary text-sm font-bold leading-normal" href="#">Servicios</a>
+<a class="text-primary-dark dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#">Nosotros</a>
+<a class="text-primary-dark dark:text-slate-300 text-sm font-medium leading-normal hover:text-primary dark:hover:text-primary" href="#">Contacto</a>
 </div>
-<button class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-card-light dark:bg-card-dark hover:bg-gray-200 dark:hover:bg-gray-700 border border-border-light dark:border-border-dark">
-<span class="material-symbols-outlined text-text-light dark:text-text-dark">shopping_cart</span>
-</button>
-<button class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-card-light dark:bg-card-dark hover:bg-gray-200 dark:hover:bg-gray-700 border border-border-light dark:border-border-dark">
-<span class="material-symbols-outlined text-text-light dark:text-text-dark">person</span>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+<span class="truncate">Solicitar Cotización</span>
 </button>
 </div>
-</div>
-</div>
+<button class="md:hidden text-primary-dark dark:text-slate-50">
+<span class="material-symbols-outlined">menu</span>
+</button>
 </header>
-<main class="container mx-auto px-4 py-8 md:py-12">
-<div class="mb-8 text-center">
-<p class="text-4xl md:text-5xl font-black tracking-tighter text-secondary dark:text-white">Descubre Nuestros Productos</p>
-<p class="mt-2 text-text-light/80 dark:text-text-dark/80 max-w-2xl mx-auto">Explora una deliciosa variedad de platos preparados con los ingredientes más frescos.</p>
+<main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+<div class="flex flex-col gap-3 p-4 text-center mb-10">
+<h1 class="text-primary-dark dark:text-slate-100 text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">Descubre Nuestras Soluciones Gastronómicas</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg font-normal leading-normal max-w-3xl mx-auto">Ofrecemos una variedad de servicios de alimentación diseñados para satisfacer las necesidades de su empresa, garantizando calidad y frescura en cada plato.</p>
 </div>
-<div class="mb-8 flex items-center justify-center flex-wrap gap-2">
-<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary pl-4 pr-4 text-white">
-<p class="text-sm font-medium">Todos</p>
-</button>
-<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-light dark:bg-card-dark pl-4 pr-4 border border-border-light dark:border-border-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary/50 text-text-light dark:text-text-dark">
-<p class="text-sm font-medium">Platos Principales</p>
-</button>
-<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-light dark:bg-card-dark pl-4 pr-4 border border-border-light dark:border-border-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary/50 text-text-light dark:text-text-dark">
-<p class="text-sm font-medium">Bebidas</p>
-</button>
-<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-light dark:bg-card-dark pl-4 pr-4 border border-border-light dark:border-border-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary/50 text-text-light dark:text-text-dark">
-<p class="text-sm font-medium">Postres</p>
-</button>
-<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-light dark:bg-card-dark pl-4 pr-4 border border-border-light dark:border-border-dark hover:bg-primary/10 dark:hover:bg-primary/20 hover:border-primary/50 text-text-light dark:text-text-dark">
-<p class="text-sm font-medium">Aperitivos</p>
-</button>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-<div class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-<div class="relative">
-<img class="aspect-square w-full object-cover" data-alt="Una pizza de pepperoni recién horneada sobre una tabla de madera." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKRSPegdsLOAqm9hXTzYusgTjcdhnbeY4a2__9WuU4QTNHNWiFF8bmF8XfJuJtNlFxaCV3RiMLSiyR1VQSMxWxBs4NAEu_VS4SZwbAKAu0dbkCw1UcQTNowZV9u76oXnu4BI4vRu_wwoUW-ktbrv-YHq0JHze9TqiEFtbmimU3c8A6KRelU2bXDIzP6aPImEcPlYwPNMq0EpyVa0aLp49zZq8ore8iUxJi3shMq5BGTHYdslpv302QG4DRBb1-2z3qZmNeJSQxq9Y"/>
-</div>
-<div class="p-4 flex flex-col flex-grow">
-<h3 class="text-lg font-bold text-text-light dark:text-text-dark flex-grow">Pizza Suprema de la Casa</h3>
-<p class="mt-2 text-xl font-bold text-primary">14,99€</p>
-<button class="mt-4 flex w-full h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-white transition-colors hover:bg-secondary/90">Añadir al Carrito</button>
-</div>
-</div>
-<div class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-<div class="relative">
-<img class="aspect-square w-full object-cover" data-alt="Una ensalada fresca y colorida en un bol blanco." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIKNIod8GIjMemYogpUEaEPhubH1QJ4LgjN91_2LCnc5v_5Fjb4Ad129_i7lpzy3rhyljKawUvZ0VK3u07lPmO-FI_un3sqUnZmWAY0JBrzkwHdLDMUz1R2yAx1Oaa73-kcr-fn7nqWTWXiw8ssSe5T6wxzXIrB5BA0PLbkEs6ailr__GPPwixgz0ObduYTfPOJigntgbPfuP7Ub1maJ0FxjDCBFkOv5FWDoFOwLyTHOMvyJyqzntltPPT6FMMrIJp53PtwqJw3I4"/>
-</div>
-<div class="p-4 flex flex-col flex-grow">
-<h3 class="text-lg font-bold text-text-light dark:text-text-dark flex-grow">Ensalada Fresca</h3>
-<p class="mt-2 text-xl font-bold text-primary">8,50€</p>
-<button class="mt-4 flex w-full h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-white transition-colors hover:bg-secondary/90">Añadir al Carrito</button>
-</div>
-</div>
-<div class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-<div class="relative">
-<img class="aspect-square w-full object-cover" data-alt="Pizza vegetariana con muchos toppings." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApvlk8YkSynUsEDVSbQmWG_GwwHObdS_8VNf2e-KQdhX_5Wfi7kQxeP2C0PhvJNECiH7lVozJphaNYa7L-SSZIXQyljW6O79pM6NYEVeNiWHHNVqR-XKug-sLx9rHSmDbx8dKij4acooZjrm2zACH200DxqO1YSNJYjT2lp6bnTfJ-ZZ4c9DAn2NGk9tnyGVaNRXk6XIhVgvjsMo82uCHUCT_a-K8YLoKT13eV_WPY3sRHMs4QOJ0bObb758Odal1PpmfafHALyeM"/>
-</div>
-<div class="p-4 flex flex-col flex-grow">
-<h3 class="text-lg font-bold text-text-light dark:text-text-dark flex-grow">Pizza Vegetariana</h3>
-<p class="mt-2 text-xl font-bold text-primary">12,99€</p>
-<button class="mt-4 flex w-full h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-white transition-colors hover:bg-secondary/90">Añadir al Carrito</button>
-</div>
-</div>
-<div class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-<div class="relative">
-<img class="aspect-square w-full object-cover" data-alt="Tres cócteles coloridos en copas." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD7vL8Y2meqGRonlma8xaCrq6lpx0CNUNU5CXjAYxTlb-Mx9HiYDmztQJbQiB5z7JXpUFQJ3oTUDaA__2egYSznxNVLlhWdbAsFUzadHlVBdozIt9Y0yqXmniAfAwTCsHF3UIFUvhnu5uAn7DFpUnDBm9ne6OAnTjD7nithUyfysrMYKbB0WFLYF7p3-sspvZTA7j4PtTB_j2K3yh6zau_fmPET-olIiOojN2rLv-UNRl_BBS3K0e7HybF7RsH_2spfFif-tqHV60"/>
-</div>
-<div class="p-4 flex flex-col flex-grow">
-<h3 class="text-lg font-bold text-text-light dark:text-text-dark flex-grow">Cócteles Tropicales</h3>
-<p class="mt-2 text-xl font-bold text-primary">7,00€</p>
-<button class="mt-4 flex w-full h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-white transition-colors hover:bg-secondary/90">Añadir al Carrito</button>
-</div>
-</div>
-<div class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-<div class="relative">
-<img class="aspect-square w-full object-cover" data-alt="Tostada con aguacate y huevo pochado." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV1_qHHpu2esAkmFv_2xs-_Yd7S-wKXyKU8t9-w0nOjpSFrhbkVKk-obCgYcTTEhLQ5V195zO41CQ9S6mISawTpdEbVMCOw2sTu6uDBrqGkc9WnfrP2lynqrk71mt7lmN5lS76CfWjGiSokQTjvH_sWMU_qTTVRYhxUAdWXXbrTjXf_ogX9DOjpx0t92eSqRREpro-4nlPF8IN0ytngNDjSN7GR5zu1RoJKYFapjgBy-TdK0gi7uOeAl8wBBIWfaF3Imjfsa6G-iM"/>
-</div>
-<div class="p-4 flex flex-col flex-grow">
-<h3 class="text-lg font-bold text-text-light dark:text-text-dark flex-grow">Tostada de Aguacate</h3>
-<p class="mt-2 text-xl font-bold text-primary">6,50€</p>
-<button class="mt-4 flex w-full h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-white transition-colors hover:bg-secondary/90">Añadir al Carrito</button>
-</div>
-</div>
-<div class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-<div class="relative">
-<img class="aspect-square w-full object-cover" data-alt="Pancakes con sirope y frutas." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEnZpiuC7bYj6XQzUhHf_SjoL_g83S49Vc-jRbyChfCPEtpKXOAg6zTmQZQJYskuGSxEe0PIcrOnnEkEDLQAqxdgo-FANrS_fPfB9pWFB2f6c-qGyLqZSbnIT0vlXzGKS2g72XsV5TOzKpnHXMq0MmxpqaS7KQGmwQ6ZG2jImlVBzbk_a5gZwHHTLzCfcsKtzVMNRYLUO7dLK55KzQ99y9opH4QWeB9G_GIsinbRqqBrvKgSIqC3TvSqgeiEKLG-QPqZmbIy3ueg4"/>
-</div>
-<div class="p-4 flex flex-col flex-grow">
-<h3 class="text-lg font-bold text-text-light dark:text-text-dark flex-grow">Pancakes con Frutas</h3>
-<p class="mt-2 text-xl font-bold text-primary">9,00€</p>
-<button class="mt-4 flex w-full h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-white transition-colors hover:bg-secondary/90">Añadir al Carrito</button>
-</div>
-</div>
-<div class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-<div class="relative">
-<img class="aspect-square w-full object-cover" data-alt="Pollo a la parrilla con espárragos y limón." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwswJce_0QCIAcq4zljCeoj8dBaoJsvtBnHIjinniLa3nSK_VYiVegOLv9K5pBFsZheQ0zgF-u94VVfZFrYPGjhdF0VeETUD4QWlJifxlNJM9MFT-rRKJ1OQtzI6lnnhhs1jTAZBVP1zTHEoni9VxmenoQN1Fq3dRp0pw9R0rJ5MadvCXM0yktmCOsN3Tod_IpxG1XRjQkyHF3k2LpzbPj2UdSCLTEiySxrgqWT8UTNkT563yzHD69yUkmqgwTqntA1DE3g_QeX6w"/>
-</div>
-<div class="p-4 flex flex-col flex-grow">
-<h3 class="text-lg font-bold text-text-light dark:text-text-dark flex-grow">Pollo a la Parrilla</h3>
-<p class="mt-2 text-xl font-bold text-primary">13,50€</p>
-<button class="mt-4 flex w-full h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-white transition-colors hover:bg-secondary/90">Añadir al Carrito</button>
-</div>
-</div>
-<div class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-<div class="relative">
-<img class="aspect-square w-full object-cover" data-alt="Una pizza de primer plano con diversos ingredientes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApWD6UDTvsXKCvb3jqFHObvUNiXuyc0Kug8kmexFnMdcaOiriPPrV0GovOM_Cu1_sS9pz5hA6VpxfYjglkVga65eB2bR9sDAOzsLVNrnNLK5oV9gpTKkwBkG_DRZJrICwDk25DhSZ-deICzF1Ux6qS9EIspFiWFKXhKC3wCkx87C13XrXyfzs4AKGqRPipCpj_E0s6NgOcIYMiD3O0mISANi_At22GrlWYqAgVoOVyzddY38dZybj0TR0f6AC_nXpiZh5IizJQzfY"/>
-</div>
-<div class="p-4 flex flex-col flex-grow">
-<h3 class="text-lg font-bold text-text-light dark:text-text-dark flex-grow">Pizza Champiñones</h3>
-<p class="mt-2 text-xl font-bold text-primary">12,00€</p>
-<button class="mt-4 flex w-full h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-white transition-colors hover:bg-secondary/90">Añadir al Carrito</button>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="flex flex-col bg-white dark:bg-primary-dark/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+<img alt="Buffet de comida fresca y variada en un evento corporativo" class="w-full h-48 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3WUQgtkQyfHGM2m7aYiHvRAMq3sOvwxP9jbae4xpu232r8iNNaFQuQUZdTSbPwwP2Kmxqo8CvE6y92vttsVfGUmrjY4Kn9I_5qUypSG8C3HVDzTbe-JikuWSmbuC6WwWrbpcunQGk7Dl2A_pNTsrTZUENMJ1kHFLWFHlm9FoTlVksmhGdA_qFEUyJ_uqZiPkbHllQ5C1wz-WHw1xctaFhhWxu4Nx40f41x953OndK0ZOj8Yo6QBWM04VoIh0tRRLQzbzPA_TdjMI"/>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="text-xl font-bold text-primary-dark dark:text-slate-100 mb-2">Catering para Eventos</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm mb-6 flex-grow">Impresiona a tus clientes y colaboradores con menús personalizados para reuniones, conferencias y celebraciones.</p>
+<div class="mt-auto flex gap-3">
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 border border-slate-300 dark:border-slate-700 bg-transparent text-primary-dark dark:text-slate-200 text-sm font-medium leading-normal hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Ver Detalles</button>
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">Cotizar</button>
 </div>
 </div>
 </div>
-<div class="mt-12 flex items-center justify-center">
-<nav aria-label="Pagination" class="flex items-center gap-2">
-<a class="flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700" href="#">
-<span class="material-symbols-outlined">chevron_left</span>
+<div class="flex flex-col bg-white dark:bg-primary-dark/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+<img alt="Interior de una cafetería moderna y luminosa dentro de una oficina" class="w-full h-48 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5LRBNZC9Jv30Busb5QVxNHp0nF56ap7ejvCuO6Xn-PSK11z6-ptdyY9gL1SA-pGuAOeKbEQ7wuhJl_hZOqKPjggaoVVhtHicvOy6Nt_oBLmXcYQR2PAmAum5MRz84yyzg0dIqKtjZwfscdEVvd5iIMtAcZKULST3TGCf7YdQEdxi_9tCp0OI8lMBEqLfF9hJI6Mn_SIXLOKxCUmuTLsjk0bapf2uzz8w6pSSDURsW8Yw887vj9lQwNVAwMg7VG7BEJ8RkQiuVZHc"/>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="text-xl font-bold text-primary-dark dark:text-slate-100 mb-2">Servicio de Cafetería</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm mb-6 flex-grow">Gestionamos la cafetería de tu empresa con opciones frescas y variadas para el día a día.</p>
+<div class="mt-auto flex gap-3">
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 border border-slate-300 dark:border-slate-700 bg-transparent text-primary-dark dark:text-slate-200 text-sm font-medium leading-normal hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Ver Detalles</button>
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">Cotizar</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-white dark:bg-primary-dark/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+<img alt="Vista aérea de un gran comedor industrial limpio y organizado con empleados comiendo." class="w-full h-48 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkhgeKBHctg-C5RhQTxI_F-bv3B7e6G3-hLRZ4hRmA9rw88Y_pqVQCR6pUYwBkO7X1YHdkeThl0EijF1sNKVpPF8AkfKrZr4M8KxqNoJugBLoiQfSamIuSbnamewyVZbTqCA9kEP3kt3LkpifoTa8bBooegW4O5w-J5PVNxnIkQxpqBN7kGsI_fh6uX0jzTIaK-VnMZlsDCwiaQdX6WCklJidgz1D6BBnyvgzJLg3ykrpAtpy7XbnpxjttcyaZ_N4cIVa83o8N7LQ"/>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="text-xl font-bold text-primary-dark dark:text-slate-100 mb-2">Comedores Industriales</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm mb-6 flex-grow">Servicio integral de alimentación para grandes volúmenes de personal, con altos estándares de calidad.</p>
+<div class="mt-auto flex gap-3">
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 border border-slate-300 dark:border-slate-700 bg-transparent text-primary-dark dark:text-slate-200 text-sm font-medium leading-normal hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Ver Detalles</button>
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">Cotizar</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-white dark:bg-primary-dark/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+<div class="w-full h-48 bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB3WUQgtkQyfHGM2m7aYiHvRAMq3sOvwxP9jbae4xpu232r8iNNaFQuQUZdTSbPwwP2Kmxqo8CvE6y92vttsVfGUmrjY4Kn9I_5qUypSG8C3HVDzTbe-JikuWSmbuC6WwWrbpcunQGk7Dl2A_pNTsrTZUENMJ1kHFLWFHlm9FoTlVksmhGdA_qFEUyJ_uqZiPkbHllQ5C1wz-WHw1xctaFhhWxu4Nx40f41x953OndK0ZOj8Yo6QBWM04VoIh0tRRLQzbzPA_TdjMI");'></div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="text-xl font-bold text-primary-dark dark:text-slate-100 mb-2">Almuerzos Ejecutivos</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm mb-4 flex-grow">Menús balanceados y deliciosos entregados directamente en tu oficina para optimizar el tiempo de tu equipo.</p>
+<div class="mb-4">
+<span class="text-2xl font-bold text-primary-dark dark:text-slate-100">$12.50</span>
+<span class="text-sm text-slate-500 dark:text-slate-400">/ por almuerzo</span>
+</div>
+<div class="flex gap-3">
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 border border-slate-300 dark:border-slate-700 bg-transparent text-primary-dark dark:text-slate-200 text-sm font-medium leading-normal hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Ver Detalles</button>
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">Comprar</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-white dark:bg-primary-dark/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+<img alt="Variedad de snacks y bebidas en una máquina expendedora moderna." class="w-full h-48 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArVGQahfCVO26I6NHR_BNOk2NPojE1FcAQ0nXGNK7HzeB6XScKBpvB2eGuIhskADIsIq8zxcbshf-99BKS84CYFx_6Te0CpBiltpS1QfJe20BBaUBZh4YasI0EtYJudPCD_ZPJDGaoyNTky1UpERl0HPFOpVCIcdgceK9M7wBEz5fz82HiOFfGJGOqQupR6I8z27Po1s9RgKB6YYp0OUzzxeOOomUWpbBVmEGc7bDhJ53HqxqDRZp8TF0fax1UwJ3N59DL40PKMHE"/>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="text-xl font-bold text-primary-dark dark:text-slate-100 mb-2">Vending Machines</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm mb-4 flex-grow">Máquinas expendedoras con opciones saludables y snacks variados para tu equipo, disponibles 24/7.</p>
+<div class="mb-4">
+<span class="text-lg font-bold text-primary-dark dark:text-slate-100">Desde $1.50</span>
+<span class="text-sm text-slate-500 dark:text-slate-400">/ producto</span>
+</div>
+<div class="flex gap-3">
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 border border-slate-300 dark:border-slate-700 bg-transparent text-primary-dark dark:text-slate-200 text-sm font-medium leading-normal hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Ver Detalles</button>
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">Comprar</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-white dark:bg-primary-dark/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+<img alt="Cafetería corporativa" class="w-full h-48 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5LRBNZC9Jv30Busb5QVxNHp0nF56ap7ejvCuO6Xn-PSK11z6-ptdyY9gL1SA-pGuAOeKbEQ7wuhJl_hZOqKPjggaoVVhtHicvOy6Nt_oBLmXcYQR2PAmAum5MRz84yyzg0dIqKtjZwfscdEVvd5iIMtAcZKULST3TGCf7YdQEdxi_9tCp0OI8lMBEqLfF9hJI6Mn_SIXLOKxCUmuTLsjk0bapf2uzz8w6pSSDURsW8Yw887vj9lQwNVAwMg7VG7BEJ8RkQiuVZHc"/>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="text-xl font-bold text-primary-dark dark:text-slate-100 mb-2">Asesoría Gastronómica</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm mb-6 flex-grow">Te ayudamos a diseñar y optimizar tus servicios de alimentación para mejorar la experiencia de tus empleados.</p>
+<div class="mt-auto flex gap-3">
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 border border-slate-300 dark:border-slate-700 bg-transparent text-primary-dark dark:text-slate-200 text-sm font-medium leading-normal hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Ver Detalles</button>
+<button class="w-full flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">Cotizar</button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center p-4 mt-16">
+<nav class="flex items-center gap-2">
+<a class="flex size-10 items-center justify-center text-slate-500 dark:text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
 </a>
-<a aria-current="page" class="text-sm font-bold flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white" href="#">1</a>
-<a class="text-sm font-medium flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700" href="#">2</a>
-<a class="text-sm font-medium flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700" href="#">3</a>
-<span class="text-sm flex h-10 w-10 items-center justify-center text-text-light/70 dark:text-text-dark/70">...</span>
-<a class="text-sm font-medium flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700" href="#">10</a>
-<a class="flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700" href="#">
-<span class="material-symbols-outlined">chevron_right</span>
+<a class="text-sm font-bold leading-normal flex size-10 items-center justify-center text-white rounded-lg bg-primary" href="#">1</a>
+<a class="text-sm font-medium leading-normal flex size-10 items-center justify-center text-primary-dark dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">2</a>
+<a class="text-sm font-medium leading-normal flex size-10 items-center justify-center text-primary-dark dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">3</a>
+<span class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-slate-500 dark:text-slate-400 rounded-lg">...</span>
+<a class="flex size-10 items-center justify-center text-slate-500 dark:text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
 </a>
 </nav>
 </div>
 </main>
-<footer class="bg-secondary dark:bg-secondary mt-16 border-t border-border-light dark:border-border-dark">
-<div class="container mx-auto px-4 py-8">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left text-white/90">
-<div>
-<h3 class="font-bold text-lg mb-2 text-white">GMExpress</h3>
-<p class="text-sm text-white/80">Tu comida favorita, entregada rápidamente.</p>
+<footer class="flex flex-col gap-8 px-5 py-10 text-center bg-slate-50 dark:bg-primary-dark/50 border-t border-slate-200 dark:border-slate-800 mt-16">
+<div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+<a class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal hover:text-primary dark:hover:text-primary transition-colors" href="#">Términos de Servicio</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal hover:text-primary dark:hover:text-primary transition-colors" href="#">Política de Privacidad</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal hover:text-primary dark:hover:text-primary transition-colors" href="#">Contacto</a>
 </div>
-<div>
-<h4 class="font-semibold mb-2 text-white">Compañía</h4>
-<ul class="space-y-1 text-sm text-white/80">
-<li><a class="hover:text-primary" href="#">Sobre Nosotros</a></li>
-<li><a class="hover:text-primary" href="#">Blog</a></li>
-<li><a class="hover:text-primary" href="#">Carreras</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-semibold mb-2 text-white">Ayuda</h4>
-<ul class="space-y-1 text-sm text-white/80">
-<li><a class="hover:text-primary" href="#">Contacto</a></li>
-<li><a class="hover:text-primary" href="#">Preguntas Frecuentes</a></li>
-<li><a class="hover:text-primary" href="#">Términos de Servicio</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-semibold mb-2 text-white">Síguenos</h4>
-<div class="flex justify-center md:justify-start gap-4">
-<a class="text-white/80 hover:text-primary" href="#">
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">
 <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path></svg>
 </a>
-<a class="text-white/80 hover:text-primary" href="#">
-<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.155 0 2.748-.012 3.088-.06 4.155-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.155.06-2.748 0-3.088-.012-4.155-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.067-.06-1.407-.06-4.155 0-2.748.012 3.088.06-4.155.049 1.064.218 1.791.465 2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 013.45 2.525c.636-.247 1.363-.416 2.427-.465C7.135 2.013 7.48 2 9.915 2h2.4zm-2.4 4.593a6.098 6.098 0 100 12.196 6.098 6.098 0 000-12.196zM12 15.338a3.338 3.338 0 110-6.676 3.338 3.338 0 010 6.676zm5.338-9.87a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z" fill-rule="evenodd"></path></svg>
 </a>
-<a class="text-white/80 hover:text-primary" href="#">
-<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M12.315 2c2.43 0 2.784.011 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.012-3.808-.06c-1.064-.049-1.791.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.345 2.525c.636-.247 1.363-.416 2.427-.465C9.795 2.01 10.148 2 12.315 2zm-1.163 1.943c-1.042.045-1.696.2-2.19.406a2.973 2.973 0 00-1.258.85 2.973 2.973 0 00-.85 1.258c-.206.494-.36 1.148-.406 2.19-.045 1.021-.057 1.348-.057 3.682s.012 2.661.057 3.682c.046.046 1.148.36 2.19.406a2.973 2.973 0 001.258.85 2.973 2.973 0 00.85 1.258c.494.206 1.148.36 2.19.406 1.021.045 1.348.057 3.682.057s2.661-.012 3.682-.057c1.042-.046 1.696-.2 2.19-.406a2.973 2.973 0 001.258-.85 2.973 2.973 0 00.85-1.258c.206-.494.36-1.148.406-2.19.045-1.021.057-1.348.057-3.682s-.012-2.661-.057-3.682c-.046-1.042-.2-1.696-.406-2.19a2.973 2.973 0 00-.85-1.258 2.973 2.973 0 00-1.258-.85c-.494-.206-1.148-.36-2.19-.406-1.021-.045-1.348-.057-3.682-.057s-2.661.012-3.682.057zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 1.943a3.192 3.192 0 110 6.384 3.192 3.192 0 010-6.384zM16.965 6.575a1.232 1.232 0 11-2.464 0 1.232 1.232 0 012.464 0z" fill-rule="evenodd"></path></svg>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
 </a>
 </div>
-</div>
-</div>
-<div class="mt-8 border-t border-white/20 pt-6 text-center text-sm text-white/60">
-<p>© 2024 GMExpress. Todos los derechos reservados.</p>
-</div>
-</div>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">© 2024 GMExpress. Todos los derechos reservados.</p>
 </footer>
 </div>
+
 </body></html>

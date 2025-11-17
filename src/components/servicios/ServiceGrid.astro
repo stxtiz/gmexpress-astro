@@ -1,0 +1,80 @@
+---
+import ServiceCard from "./ServiceCard.astro";
+
+const servicios = [
+  {
+    name: "Catering para Eventos",
+    description:
+      "Impresiona a tus clientes y colaboradores con menús personalizados para reuniones, conferencias y celebraciones.",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuB3WUQgtkQyfHGM2m7aYiHvRAMq3sOvwxP9jbae4xpu232r8iNNaFQuQUZdTSbPwwP2Kmxqo8CvE6y92vttsVfGUmrjY4Kn9I_5qUypSG8C3HVDzTbe-JikuWSmbuC6WwWrbpcunQGk7Dl2A_pNTsrTZUENMJ1kHFLWFHlm9FoTlVksmhGdA_qFEUyJ_uqZiPkbHllQ5C1wz-WHw1xctaFhhWxu4Nx40f41x953OndK0ZOj8Yo6QBWM04VoIh0tRRLQzbzPA_TdjMI",
+    alt: "Buffet de comida fresca y variada en un evento corporativo",
+    hasPrice: false,
+  },
+  {
+    name: "Servicio de Cafetería",
+    description:
+      "Gestionamos la cafetería de tu empresa con opciones frescas y variadas para el día a día.",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD5LRBNZC9Jv30Busb5QVxNHp0nF56ap7ejvCuO6Xn-PSK11z6-ptdyY9gL1SA-pGuAOeKbEQ7wuhJl_hZOqKPjggaoVVhtHicvOy6Nt_oBLmXcYQR2PAmAum5MRz84yyzg0dIqKtjZwfscdEVvd5iIMtAcZKULST3TGCf7YdQEdxi_9tCp0OI8lMBEqLfF9hJI6Mn_SIXLOKxCUmuTLsjk0bapf2uzz8w6pSSDURsW8Yw887vj9lQwNVAwMg7VG7BEJ8RkQiuVZHc",
+    alt: "Interior de una cafetería moderna y luminosa dentro de una oficina",
+    hasPrice: false,
+  },
+  {
+    name: "Comedores Industriales",
+    description:
+      "Servicio integral de alimentación para grandes volúmenes de personal, con altos estándares de calidad.",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuCkhgeKBHctg-C5RhQTxI_F-bv3B7e6G3-hLRZ4hRmA9rw88Y_pqVQCR6pUYwBkO7X1YHdkeThl0EijF1sNKVpPF8AkfKrZr4M8KxqNoJugBLoiQfSamIuSbnamewyVZbTqCA9kEP3kt3LkpifoTa8bBooegW4O5w-J5PVNxnIkQxpqBN7kGsI_fh6uX0jzTIaK-VnMZlsDCwiaQdX6WCklJidgz1D6BBnyvgzJLg3ykrpAtpy7XbnpxjttcyaZ_N4cIVa83o8N7LQ",
+    alt: "Vista aérea de un gran comedor industrial limpio y organizado con empleados comiendo",
+    hasPrice: false,
+  },
+  {
+    name: "Almuerzos Ejecutivos",
+    description:
+      "Menús balanceados y deliciosos entregados directamente en tu oficina para optimizar el tiempo de tu equipo.",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuB3WUQgtkQyfHGM2m7aYiHvRAMq3sOvwxP9jbae4xpu232r8iNNaFQuQUZdTSbPwwP2Kmxqo8CvE6y92vttsVfGUmrjY4Kn9I_5qUypSG8C3HVDzTbe-JikuWSmbuC6WwWrbpcunQGk7Dl2A_pNTsrTZUENMJ1kHFLWFHlm9FoTlVksmhGdA_qFEUyJ_uqZiPkbHllQ5C1wz-WHw1xctaFhhWxu4Nx40f41x953OndK0ZOj8Yo6QBWM04VoIh0tRRLQzbzPA_TdjMI",
+    alt: "Almuerzo ejecutivo balanceado",
+    price: "$12.500",
+    priceLabel: "/ por almuerzo",
+    hasPrice: true,
+  },
+  {
+    name: "Vending Machines",
+    description:
+      "Máquinas expendedoras con opciones saludables y snacks variados para tu equipo, disponibles 24/7.",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuArVGQahfCVO26I6NHR_BNOk2NPojE1FcAQ0nXGNK7HzeB6XScKBpvB2eGuIhskADIsIq8zxcbshf-99BKS84CYFx_6Te0CpBiltpS1QfJe20BBaUBZh4YasI0EtYJudPCD_ZPJDGaoyNTky1UpERl0HPFOpVCIcdgceK9M7wBEz5fz82HiOFfGJGOqQupR6I8z27Po1s9RgKB6YYp0OUzzxeOOomUWpbBVmEGc7bDhJ53HqxqDRZp8TF0fax1UwJ3N59DL40PKMHE",
+    alt: "Variedad de snacks y bebidas en una máquina expendedora moderna",
+    price: "$1.500",
+    priceLabel: "/ producto",
+    hasPrice: true,
+  },
+  {
+    name: "Asesoría Gastronómica",
+    description:
+      "Te ayudamos a diseñar y optimizar tus servicios de alimentación para mejorar la experiencia de tus empleados.",
+    image:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuD5LRBNZC9Jv30Busb5QVxNHp0nF56ap7ejvCuO6Xn-PSK11z6-ptdyY9gL1SA-pGuAOeKbEQ7wuhJl_hZOqKPjggaoVVhtHicvOy6Nt_oBLmXcYQR2PAmAum5MRz84yyzg0dIqKtjZwfscdEVvd5iIMtAcZKULST3TGCf7YdQEdxi_9tCp0OI8lMBEqLfF9hJI6Mn_SIXLOKxCUmuTLsjk0bapf2uzz8w6pSSDURsW8Yw887vj9lQwNVAwMg7VG7BEJ8RkQiuVZHc",
+    alt: "Asesoría gastronómica profesional",
+    hasPrice: false,
+  },
+];
+---
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  {
+    servicios.map((servicio) => (
+      <ServiceCard
+        name={servicio.name}
+        description={servicio.description}
+        image={servicio.image}
+        alt={servicio.alt}
+        price={servicio.price}
+        priceLabel={servicio.priceLabel}
+        hasPrice={servicio.hasPrice}
+      />
+    ))
+  }
+</div>

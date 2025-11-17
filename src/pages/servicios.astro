@@ -2,15 +2,13 @@
 import Layout from "../layouts/Layout.astro";
 import ProductHeader from "../components/productos/ProductHeader.astro";
 import ProductFooter from "../components/productos/ProductFooter.astro";
-import CategoryFilter from "../components/productos/CategoryFilter.astro";
-import ProductGrid from "../components/productos/ProductGrid.astro";
-import Pagination from "../components/productos/Pagination.astro";
+import ServiceGrid from "../components/servicios/ServiceGrid.astro";
 import "../styles/global.css";
 ---
 
-<Layout title="GMExpress - Descubre Nuestros Productos">
-  <div class="productos-page">
-    <ProductHeader searchPlaceholder="Buscar productos..." />
+<Layout title="GMExpress - Nuestros Servicios">
+  <div class="servicios-page">
+    <ProductHeader searchPlaceholder="Buscar servicios..." />
 
     <main class="container mx-auto px-4 py-8 md:py-12">
       <!-- Título y Descripción -->
@@ -18,27 +16,56 @@ import "../styles/global.css";
         <p
           class="text-4xl md:text-5xl font-black tracking-tighter text-text-light dark:text-white"
         >
-          Descubre Nuestros Productos
+          Descubre Nuestras Soluciones Gastronómicas
         </p>
         <p
-          class="mt-2 text-text-light/80 dark:text-text-dark/80 max-w-2xl mx-auto"
+          class="mt-2 text-text-light/80 dark:text-text-dark/80 max-w-3xl mx-auto"
         >
-          Explora una deliciosa variedad de platos preparados con los
-          ingredientes más frescos.
+          Ofrecemos una variedad de servicios de alimentación diseñados para
+          satisfacer las necesidades de su empresa, garantizando calidad y
+          frescura en cada plato.
         </p>
       </div>
 
-      <!-- Filtros de Categoría -->
-      <CategoryFilter />
-
-      <!-- Grid de Productos -->
-      <ProductGrid />
+      <!-- Grid de Servicios -->
+      <ServiceGrid />
 
       <!-- Paginación -->
-      <Pagination />
+      <div class="flex items-center justify-center p-4 mt-16">
+        <nav class="flex items-center gap-2">
+          <a
+            class="flex size-10 items-center justify-center text-text-light/50 dark:text-text-dark/50 rounded-lg hover:bg-card-light dark:hover:bg-card-dark transition-colors"
+            href="#"
+          >
+            <span class="material-symbols-outlined text-lg">chevron_left</span>
+          </a>
+          <a
+            class="text-sm font-bold leading-normal flex size-10 items-center justify-center text-white rounded-lg bg-primary"
+            href="#">1</a
+          >
+          <a
+            class="text-sm font-medium leading-normal flex size-10 items-center justify-center text-text-light dark:text-text-dark rounded-lg hover:bg-card-light dark:hover:bg-card-dark transition-colors"
+            href="#">2</a
+          >
+          <a
+            class="text-sm font-medium leading-normal flex size-10 items-center justify-center text-text-light dark:text-text-dark rounded-lg hover:bg-card-light dark:hover:bg-card-dark transition-colors"
+            href="#">3</a
+          >
+          <span
+            class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-text-light/50 dark:text-text-dark/50 rounded-lg"
+            >...</span
+          >
+          <a
+            class="flex size-10 items-center justify-center text-text-light/50 dark:text-text-dark/50 rounded-lg hover:bg-card-light dark:hover:bg-card-dark transition-colors"
+            href="#"
+          >
+            <span class="material-symbols-outlined text-lg">chevron_right</span>
+          </a>
+        </nav>
+      </div>
     </main>
 
-    <!-- Mockup Carrito lateral -->
+    <!-- Carrito lateral compartido -->
     <div
       id="cart-panel"
       class="fixed inset-y-0 right-0 z-50 w-full max-w-md translate-x-full bg-background-light dark:bg-background-dark shadow-2xl border-l border-border-light dark:border-border-dark transition-transform duration-300 flex flex-col"
@@ -66,7 +93,7 @@ import "../styles/global.css";
         id="cart-items"
         class="flex-1 overflow-y-auto px-4 py-3 space-y-3 text-sm"
       >
-        <!-- Items agregados por JS para mockup -->
+        <!-- Items del carrito -->
       </div>
 
       <div
@@ -118,11 +145,11 @@ import "../styles/global.css";
       // Cargar carrito desde localStorage
       let mockCart = JSON.parse(localStorage.getItem("gmexpress-cart") || "[]");
 
+      const formatPrice = (value) => value.trim();
+
       const saveCart = () => {
         localStorage.setItem("gmexpress-cart", JSON.stringify(mockCart));
       };
-
-      const formatPrice = (value) => value.trim();
 
       const openCart = () => {
         cartPanel?.classList.add("translate-x-0");
@@ -137,7 +164,6 @@ import "../styles/global.css";
       const updateCartDisplay = () => {
         if (!cartItems || !cartTotal || !cartSubtotal || !cartIva) return;
 
-        // Limpiar carrito
         cartItems.innerHTML = "";
 
         if (mockCart.length === 0) {
@@ -153,7 +179,6 @@ import "../styles/global.css";
           return;
         }
 
-        // Renderizar items
         mockCart.forEach((item, index) => {
           const itemEl = document.createElement("div");
           itemEl.className =
@@ -177,13 +202,11 @@ import "../styles/global.css";
           cartItems.appendChild(itemEl);
         });
 
-        // Calcular subtotal
         const subtotal = mockCart.reduce((sum, item) => {
           const priceNum = parseFloat(item.price.replace(/[^0-9]/g, ""));
           return sum + priceNum * item.quantity;
         }, 0);
 
-        // Calcular IVA (19%) y total
         const iva = subtotal * 0.19;
         const total = subtotal + iva;
 
@@ -192,21 +215,19 @@ import "../styles/global.css";
         cartTotal.textContent = `$${total.toLocaleString("es-CL", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
       };
 
-      // Evento para cerrar carrito
       cartClose?.addEventListener("click", closeCart);
 
-      // Evento global para todos los clicks
       document.addEventListener("click", (event) => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
 
-        // Abrir carrito desde el botón del header
+        // Abrir carrito
         if (target.closest("[data-cart-toggle]")) {
           openCart();
           return;
         }
 
-        // Remover item del carrito
+        // Remover item
         const removeBtn = target.closest("[data-remove-item]");
         if (removeBtn) {
           const index = parseInt(
@@ -218,33 +239,30 @@ import "../styles/global.css";
           return;
         }
 
-        // Agregar al carrito
+        // Agregar servicio al carrito
         if (
           target.closest("[data-add-to-cart]") &&
-          target.closest("[data-product]")
+          target.closest("[data-service]")
         ) {
-          const card = target.closest("[data-product]");
-          const nameEl = card.querySelector("[data-product-name]");
-          const priceEl = card.querySelector("[data-product-price]");
+          const card = target.closest("[data-service]");
+          const nameEl = card.querySelector("[data-service-name]");
+          const priceEl = card.querySelector("[data-service-price]");
 
-          const name = nameEl?.textContent ?? "Producto";
+          const name = nameEl?.textContent ?? "Servicio";
           const price = priceEl?.textContent ?? "$0";
 
-          // Buscar si el producto ya existe
           const existingIndex = mockCart.findIndex(
-            (item) => item.name === name && item.type === "producto",
+            (item) => item.name === name && item.type === "servicio",
           );
 
           if (existingIndex >= 0) {
-            // Incrementar cantidad
             mockCart[existingIndex].quantity += 1;
           } else {
-            // Agregar nuevo producto
             mockCart.push({
               name,
               price,
               quantity: 1,
-              type: "producto",
+              type: "servicio",
             });
           }
 
@@ -254,30 +272,7 @@ import "../styles/global.css";
         }
       });
 
-      // Inicializar carrito (si está vacío, agregar productos de ejemplo)
-      if (mockCart.length === 0) {
-        mockCart = [
-          {
-            name: "Hamburguesa Clásica",
-            price: "$8.990",
-            quantity: 2,
-            type: "producto",
-          },
-          {
-            name: "Pizza Margarita",
-            price: "$12.500",
-            quantity: 1,
-            type: "producto",
-          },
-          {
-            name: "Ensalada César",
-            price: "$6.990",
-            quantity: 1,
-            type: "producto",
-          },
-        ];
-        saveCart();
-      }
+      // Inicializar carrito
       updateCartDisplay();
     </script>
 
@@ -286,7 +281,7 @@ import "../styles/global.css";
 </Layout>
 
 <style>
-  :global(.productos-page) {
+  :global(.servicios-page) {
     --primary-color: #8bc34a;
     --secondary-color: #0a2342;
     --background-light: #ffffff;

@@ -1,3 +1,7 @@
+---
+const { searchPlaceholder = "Buscar productos..." } = Astro.props;
+---
+
 <header
   class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-border-light dark:border-border-dark"
 >
@@ -10,17 +14,19 @@
         >
           <img
             alt="GMExpress Logo"
-            class="h-10 w-auto"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHPhkX6YiLj4GxfSai9gy5BXQgZgKrzqEgOFI6EDlQZoUjkxEfMdc9WArGBBlPwGxDxrYLpBBjwJy3Z4iWQOSiOM7YnkkSDN2h51GLKx1En5wvwpe4qwJdZMTMe2bDjiBnpdNVQmzJFi3PQ9gjz_9Sl0swolF8ravFFhD1i9-Hanx-sVs15vty_4-ozTwFubGcxN6qB4T1qedxm1YZ0cBX_dBlpb4rXxfWStHl8a_sQ3cGR0ImG5xm_xBFXFEZoNF8H7Xy8tXJRWk"
+            class="h-10 w-auto brightness-0 invert dark:brightness-0 dark:invert"
+            src="/images/Logo-horizontal.png"
           />
         </a>
         <nav class="hidden md:flex items-center gap-6">
-          <a class="text-sm font-medium hover:text-primary" href="#"
-            >Categorías</a
+          <a class="text-sm font-medium hover:text-primary" href="/#nosotros"
+            >Nosotros</a
           >
-          <a class="text-sm font-medium hover:text-primary" href="#">Ofertas</a>
-          <a class="text-sm font-medium hover:text-primary" href="#"
-            >Sobre Nosotros</a
+          <a class="text-sm font-medium hover:text-primary" href="/servicios"
+            >Servicios</a
+          >
+          <a class="text-sm font-medium hover:text-primary" href="/productos"
+            >Productos</a
           >
           <a class="text-sm font-medium hover:text-primary" href="/">Inicio</a>
         </nav>
@@ -32,8 +38,9 @@
             >search</span
           >
           <input
+            id="search-input"
             class="w-full rounded-full border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark h-10 pl-10 pr-4 placeholder:text-text-light/60 dark:placeholder:text-text-dark/60 focus:ring-2 focus:ring-primary focus:border-primary text-sm"
-            placeholder="Buscar productos..."
+            placeholder={searchPlaceholder}
             type="search"
           />
         </div>
@@ -58,3 +65,62 @@
     </div>
   </div>
 </header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-input');
+    
+    // Función para normalizar texto (quitar acentos)
+    const normalizeText = (text: string): string => {
+      return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+    };
+    
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const searchTerm = normalizeText((e.target as HTMLInputElement).value);
+        
+        // Buscar tanto productos como servicios
+        const productCards = document.querySelectorAll('[data-product]');
+        const serviceCards = document.querySelectorAll('[data-service]');
+        const allCards = [...productCards, ...serviceCards];
+        
+        let visibleCount = 0;
+        
+        allCards.forEach((card) => {
+          const nameElement = card.querySelector('[data-product-name], [data-service-name]');
+          const name = normalizeText(nameElement?.textContent || '');
+          
+          if (searchTerm === '' || name.includes(searchTerm)) {
+            (card as HTMLElement).style.display = '';
+            visibleCount++;
+          } else {
+            (card as HTMLElement).style.display = 'none';
+          }
+        });
+        
+        // Mostrar mensaje si no hay resultados
+        let noResultsMsg = document.getElementById('no-results-message');
+        const gridContainer = document.querySelector('.grid');
+        
+        if (visibleCount === 0 && searchTerm !== '') {
+          if (!noResultsMsg && gridContainer) {
+            noResultsMsg = document.createElement('div');
+            noResultsMsg.id = 'no-results-message';
+            noResultsMsg.className = 'col-span-full text-center py-12';
+            noResultsMsg.innerHTML = `
+              <span class="material-symbols-outlined text-6xl text-text-light/30 dark:text-text-dark/30">search_off</span>
+              <p class="mt-4 text-text-light/60 dark:text-text-dark/60">No se encontraron resultados para "${(e.target as HTMLInputElement).value}"</p>
+            `;
+            gridContainer.appendChild(noResultsMsg);
+          }
+        } else if (noResultsMsg) {
+          noResultsMsg.remove();
+        }
+      });
+    }
+  });
+</script>

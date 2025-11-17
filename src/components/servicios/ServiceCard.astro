@@ -1,0 +1,84 @@
+---
+interface Props {
+  name: string;
+  price?: string;
+  priceLabel?: string;
+  image: string;
+  alt: string;
+  description: string;
+  hasPrice?: boolean;
+}
+
+const {
+  name,
+  price,
+  priceLabel,
+  image,
+  alt,
+  description,
+  hasPrice = false,
+} = Astro.props;
+---
+
+<div
+  class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+  data-service
+>
+  <div class="relative">
+    <img
+      class="aspect-[4/3] w-full object-cover"
+      src={image}
+      alt={alt}
+      data-alt={alt}
+    />
+  </div>
+  <div class="p-6 flex flex-col grow">
+    <h3
+      class="text-xl font-bold text-text-light dark:text-text-dark grow"
+      data-service-name
+    >
+      {name}
+    </h3>
+    <p class="mt-2 text-sm text-text-light/80 dark:text-text-dark/80 flex-grow">
+      {description}
+    </p>
+    {
+      hasPrice && price && (
+        <div class="mt-4 mb-2">
+          <span
+            class="text-2xl font-bold text-text-light dark:text-text-dark"
+            data-service-price
+          >
+            {price}
+          </span>
+          {priceLabel && (
+            <span class="text-sm text-text-light/60 dark:text-text-dark/60 ml-1">
+              {priceLabel}
+            </span>
+          )}
+        </div>
+      )
+    }
+    <div class="mt-4 flex gap-3">
+      <button
+        class="w-full flex items-center justify-center rounded-lg h-10 px-4 border border-border-light dark:border-border-dark bg-transparent text-text-light dark:text-text-dark text-sm font-medium leading-normal hover:bg-card-light/50 dark:hover:bg-card-dark/50 transition-colors"
+      >
+        Ver Detalles
+      </button>
+      {
+        hasPrice ? (
+          <button
+            class="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold tracking-wide hover:bg-primary/90 transition-colors"
+            data-add-to-cart
+          >
+            Agregar
+          </button>
+        ) : (
+          <button class="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold tracking-wide hover:bg-primary/90 transition-colors">
+            Cotizar
+          </button>
+        )
+      }
+    </div>
+  </div>
+</div>
