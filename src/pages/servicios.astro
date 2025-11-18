@@ -134,6 +134,30 @@ import "../styles/global.css";
       </div>
     </div>
 
+    <!-- Modal de Detalle del Servicio -->
+    <div
+      id="service-detail-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        class="relative w-full max-w-2xl mx-4 bg-background-light dark:bg-background-dark rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+      >
+        <button
+          id="close-service-modal"
+          class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card-light dark:bg-card-dark hover:bg-primary/10 transition-colors"
+        >
+          <span
+            class="material-symbols-outlined text-text-light dark:text-text-dark"
+            >close</span
+          >
+        </button>
+
+        <div id="service-modal-content">
+          <!-- Contenido inyectado dinámicamente -->
+        </div>
+      </div>
+    </div>
+
     <script>
       const cartPanel = document.getElementById("cart-panel");
       const cartClose = document.getElementById("cart-close");
@@ -160,6 +184,140 @@ import "../styles/global.css";
         cartPanel?.classList.add("translate-x-full");
         cartPanel?.classList.remove("translate-x-0");
       };
+
+      // Función para mostrar detalle del servicio
+      function showServiceDetail(
+        name,
+        price,
+        priceLabel,
+        image,
+        alt,
+        description,
+        hasPrice,
+      ) {
+        const modal = document.getElementById("service-detail-modal");
+        const modalContent = document.getElementById("service-modal-content");
+
+        if (!modal || !modalContent) return;
+
+        const priceDisplay =
+          hasPrice && price
+            ? `<p class="text-4xl font-bold text-primary mb-2">${price}${priceLabel ? ` <span class="text-xl text-text-light/60 dark:text-text-dark/60">${priceLabel}</span>` : ""}</p>`
+            : "";
+
+        const actionButton = hasPrice
+          ? `<button
+              onclick="addServiceToCartFromModal('${name.replace(/'/g, "\\'")}', '${price}')"
+              class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-colors"
+            >
+              <span class="material-symbols-outlined">shopping_cart</span>
+              <span>Agregar al Carrito</span>
+            </button>`
+          : `<a
+              href="/solicitud-cotizacion?servicio=${encodeURIComponent(name)}"
+              class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-colors"
+            >
+              <span class="material-symbols-outlined">request_quote</span>
+              <span>Solicitar Cotización</span>
+            </a>`;
+
+        modalContent.innerHTML = `
+          <div class="relative">
+            <img
+              src="${image}"
+              alt="${alt}"
+              class="w-full h-64 md:h-96 object-cover rounded-t-2xl"
+            />
+          </div>
+          <div class="p-6 md:p-8">
+            <h2 class="text-3xl font-bold text-text-light dark:text-text-dark mb-4">
+              ${name}
+            </h2>
+            ${priceDisplay}
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-text-light dark:text-text-dark mb-2">
+                Descripción
+              </h3>
+              <p class="text-text-light/80 dark:text-text-dark/80 leading-relaxed">
+                ${description}
+              </p>
+              <p class="text-text-light/80 dark:text-text-dark/80 leading-relaxed mt-4">
+                Este servicio está diseñado para satisfacer las necesidades de su empresa con los más altos 
+                estándares de calidad. Nuestro equipo profesional garantiza una experiencia excepcional.
+              </p>
+            </div>
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-text-light dark:text-text-dark mb-2">
+                Características
+              </h3>
+              <ul class="space-y-2 text-text-light/80 dark:text-text-dark/80">
+                <li class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                  <span>Servicio profesional y personalizado</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                  <span>Equipo altamente capacitado</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                  <span>Flexibilidad y adaptación a sus necesidades</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                  <span>Garantía de satisfacción</span>
+                </li>
+              </ul>
+            </div>
+            ${actionButton}
+          </div>
+        `;
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+
+      // Función para cerrar modal de servicio
+      function closeServiceModal() {
+        const modal = document.getElementById("service-detail-modal");
+        modal?.classList.add("hidden");
+        modal?.classList.remove("flex");
+      }
+
+      // Agregar servicio al carrito desde el modal
+      window.addServiceToCartFromModal = function (name, price) {
+        const existingIndex = mockCart.findIndex(
+          (item) => item.name === name && item.type === "servicio",
+        );
+
+        if (existingIndex >= 0) {
+          mockCart[existingIndex].quantity += 1;
+        } else {
+          mockCart.push({
+            name,
+            price,
+            quantity: 1,
+            type: "servicio",
+          });
+        }
+
+        saveCart();
+        updateCartDisplay();
+        closeServiceModal();
+        openCart();
+      };
+
+      // Eventos para cerrar modal
+      document
+        .getElementById("close-service-modal")
+        ?.addEventListener("click", closeServiceModal);
+      document
+        .getElementById("service-detail-modal")
+        ?.addEventListener("click", (e) => {
+          if (e.target === e.currentTarget) {
+            closeServiceModal();
+          }
+        });
 
       const updateCartDisplay = () => {
         if (!cartItems || !cartTotal || !cartSubtotal || !cartIva) return;
@@ -236,6 +394,39 @@ import "../styles/global.css";
           mockCart.splice(index, 1);
           saveCart();
           updateCartDisplay();
+          return;
+        }
+
+        // Ver detalle del servicio (botón "Ver Detalles")
+        if (target.closest("[data-view-detail]")) {
+          const card = target.closest("[data-service]");
+          if (!card) return;
+          
+          const nameEl = card.querySelector("[data-service-name]");
+          const priceEl = card.querySelector("[data-service-price]");
+          const priceLabelEl = card.querySelector("[data-price-label]");
+          const imgEl = card.querySelector("img");
+          const descEl = card.querySelector("p.text-sm");
+
+          const name = nameEl?.textContent ?? "Servicio";
+          const price = priceEl?.textContent ?? "";
+          const priceLabel = priceLabelEl?.textContent ?? "";
+          const image = imgEl?.src ?? "";
+          const alt = imgEl?.alt ?? "";
+          const description = descEl?.textContent ?? "";
+
+          // Detectar si tiene precio
+          const hasPrice = priceEl !== null && price !== "";
+
+          showServiceDetail(
+            name,
+            price,
+            priceLabel,
+            image,
+            alt,
+            description,
+            hasPrice,
+          );
           return;
         }
 

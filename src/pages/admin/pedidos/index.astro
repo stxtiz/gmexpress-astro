@@ -118,8 +118,8 @@ import "../../../styles/global.css";
                 <li><a class="dropdown-item" href="#">Configuración</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
-                  <a class="dropdown-item text-danger" href="#"
-                    >Cerrar sesión</a>
+                  <a class="dropdown-item text-danger" href="#">Cerrar sesión</a
+                  >
                 </li>
               </ul>
             </div>
@@ -560,90 +560,6 @@ import "../../../styles/global.css";
     </div>
   </div>
 
-  <!-- Modal para Responder Solicitud -->
-  <div
-    class="modal fade"
-    id="responderModal"
-    tabindex="-1"
-    aria-labelledby="responderModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header border-0 pb-0">
-          <h5 class="modal-title fw-bold" id="responderModalLabel">
-            <i class="bi bi-reply me-2"></i>Responder Solicitud
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="respuestaForm">
-            <div class="row g-3">
-              <div class="col-12">
-                <label for="cotizacion" class="form-label fw-semibold"
-                  >Monto de Cotización <span class="text-danger">*</span></label
-                >
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="cotizacion"
-                    placeholder="150.000"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="col-12">
-                <label for="mensaje" class="form-label fw-semibold"
-                  >Mensaje para el Cliente</label
-                >
-                <textarea
-                  class="form-control"
-                  id="mensaje"
-                  rows="4"
-                  placeholder="Escribe un mensaje personalizado para el cliente..."
-                ></textarea>
-              </div>
-              <div class="col-md-6">
-                <label for="fechaEntrega" class="form-label fw-semibold"
-                  >Fecha de Entrega Estimada</label
-                >
-                <input type="date" class="form-control" id="fechaEntrega" />
-              </div>
-              <div class="col-md-6">
-                <label for="validezCotizacion" class="form-label fw-semibold"
-                  >Validez de la Cotización</label
-                >
-                <select class="form-select" id="validezCotizacion">
-                  <option value="7">7 días</option>
-                  <option value="15">15 días</option>
-                  <option value="30" selected>30 días</option>
-                </select>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer border-0">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
-            >Cancelar</button
-          >
-          <button
-            type="button"
-            class="btn btn-primary"
-            onclick="enviarRespuesta()"
-          >
-            <i class="bi bi-send me-2"></i>Enviar Cotización
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <style>
     .admin-dashboard {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -743,6 +659,8 @@ import "../../../styles/global.css";
         telefono: "+56 9 8765 4321",
         fecha: "2025-11-17",
         estado: "En Proceso",
+        subtotal: "$75.588",
+        iva: "$14.362",
         total: "$89.950",
         productos: [
           {
@@ -775,6 +693,8 @@ import "../../../styles/global.css";
         telefono: "+56 9 1234 5678",
         fecha: "2025-11-17",
         estado: "En Tránsito",
+        subtotal: "$105.000",
+        iva: "$19.940",
         total: "$124.940",
         productos: [
           {
@@ -807,6 +727,8 @@ import "../../../styles/global.css";
         telefono: "+56 2 2345 6789",
         fecha: "2025-11-16",
         estado: "Recibido",
+        subtotal: "$157.084",
+        iva: "$29.846",
         total: "$186.930",
         productos: [
           {
@@ -845,6 +767,8 @@ import "../../../styles/global.css";
         telefono: "+56 2 9876 5432",
         fecha: "2025-11-17",
         estado: "En Proceso",
+        subtotal: "$197.395",
+        iva: "$37.485",
         total: "$234.880",
         productos: [
           {
@@ -877,6 +801,8 @@ import "../../../styles/global.css";
         telefono: "+56 2 5555 1234",
         fecha: "2025-11-16",
         estado: "En Tránsito",
+        subtotal: "$122.622",
+        iva: "$23.298",
         total: "$145.920",
         productos: [
           {
@@ -909,6 +835,8 @@ import "../../../styles/global.css";
         telefono: "+56 2 2222 3333",
         fecha: "2025-11-15",
         estado: "Recibido",
+        subtotal: "$251.050",
+        iva: "$47.700",
         total: "$298.750",
         productos: [
           {
@@ -941,6 +869,8 @@ import "../../../styles/global.css";
         telefono: "+56 9 4444 7777",
         fecha: "2025-11-17",
         estado: "En Proceso",
+        subtotal: "$64.655",
+        iva: "$12.285",
         total: "$76.940",
         productos: [
           {
@@ -973,6 +903,8 @@ import "../../../styles/global.css";
         telefono: "+56 9 7777 8888",
         fecha: "2025-11-16",
         estado: "En Tránsito",
+        subtotal: "$79.731",
+        iva: "$15.149",
         total: "$94.880",
         productos: [
           {
@@ -1005,6 +937,8 @@ import "../../../styles/global.css";
         telefono: "+56 2 8888 9999",
         fecha: "2025-11-17",
         estado: "En Proceso",
+        subtotal: "$141.092",
+        iva: "$26.788",
         total: "$167.880",
         productos: [
           {
@@ -1037,6 +971,8 @@ import "../../../styles/global.css";
         telefono: "+56 2 3333 4444",
         fecha: "2025-11-15",
         estado: "Recibido",
+        subtotal: "$94.840",
+        iva: "$18.020",
         total: "$112.860",
         productos: [
           {
@@ -1069,6 +1005,8 @@ import "../../../styles/global.css";
         telefono: "+56 9 5555 6666",
         fecha: "2025-11-16",
         estado: "En Tránsito",
+        subtotal: "$75.563",
+        iva: "$14.357",
         total: "$89.920",
         productos: [
           {
@@ -1101,6 +1039,8 @@ import "../../../styles/global.css";
         telefono: "+56 2 6666 7777",
         fecha: "2025-11-17",
         estado: "En Proceso",
+        subtotal: "$46.176",
+        iva: "$8.774",
         total: "$54.950",
         productos: [
           {
@@ -1311,6 +1251,14 @@ import "../../../styles/global.css";
               </tbody>
               <tfoot class="border-top">
                 <tr>
+                  <td colspan="3" class="text-end">Subtotal:</td>
+                  <td class="text-end fw-semibold">${pedido.subtotal}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end">IVA (19%):</td>
+                  <td class="text-end fw-semibold">${pedido.iva}</td>
+                </tr>
+                <tr class="border-top">
                   <td colspan="3" class="text-end fw-bold">TOTAL:</td>
                   <td class="text-end fw-bold text-success h5 mb-0">${pedido.total}</td>
                 </tr>
@@ -1414,102 +1362,64 @@ import "../../../styles/global.css";
         cliente: "Empresa ABC S.A.",
         email: "contacto@empresaabc.com",
         telefono: "+56 9 1234 5678",
+        empresa: "Empresa ABC S.A.",
+        ciudad: "Santiago",
         servicio: "Catering para Eventos",
         fecha: "2025-11-15",
         estado: "Pendiente",
         prioridad: "Alta",
+        numeroPersonas: 150,
+        fechaEstimada: "2025-12-10",
         descripcion:
           "Necesitamos servicio de catering para evento corporativo de 150 personas. Incluye desayuno, almuerzo y coffee break.",
-        detalles: {
-          personas: 150,
-          fechaEvento: "2025-12-10",
-          horaEvento: "09:00 - 18:00",
-          ubicacion: "Hotel Gran Palace, Salón Principal",
-          tipoEvento: "Conferencia Corporativa",
-          serviciosRequeridos: [
-            "Desayuno",
-            "Coffee Break (AM)",
-            "Almuerzo",
-            "Coffee Break (PM)",
-          ],
-        },
-        presupuestoEstimado: "$450.000",
       },
       {
         id: 122,
         cliente: "Tech Solutions Ltda.",
         email: "eventos@techsolutions.cl",
         telefono: "+56 9 8765 4321",
+        empresa: "Tech Solutions Ltda.",
+        ciudad: "Quilicura",
         servicio: "Comedores Industriales",
         fecha: "2025-11-14",
         estado: "En Proceso",
         prioridad: "Media",
+        numeroPersonas: 80,
+        fechaEstimada: "2025-12-01",
         descripcion:
           "Solicitud de presupuesto para implementar servicio de comedor industrial para 80 empleados, 5 días a la semana.",
-        detalles: {
-          personas: 80,
-          frecuencia: "Lunes a Viernes",
-          horario: "12:00 - 14:00",
-          ubicacion: "Parque Industrial Norte, Nave 5",
-          duracion: "Contrato anual",
-          serviciosRequeridos: [
-            "Almuerzo diario",
-            "Opciones vegetarianas",
-            "Gestión de comedores",
-          ],
-        },
-        presupuestoEstimado: "$2.800.000/mes",
       },
       {
         id: 121,
         cliente: "Constructora Del Sur",
         email: "admin@constructoradelsur.cl",
         telefono: "+56 9 5555 1234",
+        empresa: "Constructora Del Sur SpA",
+        ciudad: "Las Condes",
         servicio: "Almuerzos Ejecutivos",
         fecha: "2025-11-13",
         estado: "Pendiente",
         prioridad: "Alta",
+        numeroPersonas: 25,
+        fechaEstimada: "2025-11-20",
         descripcion:
           "Requerimos servicio de almuerzos ejecutivos para equipo de 25 personas en obra de construcción.",
-        detalles: {
-          personas: 25,
-          frecuencia: "Lunes a Sábado",
-          horario: "13:00",
-          ubicacion: "Proyecto Las Condes, Av. Apoquindo 1234",
-          duracion: "6 meses",
-          serviciosRequeridos: [
-            "Almuerzo completo",
-            "Entrega en terreno",
-            "Menú variado semanal",
-          ],
-        },
-        presupuestoEstimado: "$850.000/mes",
       },
       {
         id: 120,
         cliente: "Universidad Central",
         email: "servicios@ucentral.cl",
         telefono: "+56 2 2222 3333",
+        empresa: "Universidad Central de Chile",
+        ciudad: "Santiago Centro",
         servicio: "Servicio de Cafetería",
         fecha: "2025-11-12",
         estado: "Completada",
         prioridad: "Baja",
+        numeroPersonas: 300,
+        fechaEstimada: "2025-11-25",
         descripcion:
           "Implementación de cafetería para campus universitario con atención de 300 estudiantes diarios.",
-        detalles: {
-          personas: 300,
-          frecuencia: "Lunes a Viernes",
-          horario: "08:00 - 20:00",
-          ubicacion: "Campus Central, Edificio A",
-          duracion: "Contrato 2 años",
-          serviciosRequeridos: [
-            "Cafetería completa",
-            "Snacks",
-            "Bebidas",
-            "Menú estudiantes",
-          ],
-        },
-        presupuestoEstimado: "$3.500.000/mes",
         cotizacionEnviada: "$3.200.000/mes",
         fechaRespuesta: "2025-11-13",
       },
@@ -1518,24 +1428,16 @@ import "../../../styles/global.css";
         cliente: "StartUp Innovadora SpA",
         email: "hr@startupinnovadora.com",
         telefono: "+56 9 9999 8888",
+        empresa: "StartUp Innovadora SpA",
+        ciudad: "Providencia",
         servicio: "Vending Machines",
         fecha: "2025-11-10",
         estado: "En Proceso",
         prioridad: "Media",
+        numeroPersonas: 50,
+        fechaEstimada: "2025-11-18",
         descripcion:
-          "Solicitud de instalación de máquinas expendedoras con snacks saludables para oficina de 50 empleados.",
-        detalles: {
-          personas: 50,
-          cantidadMaquinas: 3,
-          ubicacion: "Providencia, Edificio Corporativo Piso 8",
-          tipoProductos: "Snacks saludables, bebidas naturales",
-          serviciosRequeridos: [
-            "3 máquinas expendedoras",
-            "Reposición semanal",
-            "Mantenimiento incluido",
-          ],
-        },
-        presupuestoEstimado: "$180.000/mes",
+          "Solicitud de instalación de 3 máquinas expendedoras con snacks saludables para oficina de 50 empleados.",
       },
     ];
 
@@ -1646,6 +1548,12 @@ import "../../../styles/global.css";
             </div>
             <div class="col-md-6">
               <div class="bg-light rounded p-3">
+                <p class="text-muted mb-1 small">Empresa</p>
+                <p class="fw-semibold mb-0">${sol.empresa}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="bg-light rounded p-3">
                 <p class="text-muted mb-1 small">Email</p>
                 <p class="mb-0">
                   <a href="mailto:${sol.email}" class="text-decoration-none">${sol.email}</a>
@@ -1658,6 +1566,12 @@ import "../../../styles/global.css";
                 <p class="mb-0">
                   <a href="tel:${sol.telefono}" class="text-decoration-none">${sol.telefono}</a>
                 </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="bg-light rounded p-3">
+                <p class="text-muted mb-1 small">Ciudad</p>
+                <p class="fw-semibold mb-0">${sol.ciudad}</p>
               </div>
             </div>
             <div class="col-md-6">
@@ -1679,98 +1593,70 @@ import "../../../styles/global.css";
           </div>
         </div>
 
-        <!-- Detalles Específicos -->
+        <!-- Detalles del Servicio -->
         <div class="mb-4">
           <h6 class="fw-bold mb-3">
             <i class="bi bi-list-check me-2 text-primary"></i>Detalles del Servicio
           </h6>
           <div class="row g-3">
-            ${Object.entries(sol.detalles)
-              .map(([key, value]) => {
-                const label = formatLabel(key);
-                const displayValue = Array.isArray(value)
-                  ? value.join(", ")
-                  : value;
-                return `
-                  <div class="col-md-6">
-                    <div class="bg-light rounded p-3">
-                      <p class="text-muted mb-1 small">${label}</p>
-                      <p class="mb-0 fw-semibold">${displayValue}</p>
-                    </div>
-                  </div>
-                `;
-              })
-              .join("")}
+            <div class="col-md-6">
+              <div class="bg-light rounded p-3">
+                <p class="text-muted mb-1 small">Número de Personas</p>
+                <p class="mb-0 fw-semibold">${sol.numeroPersonas}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="bg-light rounded p-3">
+                <p class="text-muted mb-1 small">Fecha Estimada de Inicio</p>
+                <p class="mb-0 fw-semibold">${formatFecha(sol.fechaEstimada)}</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Presupuesto -->
+        <!-- Cambiar Estado -->
         <div class="mb-4">
           <h6 class="fw-bold mb-3">
-            <i class="bi bi-currency-dollar me-2 text-primary"></i>Información Financiera
+            <i class="bi bi-arrow-repeat me-2 text-primary"></i>Gestión de Estado
           </h6>
           <div class="bg-light rounded p-3">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <p class="text-muted mb-1 small">Presupuesto Estimado</p>
-                <h4 class="mb-0 text-success">${sol.presupuestoEstimado}</h4>
-              </div>
-              ${
-                sol.cotizacionEnviada
-                  ? `
-                <div class="text-end">
-                  <p class="text-muted mb-1 small">Cotización Enviada</p>
-                  <h5 class="mb-0 text-primary">${sol.cotizacionEnviada}</h5>
-                  <small class="text-muted">${formatFecha(sol.fechaRespuesta)}</small>
-                </div>
-              `
-                  : ""
-              }
+            <p class="text-muted mb-2 small">Estado Actual: <strong>${sol.estado}</strong></p>
+            <div class="d-flex gap-2 flex-wrap">
+              <button 
+                class="btn btn-sm ${sol.estado === "Pendiente" ? "btn-warning" : "btn-outline-warning"}"
+                onclick="cambiarEstado('Pendiente')"
+                ${sol.estado === "Pendiente" ? "disabled" : ""}
+              >
+                <i class="bi bi-clock-history me-1"></i>Pendiente
+              </button>
+              <button 
+                class="btn btn-sm ${sol.estado === "En Proceso" ? "btn-info" : "btn-outline-info"}"
+                onclick="cambiarEstado('En Proceso')"
+                ${sol.estado === "En Proceso" ? "disabled" : ""}
+              >
+                <i class="bi bi-hourglass-split me-1"></i>En Proceso
+              </button>
+              <button 
+                class="btn btn-sm ${sol.estado === "Completada" ? "btn-success" : "btn-outline-success"}"
+                onclick="cambiarEstado('Completada')"
+                ${sol.estado === "Completada" ? "disabled" : ""}
+              >
+                <i class="bi bi-check-circle me-1"></i>Completada
+              </button>
             </div>
           </div>
         </div>
 
         <!-- Acciones -->
         <div class="d-flex gap-2">
-          ${
-            sol.estado !== "Completada"
-              ? `
-            <button class="btn btn-primary flex-grow-1" onclick="abrirModalRespuesta()">
-              <i class="bi bi-reply me-2"></i>Enviar Cotización
-            </button>
-            <button class="btn btn-outline-success" onclick="cambiarEstado('En Proceso')">
-              <i class="bi bi-clock-history me-2"></i>Marcar En Proceso
-            </button>
-          `
-              : `
-            <button class="btn btn-outline-primary flex-grow-1" disabled>
-              <i class="bi bi-check-circle me-2"></i>Solicitud Completada
-            </button>
-          `
-          }
+          <button class="btn btn-outline-primary flex-grow-1" onclick="contactarCliente()">
+            <i class="bi bi-envelope me-2"></i>Contactar Cliente
+          </button>
           <button class="btn btn-outline-secondary" onclick="exportarPDF()">
-            <i class="bi bi-file-pdf"></i>
+            <i class="bi bi-file-pdf me-2"></i>Exportar PDF
           </button>
         </div>
       `;
-    }
-
-    // Formatear label
-    function formatLabel(key) {
-      const labels = {
-        personas: "Número de Personas",
-        fechaEvento: "Fecha del Evento",
-        horaEvento: "Horario",
-        ubicacion: "Ubicación",
-        tipoEvento: "Tipo de Evento",
-        serviciosRequeridos: "Servicios Requeridos",
-        frecuencia: "Frecuencia",
-        horario: "Horario",
-        duracion: "Duración del Contrato",
-        cantidadMaquinas: "Cantidad de Máquinas",
-        tipoProductos: "Tipo de Productos",
-      };
-      return labels[key] || key;
     }
 
     // Formatear fecha
@@ -1782,6 +1668,13 @@ import "../../../styles/global.css";
         day: "numeric",
       });
     }
+
+    // Contactar cliente
+    window.contactarCliente = function () {
+      if (selectedSolicitud) {
+        window.location.href = `mailto:${selectedSolicitud.email}?subject=Solicitud #${selectedSolicitud.id} - ${selectedSolicitud.servicio}`;
+      }
+    };
 
     // Actualizar estadísticas
     function updateStats() {
@@ -1804,46 +1697,13 @@ import "../../../styles/global.css";
         solicitudes.length;
     }
 
-    // Abrir modal de respuesta
-    window.abrirModalRespuesta = function () {
-      const modal = new bootstrap.Modal(
-        document.getElementById("responderModal"),
-      );
-      modal.show();
-    };
-
-    // Enviar respuesta
-    window.enviarRespuesta = function () {
-      const cotizacion = document.getElementById("cotizacion").value;
-      if (!cotizacion) {
-        alert("Por favor ingresa un monto de cotización");
-        return;
-      }
-
-      if (selectedSolicitud) {
-        selectedSolicitud.estado = "Completada";
-        selectedSolicitud.cotizacionEnviada = `$${cotizacion}`;
-        selectedSolicitud.fechaRespuesta = new Date()
-          .toISOString()
-          .split("T")[0];
-
-        renderSolicitudesList();
-        renderDetalle();
-
-        bootstrap.Modal.getInstance(
-          document.getElementById("responderModal"),
-        ).hide();
-        showToast("Cotización enviada exitosamente", "success");
-      }
-    };
-
     // Cambiar estado
     window.cambiarEstado = function (nuevoEstado) {
-      if (selectedSolicitud) {
+      if (selectedSolicitud && selectedSolicitud.estado !== nuevoEstado) {
         selectedSolicitud.estado = nuevoEstado;
         renderSolicitudesList();
         renderDetalle();
-        showToast(`Estado actualizado a ${nuevoEstado}`, "info");
+        showToast(`Estado actualizado a: ${nuevoEstado}`, "success");
       }
     };
 

@@ -1,0 +1,94 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import SolicitudForm from "../components/servicios/SolicitudForm.astro";
+import "../styles/global.css";
+
+// Obtener el servicio desde la URL si existe
+const url = Astro.url;
+const servicioPreseleccionado = url.searchParams.get("servicio") || undefined;
+---
+
+<Layout title="GMEXPRESS - Solicitud de Cotización">
+  <main class="flex-1 pt-[68px]">
+    <!-- Hero Section -->
+    <section
+      class="w-full py-12 md:py-16 bg-linear-to-br from-primary/10 to-secondary/10"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-10">
+        <div class="flex flex-col gap-4 text-center">
+          <h1
+            class="text-4xl md:text-5xl font-bold tracking-tight text-secondary dark:text-text-dark"
+          >
+            Solicita tu Cotización
+          </h1>
+          <p
+            class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto"
+          >
+            Completa el formulario y nuestro equipo se pondrá en contacto
+            contigo en las próximas 24 horas con una propuesta personalizada
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form Section -->
+    <section class="w-full py-10 md:py-16">
+      <div class="max-w-2xl mx-auto px-4 sm:px-10">
+        <SolicitudForm servicioPreseleccionado={servicioPreseleccionado} />
+
+        <!-- Features -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+          <div
+            class="flex items-start gap-3 p-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800"
+          >
+            <span class="material-symbols-outlined text-primary text-3xl"
+              >schedule</span
+            >
+            <div>
+              <h3 class="font-bold text-secondary dark:text-text-dark">
+                Respuesta Rápida
+              </h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Recibe tu cotización en menos de 24 horas
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex items-start gap-3 p-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800"
+          >
+            <span class="material-symbols-outlined text-primary text-3xl"
+              >verified</span
+            >
+            <div>
+              <h3 class="font-bold text-secondary dark:text-text-dark">
+                Sin Compromiso
+              </h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Cotización gratuita y sin obligación de compra
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex items-start gap-3 p-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800"
+          >
+            <span class="material-symbols-outlined text-primary text-3xl"
+              >support_agent</span
+            >
+            <div>
+              <h3 class="font-bold text-secondary dark:text-text-dark">
+                Asesoría Personalizada
+              </h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Expertos que te ayudarán a encontrar la mejor solución
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

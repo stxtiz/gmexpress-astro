@@ -43,9 +43,16 @@ const { name, price, image, alt, description } = Astro.props;
         Añadir al Carrito
       </button>
       <button
-        class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 border border-primary text-primary text-sm font-bold tracking-wide hover:bg-primary/10 transition-colors"
+        class="group/btn flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full h-10 px-4 border border-primary text-primary text-sm font-bold tracking-wide hover:bg-primary hover:text-white transition-all duration-300 hover:shadow-lg hover:scale-105"
+        data-view-detail
       >
-        Ver más
+        <span class="transition-transform group-hover/btn:scale-110"
+          >Ver más</span
+        >
+        <span
+          class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1"
+          >arrow_forward</span
+        >
       </button>
     </div>
   </div>

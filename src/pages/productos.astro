@@ -107,6 +107,30 @@ import "../styles/global.css";
       </div>
     </div>
 
+    <!-- Modal de Detalle del Producto -->
+    <div
+      id="product-detail-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        class="relative w-full max-w-2xl mx-4 bg-background-light dark:bg-background-dark rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+      >
+        <button
+          id="close-modal"
+          class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card-light dark:bg-card-dark hover:bg-primary/10 transition-colors"
+        >
+          <span
+            class="material-symbols-outlined text-text-light dark:text-text-dark"
+            >close</span
+          >
+        </button>
+
+        <div id="modal-content">
+          <!-- Contenido inyectado dinámicamente -->
+        </div>
+      </div>
+    </div>
+
     <script>
       const cartPanel = document.getElementById("cart-panel");
       const cartClose = document.getElementById("cart-close");
@@ -195,6 +219,116 @@ import "../styles/global.css";
       // Evento para cerrar carrito
       cartClose?.addEventListener("click", closeCart);
 
+      // Función para mostrar detalle del producto
+      function showProductDetail(name, price, image, alt, description) {
+        const modal = document.getElementById("product-detail-modal");
+        const modalContent = document.getElementById("modal-content");
+
+        if (!modal || !modalContent) return;
+
+        modalContent.innerHTML = `
+          <div class="relative">
+            <img
+              src="${image}"
+              alt="${alt}"
+              class="w-full h-64 md:h-96 object-cover rounded-t-2xl"
+            />
+          </div>
+          <div class="p-6 md:p-8">
+            <h2 class="text-3xl font-bold text-text-light dark:text-text-dark mb-4">
+              ${name}
+            </h2>
+            <p class="text-4xl font-bold text-primary mb-6">${price}</p>
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-text-light dark:text-text-dark mb-2">
+                Descripción
+              </h3>
+              <p class="text-text-light/80 dark:text-text-dark/80 leading-relaxed">
+                ${description}
+              </p>
+              <p class="text-text-light/80 dark:text-text-dark/80 leading-relaxed mt-4">
+                Este delicioso producto está preparado con los ingredientes más frescos y de la más alta calidad. 
+                Perfecto para cualquier ocasión, te garantizamos una experiencia gastronómica única.
+              </p>
+            </div>
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-text-light dark:text-text-dark mb-2">
+                Información adicional
+              </h3>
+              <ul class="space-y-2 text-text-light/80 dark:text-text-dark/80">
+                <li class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                  <span>Ingredientes frescos y naturales</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                  <span>Preparación diaria</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                  <span>Disponible para entrega inmediata</span>
+                </li>
+              </ul>
+            </div>
+            <button
+              onclick="addToCartFromModal('${name.replace(/'/g, "\\'")}', '${price}')"
+              class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-colors"
+            >
+              <span class="material-symbols-outlined">shopping_cart</span>
+              <span>Añadir al Carrito</span>
+            </button>
+          </div>
+        `;
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+
+      // Función para cerrar modal
+      function closeProductModal() {
+        const modal = document.getElementById("product-detail-modal");
+        modal?.classList.add("hidden");
+        modal?.classList.remove("flex");
+      }
+
+      // Agregar al carrito desde el modal
+      window.addToCartFromModal = function (name, price) {
+        const existingIndex = mockCart.findIndex(
+          (item) => item.name === name && item.type === "producto",
+        );
+
+        if (existingIndex >= 0) {
+          mockCart[existingIndex].quantity += 1;
+        } else {
+          mockCart.push({
+            name,
+            price,
+            quantity: 1,
+            type: "producto",
+          });
+        }
+
+        saveCart();
+        updateCartDisplay();
+        closeProductModal();
+        openCart();
+      };
+
+      // Evento para cerrar modal
+      document
+        .getElementById("close-modal")
+        ?.addEventListener("click", closeProductModal);
+      document
+        .getElementById("product-detail-modal")
+        ?.addEventListener("click", (e) => {
+          if (e.target === e.currentTarget) {
+            closeProductModal();
+          }
+        });
+
+      // Evento para cerrar carrito
+      cartClose?.addEventListener("click", closeCart);
+
       // Evento global para todos los clicks
       document.addEventListener("click", (event) => {
         const target = event.target;
@@ -215,6 +349,26 @@ import "../styles/global.css";
           mockCart.splice(index, 1);
           saveCart();
           updateCartDisplay();
+          return;
+        }
+
+        // Ver detalle del producto (botón "Ver más")
+        if (target.closest("[data-view-detail]")) {
+          const card = target.closest("[data-product]");
+          if (!card) return;
+          
+          const nameEl = card.querySelector("[data-product-name]");
+          const priceEl = card.querySelector("[data-product-price]");
+          const imgEl = card.querySelector("img");
+          const descEl = card.querySelector("p.text-sm");
+
+          const name = nameEl?.textContent ?? "Producto";
+          const price = priceEl?.textContent ?? "$0";
+          const image = imgEl?.src ?? "";
+          const alt = imgEl?.alt ?? "";
+          const description = descEl?.textContent ?? "";
+
+          showProductDetail(name, price, image, alt, description);
           return;
         }
 

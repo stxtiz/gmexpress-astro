@@ -52,7 +52,10 @@ const {
             {price}
           </span>
           {priceLabel && (
-            <span class="text-sm text-text-light/60 dark:text-text-dark/60 ml-1">
+            <span
+              class="text-sm text-text-light/60 dark:text-text-dark/60 ml-1"
+              data-price-label
+            >
               {priceLabel}
             </span>
           )}
@@ -61,9 +64,16 @@ const {
     }
     <div class="mt-4 flex gap-3">
       <button
-        class="w-full flex items-center justify-center rounded-lg h-10 px-4 border border-border-light dark:border-border-dark bg-transparent text-text-light dark:text-text-dark text-sm font-medium leading-normal hover:bg-card-light/50 dark:hover:bg-card-dark/50 transition-colors"
+        class="group/btn w-full flex items-center justify-center gap-2 rounded-lg h-10 px-4 border-2 border-primary bg-transparent text-primary text-sm font-semibold leading-normal hover:bg-primary hover:text-white transition-all duration-300 hover:shadow-lg hover:scale-105"
+        data-view-detail
       >
-        Ver Detalles
+        <span class="transition-transform group-hover/btn:scale-110"
+          >Ver Detalles</span
+        >
+        <span
+          class="material-symbols-outlined text-sm transition-transform group-hover/btn:rotate-12"
+          >visibility</span
+        >
       </button>
       {
         hasPrice ? (
@@ -74,9 +84,12 @@ const {
             Agregar
           </button>
         ) : (
-          <button class="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold tracking-wide hover:bg-primary/90 transition-colors">
+          <a
+            href={`/solicitud-cotizacion?servicio=${encodeURIComponent(name)}`}
+            class="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold tracking-wide hover:bg-primary/90 transition-colors"
+          >
             Cotizar
-          </button>
+          </a>
         )
       }
     </div>

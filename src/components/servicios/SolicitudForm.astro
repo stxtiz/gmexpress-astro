@@ -1,0 +1,270 @@
+---
+interface Props {
+  servicioPreseleccionado?: string;
+}
+
+const { servicioPreseleccionado } = Astro.props;
+---
+
+<div
+  class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 md:p-10"
+>
+  <form id="solicitudForm" class="flex flex-col gap-6">
+    <!-- Información del Servicio -->
+    <div class="flex flex-col gap-4">
+      <h2 class="text-2xl font-bold text-secondary dark:text-text-dark">
+        Información del Servicio
+      </h2>
+
+      <!-- Tipo de Servicio -->
+      <div class="flex flex-col gap-2">
+        <label
+          for="servicio"
+          class="text-sm font-medium text-secondary dark:text-text-dark"
+        >
+          Tipo de Servicio <span class="text-red-500">*</span>
+        </label>
+        <select
+          id="servicio"
+          name="servicio"
+          required
+          class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
+        >
+          <option value="">Selecciona un servicio</option>
+          <option
+            value="Catering para Eventos"
+            selected={servicioPreseleccionado === "Catering para Eventos"}
+            >Catering para Eventos</option
+          >
+          <option
+            value="Servicio de Cafetería"
+            selected={servicioPreseleccionado === "Servicio de Cafetería"}
+            >Servicio de Cafetería</option
+          >
+          <option
+            value="Comedores Industriales"
+            selected={servicioPreseleccionado === "Comedores Industriales"}
+            >Comedores Industriales</option
+          >
+          <option
+            value="Almuerzos Ejecutivos"
+            selected={servicioPreseleccionado === "Almuerzos Ejecutivos"}
+            >Almuerzos Ejecutivos</option
+          >
+          <option
+            value="Vending Machines"
+            selected={servicioPreseleccionado === "Vending Machines"}
+            >Vending Machines</option
+          >
+          <option
+            value="Asesoría Gastronómica"
+            selected={servicioPreseleccionado === "Asesoría Gastronómica"}
+            >Asesoría Gastronómica</option
+          >
+        </select>
+      </div>
+
+      <!-- Número de Personas -->
+      <div class="flex flex-col gap-2">
+        <label
+          for="numeroPersonas"
+          class="text-sm font-medium text-secondary dark:text-text-dark"
+        >
+          Número de Personas/Empleados <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="number"
+          id="numeroPersonas"
+          name="numeroPersonas"
+          required
+          min="1"
+          placeholder="50"
+          class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+        />
+      </div>
+
+      <!-- Fecha Estimada -->
+      <div class="flex flex-col gap-2">
+        <label
+          for="fechaEstimada"
+          class="text-sm font-medium text-secondary dark:text-text-dark"
+        >
+          Fecha Estimada de Inicio <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="date"
+          id="fechaEstimada"
+          name="fechaEstimada"
+          required
+          class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+        />
+      </div>
+
+      <!-- Descripción de Necesidades -->
+      <div class="flex flex-col gap-2">
+        <label
+          for="descripcion"
+          class="text-sm font-medium text-secondary dark:text-text-dark"
+        >
+          Describe tus necesidades <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          required
+          rows="4"
+          placeholder="Por favor detalla tus requerimientos específicos..."
+          class="px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Información de Contacto -->
+    <div class="flex flex-col gap-4">
+      <h2 class="text-2xl font-bold text-secondary dark:text-text-dark">
+        Información de Contacto
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Nombre -->
+        <div class="flex flex-col gap-2">
+          <label
+            for="nombre"
+            class="text-sm font-medium text-secondary dark:text-text-dark"
+          >
+            Nombre Completo <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            required
+            placeholder="Juan Pérez"
+            class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+
+        <!-- Empresa -->
+        <div class="flex flex-col gap-2">
+          <label
+            for="empresa"
+            class="text-sm font-medium text-secondary dark:text-text-dark"
+          >
+            Empresa <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="empresa"
+            name="empresa"
+            required
+            placeholder="Mi Empresa S.A."
+            class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Email -->
+        <div class="flex flex-col gap-2">
+          <label
+            for="email"
+            class="text-sm font-medium text-secondary dark:text-text-dark"
+          >
+            Correo Electrónico <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="correo@empresa.com"
+            class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+
+        <!-- Teléfono -->
+        <div class="flex flex-col gap-2">
+          <label
+            for="telefono"
+            class="text-sm font-medium text-secondary dark:text-text-dark"
+          >
+            Teléfono <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            id="telefono"
+            name="telefono"
+            required
+            placeholder="+56 9 1234 5678"
+            class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+      </div>
+
+      <!-- Ciudad -->
+      <div class="flex flex-col gap-2">
+        <label
+          for="ciudad"
+          class="text-sm font-medium text-secondary dark:text-text-dark"
+        >
+          Ciudad <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="ciudad"
+          name="ciudad"
+          required
+          placeholder="Santiago"
+          class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+        />
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+      <button
+        type="submit"
+        class="flex-1 flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-all hover:shadow-lg"
+      >
+        <span class="material-symbols-outlined mr-2">send</span>
+        <span class="truncate">Enviar Solicitud</span>
+      </button>
+      <a
+        href="/servicios"
+        class="flex-1 flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 border-2 border-slate-300 dark:border-slate-700 text-secondary dark:text-text-dark text-base font-bold tracking-wide hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+      >
+        <span class="truncate">Cancelar</span>
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Manejar envío del formulario
+  const form = document.getElementById("solicitudForm");
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form as HTMLFormElement);
+    const data: Record<string, any> = {};
+
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    console.log("Datos de la solicitud:", data);
+
+    // Simular envío (mockup)
+    alert(
+      "¡Solicitud enviada exitosamente!\n\n" +
+        `Servicio: ${data.servicio}\n` +
+        `Empresa: ${data.empresa}\n` +
+        `Contacto: ${data.nombre}\n\n` +
+        "Nos pondremos en contacto contigo en las próximas 24 horas.\n\n" +
+        "(Esta es una versión mockup)",
+    );
+
+    // Opcional: Redirigir
+    window.location.href = "/servicios";
+  });
+</script>
