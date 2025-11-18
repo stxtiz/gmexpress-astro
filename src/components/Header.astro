@@ -50,18 +50,188 @@
       </div>
     </nav>
     <div class="hidden md:flex items-center gap-3">
-      <a
+      <button
+        id="loginBtn"
         class="flex min-w-[110px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 border border-primary text-primary text-sm font-bold tracking-wide hover:bg-primary/10 transition-colors"
-        href="#"
       >
         Iniciar Sesión
-      </a>
+      </button>
       <a
         class="flex min-w-[110px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary text-white text-sm font-bold tracking-wide hover:bg-primary/90 transition-colors"
-        href="#"
+        href="/registro"
       >
         Registrarse
       </a>
     </div>
   </div>
 </header>
+
+<!-- Modal de Login -->
+<div
+  id="loginModal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-100 hidden items-center justify-center p-4"
+>
+  <div
+    class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-8 relative animate-fade-in"
+  >
+    <button
+      id="closeModal"
+      class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+    >
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-2 text-center">
+        <h2 class="text-3xl font-bold text-secondary dark:text-text-dark">
+          Iniciar Sesión
+        </h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400">
+          Ingresa tus credenciales para acceder
+        </p>
+      </div>
+
+      <form id="loginForm" class="flex flex-col gap-4">
+        <!-- Email -->
+        <div class="flex flex-col gap-2">
+          <label for="loginEmail" class="text-sm font-medium text-secondary dark:text-text-dark">
+            Correo Electrónico
+          </label>
+          <input
+            type="email"
+            id="loginEmail"
+            name="loginEmail"
+            required
+            placeholder="correo@ejemplo.com"
+            class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+
+        <!-- Contraseña -->
+        <div class="flex flex-col gap-2">
+          <label for="loginPassword" class="text-sm font-medium text-secondary dark:text-text-dark">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            id="loginPassword"
+            name="loginPassword"
+            required
+            placeholder="Tu contraseña"
+            class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+
+        <!-- Recordarme y Olvidé mi contraseña -->
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              name="rememberMe"
+              class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary focus:ring-2 cursor-pointer"
+            />
+            <span class="text-sm text-slate-600 dark:text-slate-400">
+              Recordarme
+            </span>
+          </label>
+          <a href="#" class="text-sm text-primary hover:underline font-medium">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+
+        <!-- Botón de Login -->
+        <button
+          type="submit"
+          class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-all hover:shadow-lg mt-2"
+        >
+          <span class="material-symbols-outlined mr-2">login</span>
+          <span class="truncate">Iniciar Sesión</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="relative my-2">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-slate-200 dark:border-slate-800"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400">
+              o
+            </span>
+          </div>
+        </div>
+
+        <!-- Registro -->
+        <div class="text-center">
+          <p class="text-sm text-slate-600 dark:text-slate-400">
+            ¿No tienes una cuenta?
+            <a href="/registro" class="text-primary hover:underline font-medium ml-1">
+              Regístrate aquí
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+</style>
+
+<script>
+  const loginBtn = document.getElementById('loginBtn');
+  const loginModal = document.getElementById('loginModal');
+  const closeModal = document.getElementById('closeModal');
+  const loginForm = document.getElementById('loginForm');
+
+  // Abrir modal
+  loginBtn?.addEventListener('click', () => {
+    loginModal?.classList.remove('hidden');
+    loginModal?.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  });
+
+  // Cerrar modal
+  const closeLoginModal = () => {
+    loginModal?.classList.add('hidden');
+    loginModal?.classList.remove('flex');
+    document.body.style.overflow = 'auto';
+  };
+
+  closeModal?.addEventListener('click', closeLoginModal);
+
+  // Cerrar al hacer click fuera del modal
+  loginModal?.addEventListener('click', (e) => {
+    if (e.target === loginModal) {
+      closeLoginModal();
+    }
+  });
+
+  // Cerrar con la tecla ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !loginModal?.classList.contains('hidden')) {
+      closeLoginModal();
+    }
+  });
+
+  // Manejar el submit del formulario
+  loginForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    alert('¡Login exitoso!\n\nEsta es una versión mockup. En producción, las credenciales se validarían en el servidor.');
+    closeLoginModal();
+  });
+</script>

@@ -1,0 +1,445 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+---
+
+<Layout title="GMEXPRESS - Registro de Usuario">
+  <main class="flex-1 pt-[68px]">
+    <!-- Hero Section -->
+    <section
+      class="w-full py-12 md:py-16 bg-gradient-to-br from-primary/10 to-secondary/10"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-10">
+        <div class="flex flex-col gap-4 text-center">
+          <h1
+            class="text-4xl md:text-5xl font-bold tracking-tight text-secondary dark:text-text-dark"
+          >
+            Únete a GMEXPRESS
+          </h1>
+          <p
+            class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto"
+          >
+            Crea tu cuenta y comienza a disfrutar de nuestros productos y
+            servicios de calidad
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Registration Form Section -->
+    <section class="w-full py-10 md:py-16">
+      <div class="max-w-2xl mx-auto px-4 sm:px-10">
+        <div
+          class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 md:p-10"
+        >
+          <form class="flex flex-col gap-6">
+            <!-- Información Personal -->
+            <div class="flex flex-col gap-4">
+              <h2 class="text-2xl font-bold text-secondary dark:text-text-dark">
+                Información Personal
+              </h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Nombre -->
+                <div class="flex flex-col gap-2">
+                  <label
+                    for="firstName"
+                    class="text-sm font-medium text-secondary dark:text-text-dark"
+                  >
+                    Nombre <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    required
+                    placeholder="Juan"
+                    class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  />
+                </div>
+
+                <!-- Apellido -->
+                <div class="flex flex-col gap-2">
+                  <label
+                    for="lastName"
+                    class="text-sm font-medium text-secondary dark:text-text-dark"
+                  >
+                    Apellido <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    required
+                    placeholder="Pérez"
+                    class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  />
+                </div>
+              </div>
+
+              <!-- RUT -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="rut"
+                  class="text-sm font-medium text-secondary dark:text-text-dark"
+                >
+                  RUT <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="rut"
+                  name="rut"
+                  required
+                  placeholder="12.345.678-9"
+                  class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+              </div>
+
+              <!-- Email -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="email"
+                  class="text-sm font-medium text-secondary dark:text-text-dark"
+                >
+                  Correo Electrónico <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  placeholder="correo@ejemplo.com"
+                  class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+              </div>
+
+              <!-- Teléfono -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="phone"
+                  class="text-sm font-medium text-secondary dark:text-text-dark"
+                >
+                  Teléfono <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  required
+                  placeholder="+56 9 1234 5678"
+                  class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="flex flex-col gap-4">
+              <h2 class="text-2xl font-bold text-secondary dark:text-text-dark">
+                Dirección de Despacho
+              </h2>
+
+              <!-- Dirección -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="address"
+                  class="text-sm font-medium text-secondary dark:text-text-dark"
+                >
+                  Calle y Número <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  required
+                  placeholder="Av. Libertador Bernardo O'Higgins 1234"
+                  class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Comuna -->
+                <div class="flex flex-col gap-2">
+                  <label
+                    for="comuna"
+                    class="text-sm font-medium text-secondary dark:text-text-dark"
+                  >
+                    Comuna <span class="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="comuna"
+                    name="comuna"
+                    required
+                    class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="">Selecciona una comuna</option>
+                    <option value="santiago">Santiago</option>
+                    <option value="providencia">Providencia</option>
+                    <option value="las-condes">Las Condes</option>
+                    <option value="vitacura">Vitacura</option>
+                    <option value="nunoa">Ñuñoa</option>
+                    <option value="maipu">Maipú</option>
+                    <option value="la-florida">La Florida</option>
+                    <option value="puente-alto">Puente Alto</option>
+                  </select>
+                </div>
+
+                <!-- Región -->
+                <div class="flex flex-col gap-2">
+                  <label
+                    for="region"
+                    class="text-sm font-medium text-secondary dark:text-text-dark"
+                  >
+                    Región <span class="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="region"
+                    name="region"
+                    required
+                    class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="">Selecciona una región</option>
+                    <option value="metropolitana">Región Metropolitana</option>
+                    <option value="valparaiso">Región de Valparaíso</option>
+                    <option value="biobio">Región del Biobío</option>
+                    <option value="araucania">Región de La Araucanía</option>
+                    <option value="los-lagos">Región de Los Lagos</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Departamento/Oficina (Opcional) -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="apartment"
+                  class="text-sm font-medium text-secondary dark:text-text-dark"
+                >
+                  Departamento/Oficina (Opcional)
+                </label>
+                <input
+                  type="text"
+                  id="apartment"
+                  name="apartment"
+                  placeholder="Depto. 402"
+                  class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            <!-- Seguridad -->
+            <div class="flex flex-col gap-4">
+              <h2 class="text-2xl font-bold text-secondary dark:text-text-dark">
+                Seguridad
+              </h2>
+
+              <!-- Contraseña -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="password"
+                  class="text-sm font-medium text-secondary dark:text-text-dark"
+                >
+                  Contraseña <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  placeholder="Mínimo 8 caracteres"
+                  class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                  La contraseña debe tener al menos 8 caracteres, incluir
+                  mayúsculas, minúsculas y números
+                </p>
+              </div>
+
+              <!-- Confirmar Contraseña -->
+              <div class="flex flex-col gap-2">
+                <label
+                  for="confirmPassword"
+                  class="text-sm font-medium text-secondary dark:text-text-dark"
+                >
+                  Confirmar Contraseña <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  required
+                  placeholder="Repite tu contraseña"
+                  class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            <!-- Términos y Condiciones -->
+            <div class="flex items-start gap-3 pt-4">
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                required
+                class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary focus:ring-2 cursor-pointer"
+              />
+              <label
+                for="terms"
+                class="text-sm text-slate-600 dark:text-slate-400 cursor-pointer"
+              >
+                Acepto los <a
+                  href="#"
+                  class="text-primary hover:underline font-medium"
+                  >Términos y Condiciones</a
+                > y la
+                <a href="#" class="text-primary hover:underline font-medium"
+                  >Política de Privacidad</a
+                > de GMEXPRESS
+              </label>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+              <button
+                type="submit"
+                class="flex-1 flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-all hover:shadow-lg"
+              >
+                <span class="material-symbols-outlined mr-2">person_add</span>
+                <span class="truncate">Crear Cuenta</span>
+              </button>
+              <a
+                href="/"
+                class="flex-1 flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 border-2 border-slate-300 dark:border-slate-700 text-secondary dark:text-text-dark text-base font-bold tracking-wide hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <span class="truncate">Cancelar</span>
+              </a>
+            </div>
+
+            <!-- Login Link -->
+            <div
+              class="text-center pt-4 border-t border-slate-200 dark:border-slate-800"
+            >
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                ¿Ya tienes una cuenta?
+                <a
+                  href="/"
+                  class="text-primary hover:underline font-medium ml-1"
+                >
+                  Inicia sesión aquí
+                </a>
+              </p>
+            </div>
+          </form>
+        </div>
+
+        <!-- Features -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+          <div
+            class="flex items-start gap-3 p-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800"
+          >
+            <span class="material-symbols-outlined text-primary text-3xl"
+              >verified_user</span
+            >
+            <div>
+              <h3 class="font-bold text-secondary dark:text-text-dark">
+                Seguro y Confiable
+              </h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Tus datos están protegidos con encriptación de nivel bancario
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex items-start gap-3 p-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800"
+          >
+            <span class="material-symbols-outlined text-primary text-3xl"
+              >local_shipping</span
+            >
+            <div>
+              <h3 class="font-bold text-secondary dark:text-text-dark">
+                Despacho Express
+              </h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Recibe tus pedidos en tiempo récord en tu dirección
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex items-start gap-3 p-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800"
+          >
+            <span class="material-symbols-outlined text-primary text-3xl"
+              >loyalty</span
+            >
+            <div>
+              <h3 class="font-bold text-secondary dark:text-text-dark">
+                Beneficios Exclusivos
+              </h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                Ofertas especiales y descuentos para clientes registrados
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  // Validación básica del formulario
+  const form = document.querySelector("form");
+  const password = document.getElementById("password") as HTMLInputElement;
+  const confirmPassword = document.getElementById(
+    "confirmPassword",
+  ) as HTMLInputElement;
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    // Validar que las contraseñas coincidan
+    if (password.value !== confirmPassword.value) {
+      alert(
+        "Las contraseñas no coinciden. Por favor, verifica e intenta nuevamente.",
+      );
+      confirmPassword.focus();
+      return;
+    }
+
+    // Validar longitud de contraseña
+    if (password.value.length < 8) {
+      alert("La contraseña debe tener al menos 8 caracteres.");
+      password.focus();
+      return;
+    }
+
+    // Validar complejidad de contraseña
+    const hasUpperCase = /[A-Z]/.test(password.value);
+    const hasLowerCase = /[a-z]/.test(password.value);
+    const hasNumbers = /\d/.test(password.value);
+
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+      alert("La contraseña debe incluir mayúsculas, minúsculas y números.");
+      password.focus();
+      return;
+    }
+
+    // Si todo está bien (mockup)
+    alert(
+      "¡Registro exitoso! Bienvenido a GMEXPRESS.\n\nEsta es una versión mockup. En producción, los datos se enviarían al servidor.",
+    );
+
+    // Opcional: Redirigir a la página de inicio
+    // window.location.href = '/';
+  });
+
+  // Validación en tiempo real de coincidencia de contraseñas
+  confirmPassword?.addEventListener("input", () => {
+    if (confirmPassword.value && password.value !== confirmPassword.value) {
+      confirmPassword.setCustomValidity("Las contraseñas no coinciden");
+    } else {
+      confirmPassword.setCustomValidity("");
+    }
+  });
+</script>
