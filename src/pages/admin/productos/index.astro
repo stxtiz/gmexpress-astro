@@ -1,0 +1,1045 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import "../../../styles/global.css";
+---
+
+<Layout title="GMExpress - Admin Dashboard - Productos">
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+    crossorigin="anonymous"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+  />
+
+  <div class="admin-dashboard min-vh-100">
+    <!-- Sidebar -->
+    <div class="sidebar bg-dark text-white vh-100 position-fixed">
+      <div class="p-4">
+        <div class="d-flex align-items-center mb-4">
+          <img
+            src="/images/Logo-horizontal.png"
+            alt="GMExpress Logo"
+            class="img-fluid"
+            style="max-height: 50px; filter: brightness(0) invert(1);"
+          />
+        </div>
+        <hr class="text-white-50" />
+        <nav class="nav flex-column gap-2">
+          <a
+            href="/admin"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+          </a>
+          <a
+            href="/admin/productos"
+            class="nav-link text-white active-link d-flex align-items-center gap-2 rounded"
+          >
+            <i class="bi bi-box-seam"></i>
+            <span>Productos</span>
+          </a>
+          <a
+            href="/admin/servicios"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-gear"></i>
+            <span>Servicios</span>
+          </a>
+          <a
+            href="/admin/usuarios"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-people"></i>
+            <span>Usuarios</span>
+          </a>
+          <a
+            href="/admin/pedidos"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-cart-check"></i>
+            <span>Pedidos</span>
+          </a>
+          <hr class="text-white-50" />
+          <a
+            href="/"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-house"></i>
+            <span>Volver al sitio</span>
+          </a>
+          <a
+            href="#"
+            class="nav-link text-danger d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Cerrar sesión</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+        <div class="container-fluid">
+          <h4 class="mb-0 text-dark fw-bold">Gestión de Productos</h4>
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-link text-dark position-relative">
+              <i class="bi bi-bell fs-5"></i>
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              >
+                3
+              </span>
+            </button>
+            <div class="dropdown">
+              <button
+                class="btn btn-link text-dark dropdown-toggle d-flex align-items-center gap-2"
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                <div
+                  class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px;"
+                >
+                  <i class="bi bi-person-fill"></i>
+                </div>
+                <span class="fw-semibold">Admin</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#">Perfil</a></li>
+                <li><a class="dropdown-item" href="#">Configuración</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item text-danger" href="#">Cerrar sesión</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Content Area -->
+      <div class="p-4">
+        <!-- Stats Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div
+                  class="d-flex align-items-center justify-content-between mb-2"
+                >
+                  <div
+                    class="rounded-circle bg-primary bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-box-seam text-primary fs-4"></i>
+                  </div>
+                  <span class="badge bg-success">+8%</span>
+                </div>
+                <h3 class="fw-bold mb-0" id="total-productos">8</h3>
+                <p class="text-muted mb-0 small">Total Productos</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div
+                  class="d-flex align-items-center justify-content-between mb-2"
+                >
+                  <div
+                    class="rounded-circle bg-success bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-check-circle text-success fs-4"></i>
+                  </div>
+                  <span class="badge bg-primary">100%</span>
+                </div>
+                <h3 class="fw-bold mb-0" id="productos-activos">8</h3>
+                <p class="text-muted mb-0 small">Activos</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div
+                  class="d-flex align-items-center justify-content-between mb-2"
+                >
+                  <div
+                    class="rounded-circle bg-warning bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-tags text-warning fs-4"></i>
+                  </div>
+                  <span class="badge bg-info">5</span>
+                </div>
+                <h3 class="fw-bold mb-0" id="categorias">5</h3>
+                <p class="text-muted mb-0 small">Categorías</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div
+                  class="d-flex align-items-center justify-content-between mb-2"
+                >
+                  <div
+                    class="rounded-circle bg-info bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-currency-dollar text-info fs-4"></i>
+                  </div>
+                  <span class="badge bg-success">$9.240</span>
+                </div>
+                <h3 class="fw-bold mb-0" id="precio-promedio">$9.240</h3>
+                <p class="text-muted mb-0 small">Precio Promedio</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-start-0 ps-0"
+                    placeholder="Buscar productos..."
+                    id="searchInput"
+                  />
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select class="form-select" id="categoryFilter">
+                  <option value="">Todas las categorías</option>
+                  <option value="Pizza">Pizza</option>
+                  <option value="Ensalada">Ensalada</option>
+                  <option value="Bebidas">Bebidas</option>
+                  <option value="Desayuno">Desayuno</option>
+                  <option value="Carnes">Carnes</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class="form-select" id="statusFilter">
+                  <option value="">Todos los estados</option>
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                </select>
+              </div>
+              <div class="col-md-3 text-end">
+                <button
+                  class="btn btn-primary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#productoModal"
+                  onclick="openCreateModal()"
+                >
+                  <i class="bi bi-plus-circle me-2"></i>Nuevo Producto
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="px-4 py-3 border-0">
+                      <input type="checkbox" class="form-check-input" id="selectAll" />
+                    </th>
+                    <th class="px-4 py-3 border-0">Imagen</th>
+                    <th class="px-4 py-3 border-0">Nombre</th>
+                    <th class="px-4 py-3 border-0">Categoría</th>
+                    <th class="px-4 py-3 border-0">Precio</th>
+                    <th class="px-4 py-3 border-0">Stock</th>
+                    <th class="px-4 py-3 border-0">Estado</th>
+                    <th class="px-4 py-3 border-0 text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="productosTableBody">
+                  <!-- Se llenará dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer bg-white border-top-0">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small"
+                >Mostrando <span id="showing-count">8</span> de <span
+                  id="total-count">8</span
+                > productos</span
+              >
+              <nav>
+                <ul class="pagination pagination-sm mb-0">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#">Anterior</a>
+                  </li>
+                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">Siguiente</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Crear/Editar Producto -->
+  <div
+    class="modal fade"
+    id="productoModal"
+    tabindex="-1"
+    aria-labelledby="productoModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="productoModalLabel">
+            Nuevo Producto
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="productoForm">
+            <input type="hidden" id="productoId" />
+            <div class="row g-3">
+              <div class="col-md-8">
+                <label for="nombre" class="form-label fw-semibold"
+                  >Nombre del Producto <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nombre"
+                  placeholder="Ej: Pizza Suprema de la Casa"
+                  required
+                />
+              </div>
+              <div class="col-md-4">
+                <label for="categoria" class="form-label fw-semibold"
+                  >Categoría <span class="text-danger">*</span></label
+                >
+                <select class="form-select" id="categoria" required>
+                  <option value="">Seleccionar...</option>
+                  <option value="Pizza">Pizza</option>
+                  <option value="Ensalada">Ensalada</option>
+                  <option value="Bebidas">Bebidas</option>
+                  <option value="Desayuno">Desayuno</option>
+                  <option value="Carnes">Carnes</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label for="descripcion" class="form-label fw-semibold"
+                  >Descripción <span class="text-danger">*</span></label
+                >
+                <textarea
+                  class="form-control"
+                  id="descripcion"
+                  rows="3"
+                  placeholder="Describe el producto..."
+                  required></textarea>
+              </div>
+              <div class="col-md-6">
+                <label for="precio" class="form-label fw-semibold"
+                  >Precio <span class="text-danger">*</span></label
+                >
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="precio"
+                    placeholder="16.990"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="stock" class="form-label fw-semibold"
+                  >Stock <span class="text-danger">*</span></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="stock"
+                  placeholder="100"
+                  min="0"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="imagen" class="form-label fw-semibold"
+                  >URL de Imagen <span class="text-danger">*</span></label
+                >
+                <input
+                  type="url"
+                  class="form-control"
+                  id="imagen"
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="alt" class="form-label fw-semibold"
+                  >Texto Alternativo <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="alt"
+                  placeholder="Descripción de la imagen"
+                  required
+                />
+              </div>
+              <div class="col-12">
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="activo"
+                    checked
+                  />
+                  <label class="form-check-label fw-semibold" for="activo">
+                    Producto activo
+                  </label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="destacado"
+                  />
+                  <label class="form-check-label fw-semibold" for="destacado">
+                    Producto destacado
+                  </label>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-0">
+          <button
+            type="button"
+            class="btn btn-light"
+            data-bs-dismiss="modal">Cancelar</button
+          >
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="saveProducto()">
+            <i class="bi bi-save me-2"></i>Guardar Producto
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Eliminación -->
+  <div
+    class="modal fade"
+    id="deleteModal"
+    tabindex="-1"
+    aria-labelledby="deleteModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-danger" id="deleteModalLabel">
+            <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminación
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">
+            ¿Estás seguro de que deseas eliminar el producto <strong
+              id="deleteProductName"></strong>?
+          </p>
+          <p class="text-muted small mb-0 mt-2">
+            Esta acción no se puede deshacer.
+          </p>
+        </div>
+        <div class="modal-footer border-0">
+          <button
+            type="button"
+            class="btn btn-light"
+            data-bs-dismiss="modal">Cancelar</button
+          >
+          <button
+            type="button"
+            class="btn btn-danger"
+            onclick="confirmDelete()">
+            <i class="bi bi-trash me-2"></i>Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Vista Detallada -->
+  <div
+    class="modal fade"
+    id="viewModal"
+    tabindex="-1"
+    aria-labelledby="viewModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="viewModalLabel">
+            Detalle del Producto
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="viewModalBody">
+          <!-- Se llenará dinámicamente -->
+        </div>
+        <div class="modal-footer border-0">
+          <button
+            type="button"
+            class="btn btn-light"
+            data-bs-dismiss="modal">Cerrar</button
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .admin-dashboard {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .sidebar {
+      width: 260px;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      background: linear-gradient(180deg, #1a2e3d 0%, #0a1929 100%);
+    }
+
+    .main-content {
+      margin-left: 260px;
+      min-height: 100vh;
+    }
+
+    .hover-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .active-link {
+      background-color: #79c043 !important;
+      color: white !important;
+    }
+
+    .active-link:hover {
+      background-color: #6ab03a !important;
+    }
+
+    .table tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(121, 192, 67, 0.05);
+      transform: translateX(2px);
+    }
+
+    .product-img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .btn-action {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card {
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .badge {
+      font-weight: 600;
+      padding: 0.35em 0.65em;
+    }
+
+    .stock-badge {
+      min-width: 60px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+
+  <script is:inline>
+    // Mock data de productos
+    let productos = [
+      {
+        id: 1,
+        name: "Pizza Suprema de la Casa",
+        price: "$16.990",
+        categoria: "Pizza",
+        stock: 45,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuAKRSPegdsLOAqm9hXTzYusgTjcdhnbeY4a2__9WuU4QTNHNWiFF8bmF8XfJuJtNlFxaCV3RiMLSiyR1VQSMxWxBs4NAEu_VS4SZwbAKAu0dbkCw1UcQTNowZV9u76oXnu4BI4vRu_wwoUW-ktbrv-YHq0JHze9TqiEFtbmimU3c8A6KRelU2bXDIzP6aPImEcPlYwPNMq0EpyVa0aLp49zZq8ore8iUxJi3shMq5BGTHYdslpv302QG4DRBb1-2z3qZmNeJSQxq9Y",
+        alt: "Una pizza de pepperoni recién horneada sobre una tabla de madera.",
+        description:
+          "Deliciosa pizza con pepperoni, queso mozzarella y salsa de tomate casera.",
+        activo: true,
+        destacado: true,
+      },
+      {
+        id: 2,
+        name: "Ensalada Fresca",
+        price: "$6.990",
+        categoria: "Ensalada",
+        stock: 30,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuAIKNIod8GIjMemYogpUEaEPhubH1QJ4LgjN91_2LCnc5v_5Fjb4Ad129_i7lpzy3rhyljKawUvZ0VK3u07lPmO-FI_un3sqUnZmWAY0JBrzkwHdLDMUz1R2yAx1Oaa73-kcr-fn7nqWTWXiw8ssSe5T6wxzXIrB5BA0PLbkEs6ailr__GPPwixgz0ObduYTfPOJigntgbPfuP7Ub1maJ0FxjDCBFkOv5FWDoFOwLyTHOMvyJyqzntltPPT6FMMrIJp53PtwqJw3I4",
+        alt: "Una ensalada fresca y colorida en un bol blanco.",
+        description:
+          "Ensalada mixta con vegetales frescos, aderezo de la casa y crutones.",
+        activo: true,
+        destacado: false,
+      },
+      {
+        id: 3,
+        name: "Pizza Vegetariana",
+        price: "$12.990",
+        categoria: "Pizza",
+        stock: 25,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuApvlk8YkSynUsEDVSbQmWG_GwwHObdS_8VNf2e-KQdhX_5Wfi7kQxeP2C0PhvJNECiH7lVozJphaNYa7L-SSZIXQyljW6O79pM6NYEVeNiWHHNVqR-XKug-sLx9rHSmDbx8dKij4acooZjrm2zACH200DxqO1YSNJYjT2lp6bnTfJ-ZZ4c9DAn2NGk9tnyGVaNRXk6XIhVgvjsMo82uCHUCT_a-K8YLoKT13eV_WPY3sRHMs4QOJ0bObb758Odal1PpmfafHALyeM",
+        alt: "Pizza vegetariana con muchos toppings.",
+        description:
+          "Pizza con champiñones, pimientos, cebolla, aceitunas y queso.",
+        activo: true,
+        destacado: true,
+      },
+      {
+        id: 4,
+        name: "Cócteles Tropicales",
+        price: "$5.990",
+        categoria: "Bebidas",
+        stock: 60,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDD7vL8Y2meqGRonlma8xaCrq6lpx0CNUNU5CXjAYxTlb-Mx9HiYDmztQJbQiB5z7JXpUFQJ3oTUDaA__2egYSznxNVLlhWdbAsFUzadHlVBdozIt9Y0yqXmniAfAwTCsHF3UIFUvhnu5uAn7DFpUnDBm9ne6OAnTjD7nithUyfysrMYKbB0WFLYF7p3-sspvZTA7j4PtTB_j2K3yh6zau_fmPET-olIiOojN2rLv-UNRl_BBS3K0e7HybF7RsH_2spfFif-tqHV60",
+        alt: "Tres cócteles coloridos en copas.",
+        description: "Refrescantes bebidas tropicales con frutas naturales.",
+        activo: true,
+        destacado: false,
+      },
+      {
+        id: 5,
+        name: "Tostada de Aguacate",
+        price: "$4.990",
+        categoria: "Desayuno",
+        stock: 20,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDV1_qHHpu2esAkmFv_2xs-_Yd7S-wKXyKU8t9-w0nOjpSFrhbkVKk-obCgYcTTEhLQ5V195zO41CQ9S6mISawTpdEbVMCOw2sTu6uDBrqGkc9WnfrP2lynqrk71mt7lmN5lS76CfWjGiSokQTjvH_sWMU_qTTVRYhxUAdWXXbrTjXf_ogX9DOjpx0t92eSqRREpro-4nlPF8IN0ytngNDjSN7GR5zu1RoJKYFapjgBy-TdK0gi7uOeAl8wBBIWfaF3Imjfsa6G-iM",
+        alt: "Tostada con aguacate y huevo pochado.",
+        description: "Pan tostado con aguacate, huevo pochado y especias.",
+        activo: true,
+        destacado: false,
+      },
+      {
+        id: 6,
+        name: "Pancakes con Frutas",
+        price: "$7.990",
+        categoria: "Desayuno",
+        stock: 35,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDEnZpiuC7bYj6XQzUhHf_SjoL_g83S49Vc-jRbyChfCPEtpKXOAg6zTmQZQJYskuGSxEe0PIcrOnnEkEDLQAqxdgo-FANrS_fPfB9pWFB2f6c-qGyLqZSbnIT0vlXzGKS2g72XsV5TOzKpnHXMq0MmxpqaS7KQGmwQ6ZG2jImlVBzbk_a5gZwHHTLzCfcsKtzVMNRYLUO7dLK55KzQ99y9opH4QWeB9G_GIsinbRqqBrvKgSIqC3TvSqgeiEKLG-QPqZmbIy3ueg4",
+        alt: "Pancakes con sirope y frutas.",
+        description: "Pancakes esponjosos con sirope de maple y frutas frescas.",
+        activo: true,
+        destacado: true,
+      },
+      {
+        id: 7,
+        name: "Pollo a la Parrilla",
+        price: "$10.990",
+        categoria: "Carnes",
+        stock: 15,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuCwswJce_0QCIAcq4zljCeoj8dBaoJsvtBnHIjinniLa3nSK_VYiVegOLv9K5pBFsZheQ0zgF-u94VVfZFrYPGjhdF0VeETUD4QWlJifxlNJM9MFT-rRKJ1OQtzI6lnnhhs1jTAZBVP1zTHEoni9VxmenoQN1Fq3dRp0pw9R0rJ5MadvCXM0yktmCOsN3Tod_IpxG1XRjQkyHF3k2LpzbPj2UdSCLTEiySxrgqWT8UTNkT563yzHD69yUkmqgwTqntA1DE3g_QeX6w",
+        alt: "Pollo a la parrilla con espárragos y limón.",
+        description: "Pechuga de pollo a la parrilla con guarnición de vegetales.",
+        activo: true,
+        destacado: false,
+      },
+      {
+        id: 8,
+        name: "Pizza Champiñones",
+        price: "$11.990",
+        categoria: "Pizza",
+        stock: 40,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuApWD6UDTvsXKCvb3jqFHObvUNiXuyc0Kug8kmexFnMdcaOiriPPrV0GovOM_Cu1_sS9pz5hA6VpxfYjglkVga65eB2bR9sDAOzsLVNrnNLK5oV9gpTKkwBkG_DRZJrICwDk25DhSZ-deICzF1Ux6qS9EIspFiWFKXhKC3wCkx87C13XrXyfzs4AKGqRPipCpj_E0s6NgOcIYMiD3O0mISANi_At22GrlWYqAgVoOVyzddY38dZybj0TR0f6AC_nXpiZh5IizJQzfY",
+        alt: "Una pizza de primer plano con diversos ingredientes.",
+        description: "Pizza con champiñones frescos, queso y hierbas aromáticas.",
+        activo: true,
+        destacado: false,
+      },
+    ];
+
+    let editingId = null;
+    let deleteId = null;
+    let filteredProducts = [...productos];
+
+    // Renderizar tabla
+    function renderTable(productList = productos) {
+      const tbody = document.getElementById("productosTableBody");
+      tbody.innerHTML = "";
+
+      productList.forEach((producto) => {
+        const tr = document.createElement("tr");
+        const stockClass =
+          producto.stock < 20
+            ? "bg-danger"
+            : producto.stock < 50
+              ? "bg-warning"
+              : "bg-success";
+
+        tr.innerHTML = `
+          <td class="px-4">
+            <input type="checkbox" class="form-check-input product-checkbox" value="${producto.id}" />
+          </td>
+          <td class="px-4">
+            <img src="${producto.image}" alt="${producto.alt}" class="product-img" />
+          </td>
+          <td class="px-4">
+            <div class="fw-semibold text-dark">${producto.name}</div>
+            ${producto.destacado ? '<span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> Destacado</span>' : ""}
+          </td>
+          <td class="px-4">
+            <span class="badge bg-primary">${producto.categoria}</span>
+          </td>
+          <td class="px-4">
+            <span class="fw-bold text-success">${producto.price}</span>
+          </td>
+          <td class="px-4">
+            <span class="badge ${stockClass} stock-badge">${producto.stock} uds</span>
+          </td>
+          <td class="px-4">
+            <span class="badge ${producto.activo ? "bg-success" : "bg-secondary"}">
+              ${producto.activo ? "Activo" : "Inactivo"}
+            </span>
+          </td>
+          <td class="px-4 text-end">
+            <button class="btn btn-sm btn-action btn-outline-primary me-1" onclick="viewProducto(${producto.id})" title="Ver">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-action btn-outline-warning me-1" onclick="editProducto(${producto.id})" title="Editar">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-action btn-outline-danger" onclick="deleteProducto(${producto.id})" title="Eliminar">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updateStats();
+    }
+
+    // Actualizar estadísticas
+    function updateStats() {
+      document.getElementById("total-productos").textContent = productos.length;
+      document.getElementById("productos-activos").textContent =
+        productos.filter((p) => p.activo).length;
+
+      const categorias = new Set(productos.map((p) => p.categoria));
+      document.getElementById("categorias").textContent = categorias.size;
+
+      const precioPromedio =
+        productos.reduce(
+          (sum, p) => sum + parseFloat(p.price.replace(/[^0-9]/g, "")),
+          0
+        ) / productos.length;
+      document.getElementById("precio-promedio").textContent = `$${Math.round(precioPromedio).toLocaleString("es-CL")}`;
+
+      document.getElementById("showing-count").textContent =
+        filteredProducts.length;
+      document.getElementById("total-count").textContent = productos.length;
+    }
+
+    // Abrir modal para crear
+    window.openCreateModal = function () {
+      editingId = null;
+      document.getElementById("productoModalLabel").textContent =
+        "Nuevo Producto";
+      document.getElementById("productoForm").reset();
+      document.getElementById("activo").checked = true;
+      document.getElementById("destacado").checked = false;
+    };
+
+    // Ver producto
+    window.viewProducto = function (id) {
+      const producto = productos.find((p) => p.id === id);
+      if (producto) {
+        const modalBody = document.getElementById("viewModalBody");
+        modalBody.innerHTML = `
+          <div class="row">
+            <div class="col-md-5">
+              <img src="${producto.image}" alt="${producto.alt}" class="img-fluid rounded" />
+            </div>
+            <div class="col-md-7">
+              <h4 class="fw-bold mb-3">${producto.name}</h4>
+              <div class="mb-3">
+                <span class="badge bg-primary me-2">${producto.categoria}</span>
+                ${producto.destacado ? '<span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> Destacado</span>' : ""}
+                <span class="badge ${producto.activo ? "bg-success" : "bg-secondary"} ms-2">
+                  ${producto.activo ? "Activo" : "Inactivo"}
+                </span>
+              </div>
+              <p class="text-muted">${producto.description}</p>
+              <hr />
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="text-muted small">Precio</div>
+                  <div class="h4 text-success mb-0">${producto.price}</div>
+                </div>
+                <div class="col-6">
+                  <div class="text-muted small">Stock disponible</div>
+                  <div class="h4 mb-0">${producto.stock} <small class="text-muted">unidades</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        const modal = new bootstrap.Modal(document.getElementById("viewModal"));
+        modal.show();
+      }
+    };
+
+    // Editar producto
+    window.editProducto = function (id) {
+      const producto = productos.find((p) => p.id === id);
+      if (producto) {
+        editingId = id;
+        document.getElementById("productoModalLabel").textContent =
+          "Editar Producto";
+        document.getElementById("nombre").value = producto.name;
+        document.getElementById("categoria").value = producto.categoria;
+        document.getElementById("descripcion").value = producto.description;
+        document.getElementById("precio").value = producto.price.replace(
+          /[^0-9.]/g,
+          ""
+        );
+        document.getElementById("stock").value = producto.stock;
+        document.getElementById("imagen").value = producto.image;
+        document.getElementById("alt").value = producto.alt;
+        document.getElementById("activo").checked = producto.activo;
+        document.getElementById("destacado").checked = producto.destacado;
+
+        const modal = new bootstrap.Modal(
+          document.getElementById("productoModal")
+        );
+        modal.show();
+      }
+    };
+
+    // Eliminar producto
+    window.deleteProducto = function (id) {
+      const producto = productos.find((p) => p.id === id);
+      if (producto) {
+        deleteId = id;
+        document.getElementById("deleteProductName").textContent = producto.name;
+        const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+        modal.show();
+      }
+    };
+
+    // Confirmar eliminación
+    window.confirmDelete = function () {
+      productos = productos.filter((p) => p.id !== deleteId);
+      applyFilters();
+      bootstrap.Modal.getInstance(document.getElementById("deleteModal")).hide();
+      showToast("Producto eliminado exitosamente", "success");
+    };
+
+    // Guardar producto
+    window.saveProducto = function () {
+      const nombre = document.getElementById("nombre").value;
+      const categoria = document.getElementById("categoria").value;
+      const descripcion = document.getElementById("descripcion").value;
+      const precio = document.getElementById("precio").value;
+      const stock = parseInt(document.getElementById("stock").value);
+      const imagen = document.getElementById("imagen").value;
+      const alt = document.getElementById("alt").value;
+      const activo = document.getElementById("activo").checked;
+      const destacado = document.getElementById("destacado").checked;
+
+      if (
+        !nombre ||
+        !categoria ||
+        !descripcion ||
+        !precio ||
+        !stock ||
+        !imagen ||
+        !alt
+      ) {
+        alert("Por favor, completa todos los campos obligatorios");
+        return;
+      }
+
+      const productoData = {
+        name: nombre,
+        categoria: categoria,
+        description: descripcion,
+        price: `$${precio}`,
+        stock: stock,
+        image: imagen,
+        alt: alt,
+        activo: activo,
+        destacado: destacado,
+      };
+
+      if (editingId) {
+        // Editar
+        const index = productos.findIndex((p) => p.id === editingId);
+        productos[index] = { ...productos[index], ...productoData };
+        showToast("Producto actualizado exitosamente", "success");
+      } else {
+        // Crear
+        const newId =
+          productos.length > 0
+            ? Math.max(...productos.map((p) => p.id)) + 1
+            : 1;
+        productos.push({ id: newId, ...productoData });
+        showToast("Producto creado exitosamente", "success");
+      }
+
+      applyFilters();
+      bootstrap.Modal.getInstance(
+        document.getElementById("productoModal")
+      ).hide();
+    };
+
+    // Aplicar filtros
+    function applyFilters() {
+      const searchTerm = document
+        .getElementById("searchInput")
+        .value.toLowerCase();
+      const categoryFilter = document.getElementById("categoryFilter").value;
+      const statusFilter = document.getElementById("statusFilter").value;
+
+      filteredProducts = productos.filter((producto) => {
+        const matchSearch =
+          producto.name.toLowerCase().includes(searchTerm) ||
+          producto.description.toLowerCase().includes(searchTerm);
+        const matchCategory =
+          !categoryFilter || producto.categoria === categoryFilter;
+        const matchStatus =
+          !statusFilter ||
+          (statusFilter === "activo" && producto.activo) ||
+          (statusFilter === "inactivo" && !producto.activo);
+
+        return matchSearch && matchCategory && matchStatus;
+      });
+
+      renderTable(filteredProducts);
+    }
+
+    // Toast notification
+    function showToast(message, type = "info") {
+      const toast = document.createElement("div");
+      toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+      toast.style.zIndex = "9999";
+      toast.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle me-2"></i>
+          <span>${message}</span>
+        </div>
+      `;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Event listeners
+    document.getElementById("searchInput")?.addEventListener("input", applyFilters);
+    document.getElementById("categoryFilter")?.addEventListener("change", applyFilters);
+    document.getElementById("statusFilter")?.addEventListener("change", applyFilters);
+
+    // Select all checkbox
+    document.getElementById("selectAll")?.addEventListener("change", (e) => {
+      const checkboxes = document.querySelectorAll(".product-checkbox");
+      checkboxes.forEach((cb) => (cb.checked = e.target.checked));
+    });
+
+    // Inicializar
+    renderTable();
+  </script>
+
+  <!-- Bootstrap JS Bundle -->
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</Layout>

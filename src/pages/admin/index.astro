@@ -1,0 +1,512 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import "../../styles/global.css";
+---
+
+<Layout title="GMExpress - Admin Dashboard">
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+    crossorigin="anonymous"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+  />
+
+  <div class="admin-dashboard min-vh-100">
+    <!-- Sidebar -->
+    <div class="sidebar bg-dark text-white vh-100 position-fixed">
+      <div class="p-4">
+        <div class="d-flex align-items-center mb-4">
+          <img
+            src="/images/Logo-horizontal.png"
+            alt="GMExpress Logo"
+            class="img-fluid"
+            style="max-height: 50px; filter: brightness(0) invert(1);"
+          />
+        </div>
+        <hr class="text-white-50" />
+        <nav class="nav flex-column gap-2">
+          <a
+            href="/admin"
+            class="nav-link text-white active-link d-flex align-items-center gap-2 rounded"
+          >
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+          </a>
+          <a
+            href="/admin/productos"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-box-seam"></i>
+            <span>Productos</span>
+          </a>
+          <a
+            href="/admin/servicios"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-gear"></i>
+            <span>Servicios</span>
+          </a>
+          <a
+            href="/admin/usuarios"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-people"></i>
+            <span>Usuarios</span>
+          </a>
+          <a
+            href="/admin/pedidos"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-cart-check"></i>
+            <span>Pedidos</span>
+          </a>
+          <hr class="text-white-50" />
+          <a
+            href="/"
+            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-house"></i>
+            <span>Volver al sitio</span>
+          </a>
+          <a
+            href="#"
+            class="nav-link text-danger d-flex align-items-center gap-2 rounded hover-item"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Cerrar sesión</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+        <div class="container-fluid">
+          <h4 class="mb-0 text-dark fw-bold">Dashboard Principal</h4>
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-link text-dark position-relative">
+              <i class="bi bi-bell fs-5"></i>
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              >
+                3
+              </span>
+            </button>
+            <div class="dropdown">
+              <button
+                class="btn btn-link text-dark dropdown-toggle d-flex align-items-center gap-2"
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                <div
+                  class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                  style="width: 40px; height: 40px;"
+                >
+                  <i class="bi bi-person-fill"></i>
+                </div>
+                <span class="fw-semibold">Admin</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#">Perfil</a></li>
+                <li><a class="dropdown-item" href="#">Configuración</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item text-danger" href="#">Cerrar sesión</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Content Area -->
+      <div class="p-4">
+        <!-- Welcome Card -->
+        <div class="card border-0 shadow-sm mb-4 welcome-card">
+          <div class="card-body p-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h3 class="fw-bold text-white mb-2">
+                  ¡Bienvenido al Panel de Administración! 👋
+                </h3>
+                <p class="text-white mb-0" style="opacity: 0.9;">
+                  Aquí puedes gestionar todos los aspectos de GMExpress. Utiliza el menú lateral para navegar.
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <i class="bi bi-graph-up-arrow text-white" style="font-size: 4rem; opacity: 0.2;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 card-hover">
+              <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div
+                    class="rounded-circle bg-primary bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-box-seam text-primary fs-3"></i>
+                  </div>
+                  <span class="badge bg-success">+8%</span>
+                </div>
+                <h2 class="fw-bold mb-1">8</h2>
+                <p class="text-muted mb-0 small">Total Productos</p>
+                <a href="/admin/productos" class="stretched-link text-decoration-none"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 card-hover">
+              <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div
+                    class="rounded-circle bg-success bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-gear text-success fs-3"></i>
+                  </div>
+                  <span class="badge bg-primary">+12%</span>
+                </div>
+                <h2 class="fw-bold mb-1">6</h2>
+                <p class="text-muted mb-0 small">Total Servicios</p>
+                <a href="/admin/servicios" class="stretched-link text-decoration-none"></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 card-hover">
+              <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div
+                    class="rounded-circle bg-warning bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-people text-warning fs-3"></i>
+                  </div>
+                  <span class="badge bg-info">+25</span>
+                </div>
+                <h2 class="fw-bold mb-1">142</h2>
+                <p class="text-muted mb-0 small">Usuarios Registrados</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 card-hover">
+              <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div
+                    class="rounded-circle bg-info bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                  >
+                    <i class="bi bi-cart-check text-info fs-3"></i>
+                  </div>
+                  <span class="badge bg-warning text-dark">15</span>
+                </div>
+                <h2 class="fw-bold mb-1">58</h2>
+                <p class="text-muted mb-0 small">Pedidos del Mes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts and Activity Row -->
+        <div class="row g-3 mb-4">
+          <!-- Sales Chart -->
+          <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h5 class="fw-bold mb-0">Ventas del Mes</h5>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-secondary active">Semana</button>
+                    <button type="button" class="btn btn-outline-secondary">Mes</button>
+                    <button type="button" class="btn btn-outline-secondary">Año</button>
+                  </div>
+                </div>
+                <canvas id="salesChart" height="100"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h5 class="fw-bold mb-4">Actividad Reciente</h5>
+                <div class="activity-list">
+                  <div class="activity-item mb-3 pb-3 border-bottom">
+                    <div class="d-flex align-items-start gap-3">
+                      <div class="rounded-circle bg-success bg-opacity-10 p-2">
+                        <i class="bi bi-check-circle text-success"></i>
+                      </div>
+                      <div class="flex-grow-1">
+                        <p class="mb-1 small fw-semibold">Nuevo pedido #1234</p>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">Hace 5 minutos</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="activity-item mb-3 pb-3 border-bottom">
+                    <div class="d-flex align-items-start gap-3">
+                      <div class="rounded-circle bg-primary bg-opacity-10 p-2">
+                        <i class="bi bi-box-seam text-primary"></i>
+                      </div>
+                      <div class="flex-grow-1">
+                        <p class="mb-1 small fw-semibold">Producto actualizado</p>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">Hace 1 hora</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="activity-item mb-3 pb-3 border-bottom">
+                    <div class="d-flex align-items-start gap-3">
+                      <div class="rounded-circle bg-warning bg-opacity-10 p-2">
+                        <i class="bi bi-person-plus text-warning"></i>
+                      </div>
+                      <div class="flex-grow-1">
+                        <p class="mb-1 small fw-semibold">Nuevo usuario registrado</p>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">Hace 2 horas</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="activity-item mb-3 pb-3 border-bottom">
+                    <div class="d-flex align-items-start gap-3">
+                      <div class="rounded-circle bg-info bg-opacity-10 p-2">
+                        <i class="bi bi-gear text-info"></i>
+                      </div>
+                      <div class="flex-grow-1">
+                        <p class="mb-1 small fw-semibold">Servicio creado</p>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">Hace 3 horas</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="activity-item">
+                    <div class="d-flex align-items-start gap-3">
+                      <div class="rounded-circle bg-danger bg-opacity-10 p-2">
+                        <i class="bi bi-exclamation-triangle text-danger"></i>
+                      </div>
+                      <div class="flex-grow-1">
+                        <p class="mb-1 small fw-semibold">Stock bajo: Pizza Suprema</p>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">Hace 4 horas</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Products and Quick Actions -->
+        <div class="row g-3">
+          <!-- Top Products -->
+          <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h5 class="fw-bold mb-4">Productos Más Vendidos</h5>
+                <div class="table-responsive">
+                  <table class="table table-sm table-borderless">
+                    <tbody>
+                      <tr>
+                        <td class="py-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                              <span class="fw-bold text-primary small">1</span>
+                            </div>
+                            <span class="fw-semibold">Pizza Suprema</span>
+                          </div>
+                        </td>
+                        <td class="py-2 text-end">
+                          <span class="badge bg-success">245 ventas</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                              <span class="fw-bold text-success small">2</span>
+                            </div>
+                            <span class="fw-semibold">Ensalada Fresca</span>
+                          </div>
+                        </td>
+                        <td class="py-2 text-end">
+                          <span class="badge bg-success">189 ventas</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                              <span class="fw-bold text-warning small">3</span>
+                            </div>
+                            <span class="fw-semibold">Pancakes con Frutas</span>
+                          </div>
+                        </td>
+                        <td class="py-2 text-end">
+                          <span class="badge bg-success">156 ventas</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                              <span class="fw-bold text-info small">4</span>
+                            </div>
+                            <span class="fw-semibold">Pollo a la Parrilla</span>
+                          </div>
+                        </td>
+                        <td class="py-2 text-end">
+                          <span class="badge bg-success">142 ventas</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h5 class="fw-bold mb-4">Acciones Rápidas</h5>
+                <div class="row g-2">
+                  <div class="col-6">
+                    <a href="/admin/productos" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center py-3">
+                      <i class="bi bi-plus-circle fs-4 mb-2"></i>
+                      <span class="small">Nuevo Producto</span>
+                    </a>
+                  </div>
+                  <div class="col-6">
+                    <a href="/admin/servicios" class="btn btn-outline-success w-100 d-flex flex-column align-items-center py-3">
+                      <i class="bi bi-gear-fill fs-4 mb-2"></i>
+                      <span class="small">Nuevo Servicio</span>
+                    </a>
+                  </div>
+                  <div class="col-6">
+                    <button class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
+                      <i class="bi bi-file-earmark-bar-graph fs-4 mb-2"></i>
+                      <span class="small">Ver Reportes</span>
+                    </button>
+                  </div>
+                  <div class="col-6">
+                    <button class="btn btn-outline-info w-100 d-flex flex-column align-items-center py-3">
+                      <i class="bi bi-gear fs-4 mb-2"></i>
+                      <span class="small">Configuración</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .admin-dashboard {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .sidebar {
+      width: 260px;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      background: linear-gradient(180deg, #1a2e3d 0%, #0a1929 100%);
+    }
+
+    .main-content {
+      margin-left: 260px;
+      min-height: 100vh;
+    }
+
+    .hover-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .active-link {
+      background-color: #79c043 !important;
+      color: white !important;
+    }
+
+    .active-link:hover {
+      background-color: #6ab03a !important;
+    }
+
+    .welcome-card {
+      background: linear-gradient(135deg, #1a2e3d 0%, #0a1929 100%);
+    }
+
+    .card-hover {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .card {
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+
+  <script is:inline>
+    // Mock chart data
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('salesChart');
+      if (ctx) {
+        // Simulación simple de gráfico con barras ASCII-style
+        const data = [12, 19, 15, 22, 18, 25, 20];
+        const labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+        
+        // Aquí normalmente usarías Chart.js, pero como es mockup, solo mostramos el canvas
+        const canvas = ctx.getContext('2d');
+        canvas.fillStyle = '#79c043';
+        
+        const barWidth = ctx.width / data.length;
+        const maxValue = Math.max(...data);
+        
+        data.forEach((value, index) => {
+          const barHeight = (value / maxValue) * (ctx.height - 40);
+          const x = index * barWidth + 10;
+          const y = ctx.height - barHeight - 20;
+          
+          canvas.fillRect(x, y, barWidth - 20, barHeight);
+          
+          // Labels
+          canvas.fillStyle = '#666';
+          canvas.font = '12px Arial';
+          canvas.fillText(labels[index], x + 5, ctx.height - 5);
+          canvas.fillStyle = '#79c043';
+        });
+      }
+    });
+  </script>
+
+  <!-- Bootstrap JS Bundle -->
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</Layout>
