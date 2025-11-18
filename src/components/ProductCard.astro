@@ -22,10 +22,11 @@ const { title, description, image } = Astro.props;
       <p class="font-medium text-secondary dark:text-text-dark">{title}</p>
       <p class="text-sm text-slate-500 dark:text-slate-400">{description}</p>
     </div>
-    <button
+    <a
+      href="/productos"
       class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary/10 text-primary text-sm font-bold tracking-wide hover:bg-primary/20 transition-colors"
     >
       <span class="truncate">Ver más</span>
-    </button>
+    </a>
   </div>
 </div>
