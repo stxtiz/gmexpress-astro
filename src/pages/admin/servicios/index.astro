@@ -117,7 +117,10 @@ import "../../../styles/global.css";
                 <li><a class="dropdown-item" href="#">Perfil</a></li>
                 <li><a class="dropdown-item" href="#">Configuración</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item text-danger" href="#">Cerrar sesión</a></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="#"
+                    >Cerrar sesión</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -269,7 +272,9 @@ import "../../../styles/global.css";
                   <li class="page-item disabled">
                     <a class="page-link" href="#">Anterior</a>
                   </li>
-                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item active">
+                    <a class="page-link" href="#">1</a>
+                  </li>
                   <li class="page-item"><a class="page-link" href="#">2</a></li>
                   <li class="page-item"><a class="page-link" href="#">3</a></li>
                   <li class="page-item">
@@ -369,7 +374,8 @@ import "../../../styles/global.css";
                 </div>
               </div>
               <div class="col-md-6" id="priceField" style="display: none;">
-                <label for="precio" class="form-label fw-semibold">Precio</label>
+                <label for="precio" class="form-label fw-semibold">Precio</label
+                >
                 <div class="input-group">
                   <span class="input-group-text">$</span>
                   <input
@@ -408,15 +414,14 @@ import "../../../styles/global.css";
           </form>
         </div>
         <div class="modal-footer border-0">
-          <button
-            type="button"
-            class="btn btn-light"
-            data-bs-dismiss="modal">Cancelar</button
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cancelar</button
           >
           <button
             type="button"
             class="btn btn-primary"
-            onclick="saveServicio()">
+            onclick="saveServicio()"
+          >
             <i class="bi bi-save me-2"></i>Guardar Servicio
           </button>
         </div>
@@ -454,15 +459,14 @@ import "../../../styles/global.css";
           </p>
         </div>
         <div class="modal-footer border-0">
-          <button
-            type="button"
-            class="btn btn-light"
-            data-bs-dismiss="modal">Cancelar</button
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cancelar</button
           >
           <button
             type="button"
             class="btn btn-danger"
-            onclick="confirmDelete()">
+            onclick="confirmDelete()"
+          >
             <i class="bi bi-trash me-2"></i>Eliminar
           </button>
         </div>
@@ -688,15 +692,14 @@ import "../../../styles/global.css";
 
     // Actualizar estadísticas
     function updateStats() {
-      document.getElementById("total-servicios").textContent =
-        servicios.length;
+      document.getElementById("total-servicios").textContent = servicios.length;
       document.getElementById("servicios-activos").textContent =
         servicios.filter((s) => s.activo).length;
       document.getElementById("con-precio").textContent = servicios.filter(
-        (s) => s.hasPrice
+        (s) => s.hasPrice,
       ).length;
       document.getElementById("sin-precio").textContent = servicios.filter(
-        (s) => !s.hasPrice
+        (s) => !s.hasPrice,
       ).length;
       document.getElementById("showing-count").textContent = servicios.length;
       document.getElementById("total-count").textContent = servicios.length;
@@ -718,7 +721,7 @@ import "../../../styles/global.css";
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         alert(
-          `Servicio: ${servicio.name}\n\nDescripción: ${servicio.description}\n\nPrecio: ${servicio.hasPrice ? servicio.price : "Consultar"}\n\nEstado: ${servicio.activo ? "Activo" : "Inactivo"}`
+          `Servicio: ${servicio.name}\n\nDescripción: ${servicio.description}\n\nPrecio: ${servicio.hasPrice ? servicio.price : "Consultar"}\n\nEstado: ${servicio.activo ? "Activo" : "Inactivo"}`,
         );
       }
     };
@@ -746,7 +749,7 @@ import "../../../styles/global.css";
         togglePriceFields();
 
         const modal = new bootstrap.Modal(
-          document.getElementById("servicioModal")
+          document.getElementById("servicioModal"),
         );
         modal.show();
       }
@@ -760,7 +763,7 @@ import "../../../styles/global.css";
         document.getElementById("deleteServiceName").textContent =
           servicio.name;
         const modal = new bootstrap.Modal(
-          document.getElementById("deleteModal")
+          document.getElementById("deleteModal"),
         );
         modal.show();
       }
@@ -771,7 +774,7 @@ import "../../../styles/global.css";
       servicios = servicios.filter((s) => s.id !== deleteId);
       renderTable();
       bootstrap.Modal.getInstance(
-        document.getElementById("deleteModal")
+        document.getElementById("deleteModal"),
       ).hide();
       showToast("Servicio eliminado exitosamente", "success");
     };
@@ -821,7 +824,7 @@ import "../../../styles/global.css";
 
       renderTable();
       bootstrap.Modal.getInstance(
-        document.getElementById("servicioModal")
+        document.getElementById("servicioModal"),
       ).hide();
     };
 

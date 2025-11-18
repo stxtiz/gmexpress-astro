@@ -117,7 +117,10 @@ import "../../../styles/global.css";
                 <li><a class="dropdown-item" href="#">Perfil</a></li>
                 <li><a class="dropdown-item" href="#">Configuración</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item text-danger" href="#">Cerrar sesión</a></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="#"
+                    >Cerrar sesión</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -258,7 +261,11 @@ import "../../../styles/global.css";
                 <thead class="bg-light">
                   <tr>
                     <th class="px-4 py-3 border-0">
-                      <input type="checkbox" class="form-check-input" id="selectAll" />
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="selectAll"
+                      />
                     </th>
                     <th class="px-4 py-3 border-0">Imagen</th>
                     <th class="px-4 py-3 border-0">Nombre</th>
@@ -287,7 +294,9 @@ import "../../../styles/global.css";
                   <li class="page-item disabled">
                     <a class="page-link" href="#">Anterior</a>
                   </li>
-                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item active">
+                    <a class="page-link" href="#">1</a>
+                  </li>
                   <li class="page-item"><a class="page-link" href="#">2</a></li>
                   <li class="page-item"><a class="page-link" href="#">3</a></li>
                   <li class="page-item">
@@ -443,15 +452,14 @@ import "../../../styles/global.css";
           </form>
         </div>
         <div class="modal-footer border-0">
-          <button
-            type="button"
-            class="btn btn-light"
-            data-bs-dismiss="modal">Cancelar</button
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cancelar</button
           >
           <button
             type="button"
             class="btn btn-primary"
-            onclick="saveProducto()">
+            onclick="saveProducto()"
+          >
             <i class="bi bi-save me-2"></i>Guardar Producto
           </button>
         </div>
@@ -489,15 +497,14 @@ import "../../../styles/global.css";
           </p>
         </div>
         <div class="modal-footer border-0">
-          <button
-            type="button"
-            class="btn btn-light"
-            data-bs-dismiss="modal">Cancelar</button
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cancelar</button
           >
           <button
             type="button"
             class="btn btn-danger"
-            onclick="confirmDelete()">
+            onclick="confirmDelete()"
+          >
             <i class="bi bi-trash me-2"></i>Eliminar
           </button>
         </div>
@@ -529,10 +536,8 @@ import "../../../styles/global.css";
           <!-- Se llenará dinámicamente -->
         </div>
         <div class="modal-footer border-0">
-          <button
-            type="button"
-            class="btn btn-light"
-            data-bs-dismiss="modal">Cerrar</button
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cerrar</button
           >
         </div>
       </div>
@@ -711,7 +716,8 @@ import "../../../styles/global.css";
         image:
           "https://lh3.googleusercontent.com/aida-public/AB6AXuDEnZpiuC7bYj6XQzUhHf_SjoL_g83S49Vc-jRbyChfCPEtpKXOAg6zTmQZQJYskuGSxEe0PIcrOnnEkEDLQAqxdgo-FANrS_fPfB9pWFB2f6c-qGyLqZSbnIT0vlXzGKS2g72XsV5TOzKpnHXMq0MmxpqaS7KQGmwQ6ZG2jImlVBzbk_a5gZwHHTLzCfcsKtzVMNRYLUO7dLK55KzQ99y9opH4QWeB9G_GIsinbRqqBrvKgSIqC3TvSqgeiEKLG-QPqZmbIy3ueg4",
         alt: "Pancakes con sirope y frutas.",
-        description: "Pancakes esponjosos con sirope de maple y frutas frescas.",
+        description:
+          "Pancakes esponjosos con sirope de maple y frutas frescas.",
         activo: true,
         destacado: true,
       },
@@ -724,7 +730,8 @@ import "../../../styles/global.css";
         image:
           "https://lh3.googleusercontent.com/aida-public/AB6AXuCwswJce_0QCIAcq4zljCeoj8dBaoJsvtBnHIjinniLa3nSK_VYiVegOLv9K5pBFsZheQ0zgF-u94VVfZFrYPGjhdF0VeETUD4QWlJifxlNJM9MFT-rRKJ1OQtzI6lnnhhs1jTAZBVP1zTHEoni9VxmenoQN1Fq3dRp0pw9R0rJ5MadvCXM0yktmCOsN3Tod_IpxG1XRjQkyHF3k2LpzbPj2UdSCLTEiySxrgqWT8UTNkT563yzHD69yUkmqgwTqntA1DE3g_QeX6w",
         alt: "Pollo a la parrilla con espárragos y limón.",
-        description: "Pechuga de pollo a la parrilla con guarnición de vegetales.",
+        description:
+          "Pechuga de pollo a la parrilla con guarnición de vegetales.",
         activo: true,
         destacado: false,
       },
@@ -737,7 +744,8 @@ import "../../../styles/global.css";
         image:
           "https://lh3.googleusercontent.com/aida-public/AB6AXuApWD6UDTvsXKCvb3jqFHObvUNiXuyc0Kug8kmexFnMdcaOiriPPrV0GovOM_Cu1_sS9pz5hA6VpxfYjglkVga65eB2bR9sDAOzsLVNrnNLK5oV9gpTKkwBkG_DRZJrICwDk25DhSZ-deICzF1Ux6qS9EIspFiWFKXhKC3wCkx87C13XrXyfzs4AKGqRPipCpj_E0s6NgOcIYMiD3O0mISANi_At22GrlWYqAgVoOVyzddY38dZybj0TR0f6AC_nXpiZh5IizJQzfY",
         alt: "Una pizza de primer plano con diversos ingredientes.",
-        description: "Pizza con champiñones frescos, queso y hierbas aromáticas.",
+        description:
+          "Pizza con champiñones frescos, queso y hierbas aromáticas.",
         activo: true,
         destacado: false,
       },
@@ -816,9 +824,10 @@ import "../../../styles/global.css";
       const precioPromedio =
         productos.reduce(
           (sum, p) => sum + parseFloat(p.price.replace(/[^0-9]/g, "")),
-          0
+          0,
         ) / productos.length;
-      document.getElementById("precio-promedio").textContent = `$${Math.round(precioPromedio).toLocaleString("es-CL")}`;
+      document.getElementById("precio-promedio").textContent =
+        `$${Math.round(precioPromedio).toLocaleString("es-CL")}`;
 
       document.getElementById("showing-count").textContent =
         filteredProducts.length;
@@ -886,7 +895,7 @@ import "../../../styles/global.css";
         document.getElementById("descripcion").value = producto.description;
         document.getElementById("precio").value = producto.price.replace(
           /[^0-9.]/g,
-          ""
+          "",
         );
         document.getElementById("stock").value = producto.stock;
         document.getElementById("imagen").value = producto.image;
@@ -895,7 +904,7 @@ import "../../../styles/global.css";
         document.getElementById("destacado").checked = producto.destacado;
 
         const modal = new bootstrap.Modal(
-          document.getElementById("productoModal")
+          document.getElementById("productoModal"),
         );
         modal.show();
       }
@@ -906,8 +915,11 @@ import "../../../styles/global.css";
       const producto = productos.find((p) => p.id === id);
       if (producto) {
         deleteId = id;
-        document.getElementById("deleteProductName").textContent = producto.name;
-        const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+        document.getElementById("deleteProductName").textContent =
+          producto.name;
+        const modal = new bootstrap.Modal(
+          document.getElementById("deleteModal"),
+        );
         modal.show();
       }
     };
@@ -916,7 +928,9 @@ import "../../../styles/global.css";
     window.confirmDelete = function () {
       productos = productos.filter((p) => p.id !== deleteId);
       applyFilters();
-      bootstrap.Modal.getInstance(document.getElementById("deleteModal")).hide();
+      bootstrap.Modal.getInstance(
+        document.getElementById("deleteModal"),
+      ).hide();
       showToast("Producto eliminado exitosamente", "success");
     };
 
@@ -974,7 +988,7 @@ import "../../../styles/global.css";
 
       applyFilters();
       bootstrap.Modal.getInstance(
-        document.getElementById("productoModal")
+        document.getElementById("productoModal"),
       ).hide();
     };
 
@@ -1022,9 +1036,15 @@ import "../../../styles/global.css";
     }
 
     // Event listeners
-    document.getElementById("searchInput")?.addEventListener("input", applyFilters);
-    document.getElementById("categoryFilter")?.addEventListener("change", applyFilters);
-    document.getElementById("statusFilter")?.addEventListener("change", applyFilters);
+    document
+      .getElementById("searchInput")
+      ?.addEventListener("input", applyFilters);
+    document
+      .getElementById("categoryFilter")
+      ?.addEventListener("change", applyFilters);
+    document
+      .getElementById("statusFilter")
+      ?.addEventListener("change", applyFilters);
 
     // Select all checkbox
     document.getElementById("selectAll")?.addEventListener("change", (e) => {
