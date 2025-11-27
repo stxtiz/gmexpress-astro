@@ -547,7 +547,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
   <script>
     import { db } from "../../../firebase/client";
-    import { doc, updateDoc, addDoc, collection, serverTimestamp, query, orderBy, onSnapshot } from "firebase/firestore";
+    import { doc, updateDoc, addDoc, collection, serverTimestamp, query, onSnapshot } from "firebase/firestore";
 
     // Mock data de pedidos
     const pedidos = [
@@ -1264,6 +1264,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         // Remove orderBy to avoid index issues for now
         const q = query(collection(db, "solicitudes"));
         
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const unsubscribe = onSnapshot(q, (snapshot) => {
             solicitudes = snapshot.docs.map(doc => {
                 const data = doc.data();
