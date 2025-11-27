@@ -575,28 +575,64 @@ import "../../../styles/global.css";
       orderBy
     } from "firebase/firestore";
 
-    let servicios = [];
-    let editingId = null;
-    let deleteId = null;
-    let filteredServices = [];
-
     const servicesCollection = collection(db, "services");
-
-    // Real-time listener
     const q = query(servicesCollection, orderBy("name"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+
+    // Definir tipos
+    // Definir tipos
+    interface Service {
+      id: string;
+      name: string;
+      price: number;
+      description: string;
+      image: string;
+      alt: string;
+      category: string;
+      active: boolean;
+      hasPrice: boolean;
+      priceLabel?: string;
+      activo: boolean;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      createdAt?: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      updatedAt?: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [key: string]: any;
+    }
+
+    declare global {
+      interface Window {
+        togglePriceFields: () => void;
+        openCreateModal: () => void;
+        viewServicio: (id: string) => void;
+        editServicio: (id: string) => void;
+        deleteServicio: (id: string) => void;
+        confirmDelete: () => Promise<void>;
+        saveServicio: () => Promise<void>;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      var bootstrap: any;
+    }
+
+    let servicios: Service[] = [];
+    let editingId: string | null = null;
+    let deleteId: string | null = null;
+    let filteredServices: Service[] = [];
+
+    onSnapshot(q, (snapshot) => {
       servicios = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })) as Service[];
       filteredServices = [...servicios];
       renderTable();
       updateStats();
     });
 
     // Renderizar tabla
-    function renderTable(serviceList = filteredServices) {
-      const tbody = document.getElementById("serviciosTableBody");
+    // Renderizar tabla
+    function renderTable(serviceList: Service[] = filteredServices) {
+      const tbody = document.getElementById("serviciosTableBody") as HTMLTableSectionElement;
       if (!tbody) return;
       tbody.innerHTML = "";
 
@@ -644,8 +680,8 @@ import "../../../styles/global.css";
       
       const showingCount = document.getElementById("showing-count");
       const totalCount = document.getElementById("total-count");
-      if(showingCount) showingCount.textContent = serviceList.length;
-      if(totalCount) totalCount.textContent = servicios.length;
+      if(showingCount) showingCount.textContent = serviceList.length.toString();
+      if(totalCount) totalCount.textContent = servicios.length.toString();
     }
 
     // Actualizar estadísticas
@@ -655,22 +691,23 @@ import "../../../styles/global.css";
       const conPrecio = document.getElementById("con-precio");
       const sinPrecio = document.getElementById("sin-precio");
 
-      if(totalServicios) totalServicios.textContent = servicios.length;
-      if(serviciosActivos) serviciosActivos.textContent = servicios.filter((s) => s.activo).length;
-      if(conPrecio) conPrecio.textContent = servicios.filter((s) => s.hasPrice).length;
-      if(sinPrecio) sinPrecio.textContent = servicios.filter((s) => !s.hasPrice).length;
+      if(totalServicios) totalServicios.textContent = servicios.length.toString();
+      if(serviciosActivos) serviciosActivos.textContent = servicios.filter((s) => s.activo).length.toString();
+      if(conPrecio) conPrecio.textContent = servicios.filter((s) => s.hasPrice).length.toString();
+      if(sinPrecio) sinPrecio.textContent = servicios.filter((s) => !s.hasPrice).length.toString();
     }
 
     // Toggle price fields
+    // Toggle price fields
     window.togglePriceFields = function() {
-      const hasPrice = document.getElementById("hasPrice").checked;
+      const hasPrice = (document.getElementById("hasPrice") as HTMLInputElement).checked;
       const priceField = document.getElementById("priceField");
       const priceLabelField = document.getElementById("priceLabelField");
       
       if(priceField) priceField.style.display = hasPrice ? "block" : "none";
       if(priceLabelField) priceLabelField.style.display = hasPrice ? "block" : "none";
       
-      const precioInput = document.getElementById("precio");
+      const precioInput = document.getElementById("precio") as HTMLInputElement;
       if(precioInput) precioInput.required = hasPrice;
     }
 
@@ -678,9 +715,9 @@ import "../../../styles/global.css";
     window.openCreateModal = function () {
       editingId = null;
       const label = document.getElementById("servicioModalLabel");
-      const form = document.getElementById("servicioForm");
-      const activo = document.getElementById("activo");
-      const hasPrice = document.getElementById("hasPrice");
+      const form = document.getElementById("servicioForm") as HTMLFormElement;
+      const activo = document.getElementById("activo") as HTMLInputElement;
+      const hasPrice = document.getElementById("hasPrice") as HTMLInputElement;
       
       if(label) label.textContent = "Nuevo Servicio";
       if(form) form.reset();
@@ -702,21 +739,21 @@ import "../../../styles/global.css";
     };
 
     // Editar servicio
-    window.editServicio = function (id) {
+    window.editServicio = function (id: string) {
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         editingId = id;
-        document.getElementById("servicioModalLabel").textContent = "Editar Servicio";
-        document.getElementById("nombre").value = servicio.name;
-        document.getElementById("descripcion").value = servicio.description;
-        document.getElementById("imagen").value = servicio.image;
-        document.getElementById("alt").value = servicio.alt;
-        document.getElementById("hasPrice").checked = servicio.hasPrice;
-        document.getElementById("activo").checked = servicio.activo;
+        document.getElementById("servicioModalLabel")!.textContent = "Editar Servicio";
+        (document.getElementById("nombre") as HTMLInputElement).value = servicio.name;
+        (document.getElementById("descripcion") as HTMLTextAreaElement).value = servicio.description;
+        (document.getElementById("imagen") as HTMLInputElement).value = servicio.image;
+        (document.getElementById("alt") as HTMLInputElement).value = servicio.alt;
+        (document.getElementById("hasPrice") as HTMLInputElement).checked = servicio.hasPrice;
+        (document.getElementById("activo") as HTMLInputElement).checked = servicio.activo;
 
         if (servicio.hasPrice) {
-          document.getElementById("precio").value = servicio.price.replace('$', '').replace(/\./g, '');
-          document.getElementById("priceLabel").value = servicio.priceLabel || "";
+          (document.getElementById("precio") as HTMLInputElement).value = servicio.price.toString().replace('$', '').replace(/\./g, '');
+          (document.getElementById("priceLabel") as HTMLInputElement).value = servicio.priceLabel || "";
         }
 
         window.togglePriceFields();
@@ -727,7 +764,8 @@ import "../../../styles/global.css";
     };
 
     // Eliminar servicio
-    window.deleteServicio = function (id) {
+    // Eliminar servicio
+    window.deleteServicio = function (id: string) {
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         deleteId = id;
@@ -753,21 +791,22 @@ import "../../../styles/global.css";
     };
 
     // Guardar servicio
+    // Guardar servicio
     window.saveServicio = async function () {
-      const nombre = document.getElementById("nombre").value;
-      const descripcion = document.getElementById("descripcion").value;
-      const imagen = document.getElementById("imagen").value;
-      const alt = document.getElementById("alt").value;
-      const hasPrice = document.getElementById("hasPrice").checked;
-      const activo = document.getElementById("activo").checked;
+      const nombre = (document.getElementById("nombre") as HTMLInputElement).value;
+      const descripcion = (document.getElementById("descripcion") as HTMLTextAreaElement).value;
+      const imagen = (document.getElementById("imagen") as HTMLInputElement).value;
+      const alt = (document.getElementById("alt") as HTMLInputElement).value;
+      const hasPrice = (document.getElementById("hasPrice") as HTMLInputElement).checked;
+      const activo = (document.getElementById("activo") as HTMLInputElement).checked;
       
       let precio = "";
       let priceLabel = "";
       
       if(hasPrice) {
-          const precioRaw = document.getElementById("precio").value;
+          const precioRaw = (document.getElementById("precio") as HTMLInputElement).value;
           precio = "$" + parseInt(precioRaw).toLocaleString('es-CL');
-          priceLabel = document.getElementById("priceLabel").value;
+          priceLabel = (document.getElementById("priceLabel") as HTMLInputElement).value;
       }
 
       if (!nombre || !descripcion || !imagen || !alt) {
@@ -775,7 +814,7 @@ import "../../../styles/global.css";
         return;
       }
       
-      if (hasPrice && !document.getElementById("precio").value) {
+      if (hasPrice && !(document.getElementById("precio") as HTMLInputElement).value) {
           alert("Por favor, ingresa el precio");
           return;
       }
@@ -812,7 +851,7 @@ import "../../../styles/global.css";
     
     // Search filter
     document.getElementById("searchInput")?.addEventListener("input", (e) => {
-        const term = e.target.value.toLowerCase();
+        const term = (e.target as HTMLInputElement).value.toLowerCase();
         filteredServices = servicios.filter(s => 
             s.name.toLowerCase().includes(term) || 
             s.description.toLowerCase().includes(term)

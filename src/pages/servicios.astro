@@ -167,7 +167,7 @@ import "../styles/global.css";
       const cartTotal = document.getElementById("cart-total");
 
       // Cargar carrito desde localStorage
-      let mockCart = JSON.parse(localStorage.getItem("gmexpress-cart") || "[]");
+      const mockCart = JSON.parse(localStorage.getItem("gmexpress-cart") || "[]");
 
       const formatPrice = (value) => value.trim();
 

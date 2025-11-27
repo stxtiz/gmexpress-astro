@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
+
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 ---
@@ -195,7 +195,6 @@ import "../styles/global.css";
                     <option value="">Selecciona una comuna</option>
                     <!-- Options populated by JS -->
                   </select>
-                  </select>
                 </div>
 
                 <!-- Región -->
@@ -214,7 +213,6 @@ import "../styles/global.css";
                   >
                     <option value="">Selecciona una región</option>
                     <!-- Options populated by JS -->
-                  </select>
                   </select>
                 </div>
               </div>
@@ -516,7 +514,7 @@ import "../styles/global.css";
     if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) return false;
     const tmp = rut.split('-');
     let digito = tmp[1];
-    let rutBody = tmp[0];
+    const rutBody = tmp[0];
     if (digito == 'K') digito = 'k';
     
     return (rutBody == 0) ? false : checkDigito(rutBody) == digito;

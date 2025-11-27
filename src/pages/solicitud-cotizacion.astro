@@ -1,13 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import SolicitudForm from "../components/servicios/SolicitudForm.astro";
-import "../styles/global.css";
+import Footer from "../components/Footer.astro";
 
-// Obtener el servicio desde la URL si existe
-const url = Astro.url;
-const servicioPreseleccionado = url.searchParams.get("servicio") || undefined;
+const servicioPreseleccionado = Astro.url.searchParams.get("servicio") || undefined;
 ---
 
 <Layout title="GMEXPRESS - Solicitud de Cotización">

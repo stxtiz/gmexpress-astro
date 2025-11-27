@@ -649,29 +649,59 @@ import "../../../styles/global.css";
       orderBy
     } from "firebase/firestore";
 
-    let productos = [];
-    let editingId = null;
-    let deleteId = null;
-    let filteredProducts = [];
-
-    // Referencia a la colección
     const productsCollection = collection(db, "products");
-
-    // Escuchar cambios en tiempo real
     const q = query(productsCollection, orderBy("name"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+
+    interface Product {
+      id: string;
+      name: string;
+      categoria: string;
+      description: string;
+      price: string;
+      stock: number;
+      image: string;
+      alt: string;
+      activo: boolean;
+      destacado: boolean;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      createdAt?: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      updatedAt?: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [key: string]: any;
+    }
+
+    declare global {
+      interface Window {
+        openCreateModal: () => void;
+        viewProducto: (id: string) => void;
+        editProducto: (id: string) => void;
+        deleteProducto: (id: string) => void;
+        confirmDelete: () => Promise<void>;
+        saveProducto: () => Promise<void>;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      var bootstrap: any;
+    }
+
+    let productos: Product[] = [];
+    let editingId: string | null = null;
+    let deleteId: string | null = null;
+    let filteredProducts: Product[] = [];
+
+    onSnapshot(q, (snapshot) => {
       productos = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })) as Product[];
       filteredProducts = [...productos];
       renderTable();
       updateStats();
     });
 
     // Renderizar tabla
-    function renderTable(productList = filteredProducts) {
-      const tbody = document.getElementById("productosTableBody");
+    function renderTable(productList: Product[] = filteredProducts) {
+      const tbody = document.getElementById("productosTableBody") as HTMLTableSectionElement;
       if (!tbody) return;
       tbody.innerHTML = "";
 
@@ -727,8 +757,8 @@ import "../../../styles/global.css";
       // Update counts
       const showingCount = document.getElementById("showing-count");
       const totalCount = document.getElementById("total-count");
-      if(showingCount) showingCount.textContent = productList.length;
-      if(totalCount) totalCount.textContent = productos.length;
+      if(showingCount) showingCount.textContent = productList.length.toString();
+      if(totalCount) totalCount.textContent = productos.length.toString();
     }
 
     // Actualizar estadísticas
@@ -738,11 +768,11 @@ import "../../../styles/global.css";
       const categorias = document.getElementById("categorias");
       const precioPromedio = document.getElementById("precio-promedio");
 
-      if (totalProductos) totalProductos.textContent = productos.length;
-      if (productosActivos) productosActivos.textContent = productos.filter((p) => p.activo).length;
+      if (totalProductos) totalProductos.textContent = productos.length.toString();
+      if (productosActivos) productosActivos.textContent = productos.filter((p) => p.activo).length.toString();
       
       const uniqueCategories = new Set(productos.map(p => p.categoria));
-      if (categorias) categorias.textContent = uniqueCategories.size;
+      if (categorias) categorias.textContent = uniqueCategories.size.toString();
 
       if (precioPromedio && productos.length > 0) {
         const total = productos.reduce((sum, p) => {
@@ -758,15 +788,15 @@ import "../../../styles/global.css";
     window.openCreateModal = function () {
       editingId = null;
       const label = document.getElementById("productoModalLabel");
-      const form = document.getElementById("productoForm");
-      const activo = document.getElementById("activo");
+      const form = document.getElementById("productoForm") as HTMLFormElement;
+      const activo = document.getElementById("activo") as HTMLInputElement;
       
       if(label) label.textContent = "Nuevo Producto";
       if(form) form.reset();
       if(activo) activo.checked = true;
     };
 
-    window.viewProducto = function (id) {
+    window.viewProducto = function (id: string) {
       const producto = productos.find((p) => p.id === id);
       if (producto) {
         const modalBody = document.getElementById("viewModalBody");
@@ -793,27 +823,27 @@ import "../../../styles/global.css";
       }
     };
 
-    window.editProducto = function (id) {
+    window.editProducto = function (id: string) {
       const producto = productos.find((p) => p.id === id);
       if (producto) {
         editingId = id;
-        document.getElementById("productoModalLabel").textContent = "Editar Producto";
-        document.getElementById("nombre").value = producto.name;
-        document.getElementById("categoria").value = producto.categoria;
-        document.getElementById("descripcion").value = producto.description;
-        document.getElementById("precio").value = producto.price.replace('$', '').replace(/\./g, '');
-        document.getElementById("stock").value = producto.stock;
-        document.getElementById("imagen").value = producto.image;
-        document.getElementById("alt").value = producto.alt;
-        document.getElementById("activo").checked = producto.activo;
-        document.getElementById("destacado").checked = producto.destacado;
+        document.getElementById("productoModalLabel")!.textContent = "Editar Producto";
+        (document.getElementById("nombre") as HTMLInputElement).value = producto.name;
+        (document.getElementById("categoria") as HTMLSelectElement).value = producto.categoria;
+        (document.getElementById("descripcion") as HTMLTextAreaElement).value = producto.description;
+        (document.getElementById("precio") as HTMLInputElement).value = producto.price.replace('$', '').replace(/\./g, '');
+        (document.getElementById("stock") as HTMLInputElement).value = producto.stock.toString();
+        (document.getElementById("imagen") as HTMLInputElement).value = producto.image;
+        (document.getElementById("alt") as HTMLInputElement).value = producto.alt;
+        (document.getElementById("activo") as HTMLInputElement).checked = producto.activo;
+        (document.getElementById("destacado") as HTMLInputElement).checked = producto.destacado;
 
         const modal = new bootstrap.Modal(document.getElementById("productoModal"));
         modal.show();
       }
     };
 
-    window.deleteProducto = function (id) {
+    window.deleteProducto = function (id: string) {
       const producto = productos.find((p) => p.id === id);
       if (producto) {
         deleteId = id;
@@ -838,15 +868,15 @@ import "../../../styles/global.css";
     };
 
     window.saveProducto = async function () {
-      const nombre = document.getElementById("nombre").value;
-      const categoria = document.getElementById("categoria").value;
-      const descripcion = document.getElementById("descripcion").value;
-      const precioRaw = document.getElementById("precio").value;
-      const stock = parseInt(document.getElementById("stock").value);
-      const imagen = document.getElementById("imagen").value;
-      const alt = document.getElementById("alt").value;
-      const activo = document.getElementById("activo").checked;
-      const destacado = document.getElementById("destacado").checked;
+      const nombre = (document.getElementById("nombre") as HTMLInputElement).value;
+      const categoria = (document.getElementById("categoria") as HTMLSelectElement).value;
+      const descripcion = (document.getElementById("descripcion") as HTMLTextAreaElement).value;
+      const precioRaw = (document.getElementById("precio") as HTMLInputElement).value;
+      const stock = parseInt((document.getElementById("stock") as HTMLInputElement).value);
+      const imagen = (document.getElementById("imagen") as HTMLInputElement).value;
+      const alt = (document.getElementById("alt") as HTMLInputElement).value;
+      const activo = (document.getElementById("activo") as HTMLInputElement).checked;
+      const destacado = (document.getElementById("destacado") as HTMLInputElement).checked;
 
       if (!nombre || !categoria || !descripcion || !precioRaw || !stock || !imagen || !alt) {
         alert("Por favor, completa todos los campos obligatorios");
@@ -888,19 +918,19 @@ import "../../../styles/global.css";
 
     // Filtros
     document.getElementById("searchInput")?.addEventListener("input", (e) => {
-      const term = e.target.value.toLowerCase();
-      filterProducts(term, document.getElementById("categoryFilter").value, document.getElementById("statusFilter").value);
+      const term = (e.target as HTMLInputElement).value.toLowerCase();
+      filterProducts(term, (document.getElementById("categoryFilter") as HTMLSelectElement).value, (document.getElementById("statusFilter") as HTMLSelectElement).value);
     });
 
     document.getElementById("categoryFilter")?.addEventListener("change", (e) => {
-      filterProducts(document.getElementById("searchInput").value.toLowerCase(), e.target.value, document.getElementById("statusFilter").value);
+      filterProducts((document.getElementById("searchInput") as HTMLInputElement).value.toLowerCase(), (e.target as HTMLSelectElement).value, (document.getElementById("statusFilter") as HTMLSelectElement).value);
     });
 
     document.getElementById("statusFilter")?.addEventListener("change", (e) => {
-      filterProducts(document.getElementById("searchInput").value.toLowerCase(), document.getElementById("categoryFilter").value, e.target.value);
+      filterProducts((document.getElementById("searchInput") as HTMLInputElement).value.toLowerCase(), (document.getElementById("categoryFilter") as HTMLSelectElement).value, (e.target as HTMLSelectElement).value);
     });
 
-    function filterProducts(term, category, status) {
+    function filterProducts(term: string, category: string, status: string) {
       filteredProducts = productos.filter(p => {
         const matchesTerm = p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term);
         const matchesCategory = category === "" || p.categoria === category;
@@ -913,7 +943,7 @@ import "../../../styles/global.css";
       renderTable(filteredProducts);
     }
 
-    function showToast(message, type = "info") {
+    function showToast(message: string, type = "info") {
       const toast = document.createElement("div");
       toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
       toast.style.zIndex = "9999";
@@ -929,8 +959,8 @@ import "../../../styles/global.css";
 
     // Select all checkbox
     document.getElementById("selectAll")?.addEventListener("change", (e) => {
-      const checkboxes = document.querySelectorAll(".product-checkbox");
-      checkboxes.forEach((cb) => (cb.checked = e.target.checked));
+      const checkboxes = document.querySelectorAll(".product-checkbox") as NodeListOf<HTMLInputElement>;
+      checkboxes.forEach((cb) => (cb.checked = (e.target as HTMLInputElement).checked));
     });
   </script>
 
