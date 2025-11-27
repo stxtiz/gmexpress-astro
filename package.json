@@ -12,6 +12,7 @@
     "@astrojs/check": "^0.9.5",
     "@tailwindcss/vite": "^4.1.17",
     "astro": "^5.15.8",
+    "firebase": "^12.6.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3"
   },

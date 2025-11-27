@@ -60,20 +60,38 @@ import "../styles/global.css";
                   />
                 </div>
 
-                <!-- Apellido -->
+                <!-- Apellido Paterno -->
                 <div class="flex flex-col gap-2">
                   <label
-                    for="lastName"
+                    for="lastNamePaterno"
                     class="text-sm font-medium text-secondary dark:text-text-dark"
                   >
-                    Apellido <span class="text-red-500">*</span>
+                    Apellido Paterno <span class="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    id="lastName"
-                    name="lastName"
+                    id="lastNamePaterno"
+                    name="lastNamePaterno"
                     required
                     placeholder="Pérez"
+                    class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  />
+                </div>
+
+                <!-- Apellido Materno -->
+                <div class="flex flex-col gap-2">
+                  <label
+                    for="lastNameMaterno"
+                    class="text-sm font-medium text-secondary dark:text-text-dark"
+                  >
+                    Apellido Materno <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="lastNameMaterno"
+                    name="lastNameMaterno"
+                    required
+                    placeholder="González"
                     class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   />
                 </div>
@@ -92,6 +110,7 @@ import "../styles/global.css";
                   id="rut"
                   name="rut"
                   required
+                  maxlength="12"
                   placeholder="12.345.678-9"
                   class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
@@ -174,14 +193,8 @@ import "../styles/global.css";
                     class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Selecciona una comuna</option>
-                    <option value="santiago">Santiago</option>
-                    <option value="providencia">Providencia</option>
-                    <option value="las-condes">Las Condes</option>
-                    <option value="vitacura">Vitacura</option>
-                    <option value="nunoa">Ñuñoa</option>
-                    <option value="maipu">Maipú</option>
-                    <option value="la-florida">La Florida</option>
-                    <option value="puente-alto">Puente Alto</option>
+                    <!-- Options populated by JS -->
+                  </select>
                   </select>
                 </div>
 
@@ -200,11 +213,8 @@ import "../styles/global.css";
                     class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Selecciona una región</option>
-                    <option value="metropolitana">Región Metropolitana</option>
-                    <option value="valparaiso">Región de Valparaíso</option>
-                    <option value="biobio">Región del Biobío</option>
-                    <option value="araucania">Región de La Araucanía</option>
-                    <option value="los-lagos">Región de Los Lagos</option>
+                    <!-- Options populated by JS -->
+                  </select>
                   </select>
                 </div>
               </div>
@@ -388,58 +398,222 @@ import "../styles/global.css";
 </Layout>
 
 <script>
-  // Validación básica del formulario
-  const form = document.querySelector("form");
-  const password = document.getElementById("password") as HTMLInputElement;
-  const confirmPassword = document.getElementById(
-    "confirmPassword",
-  ) as HTMLInputElement;
+  import { auth, db } from "../firebase/client";
+  import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+  import { doc, setDoc } from "firebase/firestore";
 
-  form?.addEventListener("submit", (e) => {
+  const form = document.querySelector("form");
+  const password = document.getElementById("password");
+  const confirmPassword = document.getElementById("confirmPassword");
+  const regionSelect = document.getElementById("region");
+  const comunaSelect = document.getElementById("comuna");
+  const rutInput = document.getElementById("rut");
+  const phoneInput = document.getElementById("phone");
+
+  // Data provided by user
+  const chileData = {
+    "regiones": [
+        {
+            "region": "Arica y Parinacota",
+            "comunas": ["Arica", "Camarones", "Putre", "General Lagos"]
+        },
+        {
+            "region": "Tarapacá",
+            "comunas": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"]
+        },
+        {
+            "region": "Antofagasta",
+            "comunas": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"]
+        },
+        {
+            "region": "Atacama",
+            "comunas": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"]
+        },
+        {
+            "region": "Coquimbo",
+            "comunas": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"]
+        },
+        {
+            "region": "Valparaíso",
+            "comunas": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"]
+        },
+        {
+            "region": "Región del Libertador Gral. Bernardo O’Higgins",
+            "comunas": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"]
+        },
+        {
+            "region": "Región del Maule",
+            "comunas": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"]
+        },
+        {
+            "region": "Región de Ñuble",
+            "comunas": ["Cobquecura", "Coelemu", "Ninhue", "Portezuelo", "Quirihue", "Ránquil", "Treguaco", "Bulnes", "Chillán Viejo", "Chillán", "El Carmen", "Pemuco", "Pinto", "Quillón", "San Ignacio", "Yungay", "Coihueco", "Ñiquén", "San Carlos", "San Fabián", "San Nicolás"]
+        },
+        {
+            "region": "Región del Biobío",
+            "comunas": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Hualpén", "Lebu", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Los Álamos", "Tirúa", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"]
+        },
+        {
+            "region": "Región de la Araucanía",
+            "comunas": ["Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"]
+        },
+        {
+            "region": "Región de Los Ríos",
+            "comunas": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Futrono", "Lago Ranco", "Río Bueno"]
+        },
+        {
+            "region": "Región de Los Lagos",
+            "comunas": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"]
+        },
+        {
+            "region": "Región Aisén del Gral. Carlos Ibáñez del Campo",
+            "comunas": ["Coihaique", "Lago Verde", "Aisén", "Cisnes", "Guaitecas", "Cochrane", "O’Higgins", "Tortel", "Chile Chico", "Río Ibáñez"]
+        },
+        {
+            "region": "Región de Magallanes y de la Antártica Chilena",
+            "comunas": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos (Ex Navarino)", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"]
+        },
+        {
+            "region": "Región Metropolitana de Santiago",
+            "comunas": ["Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "Santiago", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"]
+         }
+    ]
+  };
+
+  const regionesData = chileData.regiones;
+
+  function populateRegiones() {
+    regionSelect.innerHTML = '<option value="">Selecciona una región</option>';
+    regionesData.forEach((region) => {
+      const option = document.createElement("option");
+      option.value = region.region;
+      option.textContent = region.region;
+      regionSelect.appendChild(option);
+    });
+  }
+
+  // Initialize immediately
+  populateRegiones();
+
+
+  regionSelect.addEventListener("change", (e) => {
+    const selectedRegionName = e.target.value;
+    comunaSelect.innerHTML = '<option value="">Selecciona una comuna</option>';
+    
+    const region = regionesData.find(r => r.region === selectedRegionName);
+    if (region) {
+      region.comunas.forEach(comuna => {
+        const option = document.createElement("option");
+        option.value = comuna;
+        option.textContent = comuna;
+        comunaSelect.appendChild(option);
+      });
+    }
+  });
+
+  // RUT Validation
+  function validateRUT(rut) {
+    if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) return false;
+    const tmp = rut.split('-');
+    let digito = tmp[1];
+    let rutBody = tmp[0];
+    if (digito == 'K') digito = 'k';
+    
+    return (rutBody == 0) ? false : checkDigito(rutBody) == digito;
+  }
+
+  function checkDigito(T) {
+    let M = 0, S = 1;
+    for (; T; T = Math.floor(T / 10))
+      S = (S + T % 10 * (9 - M++ % 6)) % 11;
+    return S ? S - 1 : 'k';
+  }
+
+  // Format RUT on input
+  rutInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\./g, '').replace(/-/g, '');
+    if (value.match(/^(\d{2})(\d{3}){2}(\w{1})$/)) {
+      value = value.replace(/^(\d{2})(\d{3})(\d{3})(\w{1})$/, '$1.$2.$3-$4');
+    } else if (value.match(/^(\d)(\d{3}){2}(\w{0,1})$/)) {
+      value = value.replace(/^(\d)(\d{3})(\d{3})(\w{0,1})$/, '$1.$2.$3-$4');
+    } else if (value.match(/^(\d)(\d{3})(\d{0,2})$/)) {
+      value = value.replace(/^(\d)(\d{3})(\d{0,2})$/, '$1.$2.$3');
+    } else if (value.match(/^(\d)(\d{0,2})$/)) {
+      value = value.replace(/^(\d)(\d{0,2})$/, '$1.$2');
+    }
+    e.target.value = value;
+  });
+
+  // Phone Validation
+  function validatePhone(phone) {
+    // Acepta +56912345678 o 912345678
+    const phoneRegex = /^(\+?56)?(\s?)(0?9)(\s?)[98765432]\d{7}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Form Submit
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Validar que las contraseñas coincidan
+    // Validations
     if (password.value !== confirmPassword.value) {
-      alert(
-        "Las contraseñas no coinciden. Por favor, verifica e intenta nuevamente.",
+      alert("Las contraseñas no coinciden.");
+      return;
+    }
+
+    // Clean RUT for validation (remove dots)
+    const cleanRut = rutInput.value.replace(/\./g, '');
+    if (!validateRUT(cleanRut)) {
+      alert("RUT inválido. Por favor verifique.");
+      return;
+    }
+
+    if (!validatePhone(phoneInput.value)) {
+      alert("Teléfono inválido. Use formato chileno (ej: +56912345678).");
+      return;
+    }
+
+    try {
+      // Create User in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth, 
+        document.getElementById("email").value, 
+        password.value
       );
-      confirmPassword.focus();
-      return;
-    }
+      const user = userCredential.user;
 
-    // Validar longitud de contraseña
-    if (password.value.length < 8) {
-      alert("La contraseña debe tener al menos 8 caracteres.");
-      password.focus();
-      return;
-    }
+      // Update Profile
+      await updateProfile(user, {
+        displayName: `${document.getElementById("firstName").value} ${document.getElementById("lastNamePaterno").value}`
+      });
 
-    // Validar complejidad de contraseña
-    const hasUpperCase = /[A-Z]/.test(password.value);
-    const hasLowerCase = /[a-z]/.test(password.value);
-    const hasNumbers = /\d/.test(password.value);
+      // Save additional data to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        firstName: document.getElementById("firstName").value,
+        lastNamePaterno: document.getElementById("lastNamePaterno").value,
+        lastNameMaterno: document.getElementById("lastNameMaterno").value,
+        rut: rutInput.value,
+        email: document.getElementById("email").value,
+        phone: phoneInput.value,
+        address: document.getElementById("address").value,
+        region: regionSelect.value,
+        comuna: comunaSelect.value,
+        apartment: document.getElementById("apartment").value,
+        createdAt: new Date(),
+        role: "user" // Default role
+      });
 
-    if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
-      alert("La contraseña debe incluir mayúsculas, minúsculas y números.");
-      password.focus();
-      return;
-    }
+      alert("¡Registro exitoso! Bienvenido a GMEXPRESS.");
+      window.location.href = "/";
 
-    // Si todo está bien (mockup)
-    alert(
-      "¡Registro exitoso! Bienvenido a GMEXPRESS.\n\nEsta es una versión mockup. En producción, los datos se enviarían al servidor.",
-    );
-
-    // Opcional: Redirigir a la página de inicio
-    // window.location.href = '/';
-  });
-
-  // Validación en tiempo real de coincidencia de contraseñas
-  confirmPassword?.addEventListener("input", () => {
-    if (confirmPassword.value && password.value !== confirmPassword.value) {
-      confirmPassword.setCustomValidity("Las contraseñas no coinciden");
-    } else {
-      confirmPassword.setCustomValidity("");
+    } catch (error) {
+      console.error("Error registering:", error);
+      let msg = "Error al registrar usuario.";
+      if (error.code === 'auth/email-already-in-use') msg = "El correo ya está registrado.";
+      if (error.code === 'auth/weak-password') msg = "La contraseña es muy débil.";
+      alert(msg);
     }
   });
+
+
 </script>

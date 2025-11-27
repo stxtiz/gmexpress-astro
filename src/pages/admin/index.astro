@@ -166,7 +166,7 @@ import "../../styles/global.css";
                   </div>
                   <span class="badge bg-success">+8%</span>
                 </div>
-                <h2 class="fw-bold mb-1">8</h2>
+                <h2 class="fw-bold mb-1" id="total-products-count">...</h2>
                 <p class="text-muted mb-0 small">Total Productos</p>
                 <a
                   href="/admin/productos"
@@ -187,7 +187,7 @@ import "../../styles/global.css";
                   </div>
                   <span class="badge bg-primary">+12%</span>
                 </div>
-                <h2 class="fw-bold mb-1">6</h2>
+                <h2 class="fw-bold mb-1" id="total-services-count">...</h2>
                 <p class="text-muted mb-0 small">Total Servicios</p>
                 <a
                   href="/admin/servicios"
@@ -535,19 +535,32 @@ import "../../styles/global.css";
     }
   </style>
 
-  <script is:inline>
-    // Mock chart data
+  <script>
+    import { db } from "../../firebase/client";
+    import { collection, onSnapshot } from "firebase/firestore";
+
+    // Update stats
+    const productsCol = collection(db, "products");
+    const servicesCol = collection(db, "services");
+
+    onSnapshot(productsCol, (snap) => {
+      const count = document.getElementById("total-products-count");
+      if(count) count.textContent = snap.size;
+    });
+
+    onSnapshot(servicesCol, (snap) => {
+      const count = document.getElementById("total-services-count");
+      if(count) count.textContent = snap.size;
+    });
+
+    // Mock chart data (kept for visual consistency)
     document.addEventListener("DOMContentLoaded", function () {
       const ctx = document.getElementById("salesChart");
       if (ctx) {
-        // Simulación simple de gráfico con barras ASCII-style
         const data = [12, 19, 15, 22, 18, 25, 20];
         const labels = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-
-        // Aquí normalmente usarías Chart.js, pero como es mockup, solo mostramos el canvas
         const canvas = ctx.getContext("2d");
         canvas.fillStyle = "#79c043";
-
         const barWidth = ctx.width / data.length;
         const maxValue = Math.max(...data);
 
@@ -555,10 +568,7 @@ import "../../styles/global.css";
           const barHeight = (value / maxValue) * (ctx.height - 40);
           const x = index * barWidth + 10;
           const y = ctx.height - barHeight - 20;
-
           canvas.fillRect(x, y, barWidth - 20, barHeight);
-
-          // Labels
           canvas.fillStyle = "#666";
           canvas.font = "12px Arial";
           canvas.fillText(labels[index], x + 5, ctx.height - 5);

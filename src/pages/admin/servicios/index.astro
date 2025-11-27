@@ -562,90 +562,45 @@ import "../../../styles/global.css";
     }
   </style>
 
-  <script is:inline>
-    // Mock data de servicios
-    let servicios = [
-      {
-        id: 1,
-        name: "Catering para Eventos",
-        description:
-          "Impresiona a tus clientes y colaboradores con menús personalizados para reuniones, conferencias y celebraciones.",
-        image:
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuB3WUQgtkQyfHGM2m7aYiHvRAMq3sOvwxP9jbae4xpu232r8iNNaFQuQUZdTSbPwwP2Kmxqo8CvE6y92vttsVfGUmrjY4Kn9I_5qUypSG8C3HVDzTbe-JikuWSmbuC6WwWrbpcunQGk7Dl2A_pNTsrTZUENMJ1kHFLWFHlm9FoTlVksmhGdA_qFEUyJ_uqZiPkbHllQ5C1wz-WHw1xctaFhhWxu4Nx40f41x953OndK0ZOj8Yo6QBWM04VoIh0tRRLQzbzPA_TdjMI",
-        alt: "Buffet de comida fresca y variada en un evento corporativo",
-        hasPrice: false,
-        activo: true,
-      },
-      {
-        id: 2,
-        name: "Servicio de Cafetería",
-        description:
-          "Gestionamos la cafetería de tu empresa con opciones frescas y variadas para el día a día.",
-        image:
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuD5LRBNZC9Jv30Busb5QVxNHp0nF56ap7ejvCuO6Xn-PSK11z6-ptdyY9gL1SA-pGuAOeKbEQ7wuhJl_hZOqKPjggaoVVhtHicvOy6Nt_oBLmXcYQR2PAmAum5MRz84yyzg0dIqKtjZwfscdEVvd5iIMtAcZKULST3TGCf7YdQEdxi_9tCp0OI8lMBEqLfF9hJI6Mn_SIXLOKxCUmuTLsjk0bapf2uzz8w6pSSDURsW8Yw887vj9lQwNVAwMg7VG7BEJ8RkQiuVZHc",
-        alt: "Interior de una cafetería moderna y luminosa dentro de una oficina",
-        hasPrice: false,
-        activo: true,
-      },
-      {
-        id: 3,
-        name: "Comedores Industriales",
-        description:
-          "Servicio integral de alimentación para grandes volúmenes de personal, con altos estándares de calidad.",
-        image:
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuCkhgeKBHctg-C5RhQTxI_F-bv3B7e6G3-hLRZ4hRmA9rw88Y_pqVQCR6pUYwBkO7X1YHdkeThl0EijF1sNKVpPF8AkfKrZr4M8KxqNoJugBLoiQfSamIuSbnamewyVZbTqCA9kEP3kt3LkpifoTa8bBooegW4O5w-J5PVNxnIkQxpqBN7kGsI_fh6uX0jzTIaK-VnMZlsDCwiaQdX6WCklJidgz1D6BBnyvgzJLg3ykrpAtpy7XbnpxjttcyaZ_N4cIVa83o8N7LQ",
-        alt: "Vista aérea de un gran comedor industrial limpio y organizado con empleados comiendo",
-        hasPrice: false,
-        activo: true,
-      },
-      {
-        id: 4,
-        name: "Almuerzos Ejecutivos",
-        description:
-          "Menús balanceados y deliciosos entregados directamente en tu oficina para optimizar el tiempo de tu equipo.",
-        image:
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuB3WUQgtkQyfHGM2m7aYiHvRAMq3sOvwxP9jbae4xpu232r8iNNaFQuQUZdTSbPwwP2Kmxqo8CvE6y92vttsVfGUmrjY4Kn9I_5qUypSG8C3HVDzTbe-JikuWSmbuC6WwWrbpcunQGk7Dl2A_pNTsrTZUENMJ1kHFLWFHlm9FoTlVksmhGdA_qFEUyJ_uqZiPkbHllQ5C1wz-WHw1xctaFhhWxu4Nx40f41x953OndK0ZOj8Yo6QBWM04VoIh0tRRLQzbzPA_TdjMI",
-        alt: "Almuerzo ejecutivo balanceado",
-        price: "$12.500",
-        priceLabel: "/ por almuerzo",
-        hasPrice: true,
-        activo: true,
-      },
-      {
-        id: 5,
-        name: "Vending Machines",
-        description:
-          "Máquinas expendedoras con opciones saludables y snacks variados para tu equipo, disponibles 24/7.",
-        image:
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuArVGQahfCVO26I6NHR_BNOk2NPojE1FcAQ0nXGNK7HzeB6XScKBpvB2eGuIhskADIsIq8zxcbshf-99BKS84CYFx_6Te0CpBiltpS1QfJe20BBaUBZh4YasI0EtYJudPCD_ZPJDGaoyNTky1UpERl0HPFOpVCIcdgceK9M7wBEz5fz82HiOFfGJGOqQupR6I8z27Po1s9RgKB6YYp0OUzzxeOOomUWpbBVmEGc7bDhJ53HqxqDRZp8TF0fax1UwJ3N59DL40PKMHE",
-        alt: "Variedad de snacks y bebidas en una máquina expendedora moderna",
-        price: "$1.500",
-        priceLabel: "/ producto",
-        hasPrice: true,
-        activo: true,
-      },
-      {
-        id: 6,
-        name: "Asesoría Gastronómica",
-        description:
-          "Te ayudamos a diseñar y optimizar tus servicios de alimentación para mejorar la experiencia de tus empleados.",
-        image:
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuD5LRBNZC9Jv30Busb5QVxNHp0nF56ap7ejvCuO6Xn-PSK11z6-ptdyY9gL1SA-pGuAOeKbEQ7wuhJl_hZOqKPjggaoVVhtHicvOy6Nt_oBLmXcYQR2PAmAum5MRz84yyzg0dIqKtjZwfscdEVvd5iIMtAcZKULST3TGCf7YdQEdxi_9tCp0OI8lMBEqLfF9hJI6Mn_SIXLOKxCUmuTLsjk0bapf2uzz8w6pSSDURsW8Yw887vj9lQwNVAwMg7VG7BEJ8RkQiuVZHc",
-        alt: "Asesoría gastronómica profesional",
-        hasPrice: false,
-        activo: true,
-      },
-    ];
+  <script>
+    import { db } from "../../../firebase/client";
+    import {
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy
+    } from "firebase/firestore";
 
+    let servicios = [];
     let editingId = null;
     let deleteId = null;
+    let filteredServices = [];
+
+    const servicesCollection = collection(db, "services");
+
+    // Real-time listener
+    const q = query(servicesCollection, orderBy("name"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      servicios = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      filteredServices = [...servicios];
+      renderTable();
+      updateStats();
+    });
 
     // Renderizar tabla
-    function renderTable() {
+    function renderTable(serviceList = filteredServices) {
       const tbody = document.getElementById("serviciosTableBody");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
-      servicios.forEach((servicio) => {
+      serviceList.forEach((servicio) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="px-4">
@@ -658,7 +613,7 @@ import "../../../styles/global.css";
             <div class="fw-semibold text-dark">${servicio.name}</div>
           </td>
           <td class="px-4">
-            <div class="text-muted small" style="max-width: 300px;">${servicio.description.substring(0, 80)}...</div>
+            <div class="text-muted small" style="max-width: 300px;">${servicio.description ? servicio.description.substring(0, 80) : ''}...</div>
           </td>
           <td class="px-4">
             ${
@@ -673,47 +628,67 @@ import "../../../styles/global.css";
             </span>
           </td>
           <td class="px-4 text-end">
-            <button class="btn btn-sm btn-action btn-outline-primary me-1" onclick="viewServicio(${servicio.id})" title="Ver">
+            <button class="btn btn-sm btn-action btn-outline-primary me-1" onclick="window.viewServicio('${servicio.id}')" title="Ver">
               <i class="bi bi-eye"></i>
             </button>
-            <button class="btn btn-sm btn-action btn-outline-warning me-1" onclick="editServicio(${servicio.id})" title="Editar">
+            <button class="btn btn-sm btn-action btn-outline-warning me-1" onclick="window.editServicio('${servicio.id}')" title="Editar">
               <i class="bi bi-pencil"></i>
             </button>
-            <button class="btn btn-sm btn-action btn-outline-danger" onclick="deleteServicio(${servicio.id})" title="Eliminar">
+            <button class="btn btn-sm btn-action btn-outline-danger" onclick="window.deleteServicio('${servicio.id}')" title="Eliminar">
               <i class="bi bi-trash"></i>
             </button>
           </td>
         `;
         tbody.appendChild(tr);
       });
-
-      updateStats();
+      
+      const showingCount = document.getElementById("showing-count");
+      const totalCount = document.getElementById("total-count");
+      if(showingCount) showingCount.textContent = serviceList.length;
+      if(totalCount) totalCount.textContent = servicios.length;
     }
 
     // Actualizar estadísticas
     function updateStats() {
-      document.getElementById("total-servicios").textContent = servicios.length;
-      document.getElementById("servicios-activos").textContent =
-        servicios.filter((s) => s.activo).length;
-      document.getElementById("con-precio").textContent = servicios.filter(
-        (s) => s.hasPrice,
-      ).length;
-      document.getElementById("sin-precio").textContent = servicios.filter(
-        (s) => !s.hasPrice,
-      ).length;
-      document.getElementById("showing-count").textContent = servicios.length;
-      document.getElementById("total-count").textContent = servicios.length;
+      const totalServicios = document.getElementById("total-servicios");
+      const serviciosActivos = document.getElementById("servicios-activos");
+      const conPrecio = document.getElementById("con-precio");
+      const sinPrecio = document.getElementById("sin-precio");
+
+      if(totalServicios) totalServicios.textContent = servicios.length;
+      if(serviciosActivos) serviciosActivos.textContent = servicios.filter((s) => s.activo).length;
+      if(conPrecio) conPrecio.textContent = servicios.filter((s) => s.hasPrice).length;
+      if(sinPrecio) sinPrecio.textContent = servicios.filter((s) => !s.hasPrice).length;
+    }
+
+    // Toggle price fields
+    window.togglePriceFields = function() {
+      const hasPrice = document.getElementById("hasPrice").checked;
+      const priceField = document.getElementById("priceField");
+      const priceLabelField = document.getElementById("priceLabelField");
+      
+      if(priceField) priceField.style.display = hasPrice ? "block" : "none";
+      if(priceLabelField) priceLabelField.style.display = hasPrice ? "block" : "none";
+      
+      const precioInput = document.getElementById("precio");
+      if(precioInput) precioInput.required = hasPrice;
     }
 
     // Abrir modal para crear
     window.openCreateModal = function () {
       editingId = null;
-      document.getElementById("servicioModalLabel").textContent =
-        "Nuevo Servicio";
-      document.getElementById("servicioForm").reset();
-      document.getElementById("activo").checked = true;
-      document.getElementById("hasPrice").checked = false;
-      togglePriceFields();
+      const label = document.getElementById("servicioModalLabel");
+      const form = document.getElementById("servicioForm");
+      const activo = document.getElementById("activo");
+      const hasPrice = document.getElementById("hasPrice");
+      
+      if(label) label.textContent = "Nuevo Servicio";
+      if(form) form.reset();
+      if(activo) activo.checked = true;
+      if(hasPrice) {
+          hasPrice.checked = false;
+          window.togglePriceFields();
+      }
     };
 
     // Ver servicio
@@ -721,7 +696,7 @@ import "../../../styles/global.css";
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         alert(
-          `Servicio: ${servicio.name}\n\nDescripción: ${servicio.description}\n\nPrecio: ${servicio.hasPrice ? servicio.price : "Consultar"}\n\nEstado: ${servicio.activo ? "Activo" : "Inactivo"}`,
+          `Servicio: ${servicio.name}\n\nDescripción: ${servicio.description}\n\nPrecio: ${servicio.hasPrice ? servicio.price : "Consultar"}\n\nEstado: ${servicio.activo ? "Activo" : "Inactivo"}`
         );
       }
     };
@@ -731,8 +706,7 @@ import "../../../styles/global.css";
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         editingId = id;
-        document.getElementById("servicioModalLabel").textContent =
-          "Editar Servicio";
+        document.getElementById("servicioModalLabel").textContent = "Editar Servicio";
         document.getElementById("nombre").value = servicio.name;
         document.getElementById("descripcion").value = servicio.description;
         document.getElementById("imagen").value = servicio.image;
@@ -741,16 +715,13 @@ import "../../../styles/global.css";
         document.getElementById("activo").checked = servicio.activo;
 
         if (servicio.hasPrice) {
-          document.getElementById("precio").value = servicio.price;
-          document.getElementById("priceLabel").value =
-            servicio.priceLabel || "";
+          document.getElementById("precio").value = servicio.price.replace('$', '').replace(/\./g, '');
+          document.getElementById("priceLabel").value = servicio.priceLabel || "";
         }
 
-        togglePriceFields();
+        window.togglePriceFields();
 
-        const modal = new bootstrap.Modal(
-          document.getElementById("servicioModal"),
-        );
+        const modal = new bootstrap.Modal(document.getElementById("servicioModal"));
         modal.show();
       }
     };
@@ -760,37 +731,53 @@ import "../../../styles/global.css";
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         deleteId = id;
-        document.getElementById("deleteServiceName").textContent =
-          servicio.name;
-        const modal = new bootstrap.Modal(
-          document.getElementById("deleteModal"),
-        );
+        document.getElementById("deleteServiceName").textContent = servicio.name;
+        const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
         modal.show();
       }
     };
 
     // Confirmar eliminación
-    window.confirmDelete = function () {
-      servicios = servicios.filter((s) => s.id !== deleteId);
-      renderTable();
-      bootstrap.Modal.getInstance(
-        document.getElementById("deleteModal"),
-      ).hide();
-      showToast("Servicio eliminado exitosamente", "success");
+    window.confirmDelete = async function () {
+      if(deleteId) {
+          try {
+            await deleteDoc(doc(db, "services", deleteId));
+            const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
+            modal.hide();
+            showToast("Servicio eliminado exitosamente", "success");
+          } catch(e) {
+            console.error("Error deleting service:", e);
+            alert("Error al eliminar el servicio");
+          }
+      }
     };
 
     // Guardar servicio
-    window.saveServicio = function () {
+    window.saveServicio = async function () {
       const nombre = document.getElementById("nombre").value;
       const descripcion = document.getElementById("descripcion").value;
       const imagen = document.getElementById("imagen").value;
       const alt = document.getElementById("alt").value;
       const hasPrice = document.getElementById("hasPrice").checked;
       const activo = document.getElementById("activo").checked;
+      
+      let precio = "";
+      let priceLabel = "";
+      
+      if(hasPrice) {
+          const precioRaw = document.getElementById("precio").value;
+          precio = "$" + parseInt(precioRaw).toLocaleString('es-CL');
+          priceLabel = document.getElementById("priceLabel").value;
+      }
 
       if (!nombre || !descripcion || !imagen || !alt) {
         alert("Por favor, completa todos los campos obligatorios");
         return;
+      }
+      
+      if (hasPrice && !document.getElementById("precio").value) {
+          alert("Por favor, ingresa el precio");
+          return;
       }
 
       const servicioData = {
@@ -798,52 +785,41 @@ import "../../../styles/global.css";
         description: descripcion,
         image: imagen,
         alt: alt,
-        hasPrice: hasPrice,
-        activo: activo,
+        hasPrice,
+        price: precio,
+        priceLabel,
+        activo,
+        updatedAt: new Date()
       };
 
-      if (hasPrice) {
-        servicioData.price = document.getElementById("precio").value;
-        servicioData.priceLabel = document.getElementById("priceLabel").value;
-      }
-
-      if (editingId) {
-        // Editar
-        const index = servicios.findIndex((s) => s.id === editingId);
-        servicios[index] = { ...servicios[index], ...servicioData };
-        showToast("Servicio actualizado exitosamente", "success");
-      } else {
-        // Crear
-        const newId =
-          servicios.length > 0
-            ? Math.max(...servicios.map((s) => s.id)) + 1
-            : 1;
-        servicios.push({ id: newId, ...servicioData });
-        showToast("Servicio creado exitosamente", "success");
-      }
-
-      renderTable();
-      bootstrap.Modal.getInstance(
-        document.getElementById("servicioModal"),
-      ).hide();
-    };
-
-    // Toggle campos de precio
-    window.togglePriceFields = function () {
-      const hasPrice = document.getElementById("hasPrice").checked;
-      const priceField = document.getElementById("priceField");
-      const priceLabelField = document.getElementById("priceLabelField");
-
-      if (hasPrice) {
-        priceField.style.display = "block";
-        priceLabelField.style.display = "block";
-      } else {
-        priceField.style.display = "none";
-        priceLabelField.style.display = "none";
+      try {
+          if (editingId) {
+            await updateDoc(doc(db, "services", editingId), servicioData);
+            showToast("Servicio actualizado exitosamente", "success");
+          } else {
+            servicioData.createdAt = new Date();
+            await addDoc(servicesCollection, servicioData);
+            showToast("Servicio creado exitosamente", "success");
+          }
+          
+          const modal = bootstrap.Modal.getInstance(document.getElementById("servicioModal"));
+          modal.hide();
+      } catch(e) {
+          console.error("Error saving service:", e);
+          alert("Error al guardar el servicio");
       }
     };
+    
+    // Search filter
+    document.getElementById("searchInput")?.addEventListener("input", (e) => {
+        const term = e.target.value.toLowerCase();
+        filteredServices = servicios.filter(s => 
+            s.name.toLowerCase().includes(term) || 
+            s.description.toLowerCase().includes(term)
+        );
+        renderTable(filteredServices);
+    });
 
-    // Toast notification
     function showToast(message, type = "info") {
       const toast = document.createElement("div");
       toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
@@ -855,26 +831,8 @@ import "../../../styles/global.css";
         </div>
       `;
       document.body.appendChild(toast);
-
-      setTimeout(() => {
-        toast.remove();
-      }, 3000);
+      setTimeout(() => toast.remove(), 3000);
     }
-
-    // Búsqueda
-    document.getElementById("searchInput")?.addEventListener("input", (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const tbody = document.getElementById("serviciosTableBody");
-      const rows = tbody.getElementsByTagName("tr");
-
-      Array.from(rows).forEach((row) => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? "" : "none";
-      });
-    });
-
-    // Inicializar
-    renderTable();
   </script>
 
   <!-- Bootstrap JS Bundle -->
