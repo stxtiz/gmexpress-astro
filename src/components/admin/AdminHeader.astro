@@ -1,0 +1,269 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+
+// IMPORTS — deben ir SIEMPRE aquí arriba en Astro
+import { auth, db } from "../../firebase/client";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  updateDoc,
+  where,
+  writeBatch,
+} from "firebase/firestore";
+---
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+  <div class="container-fluid">
+    <h4 class="mb-0 text-dark fw-bold">{title}</h4>
+
+    <div class="d-flex align-items-center gap-3">
+      <!-- Notifications Dropdown -->
+      <div class="dropdown">
+        <button
+          class="btn btn-link text-dark position-relative"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          id="notificationBtn"
+        >
+          <i class="bi bi-bell fs-5"></i>
+          <span
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+            id="notificationBadge"
+          >
+            0
+          </span>
+        </button>
+
+        <ul
+          class="dropdown-menu dropdown-menu-end p-0 shadow border-0"
+          style="width: 320px; max-height: 400px; overflow-y: auto;"
+          id="notificationList"
+        >
+          <li class="p-3 border-bottom bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <h6 class="mb-0 fw-bold">Notificaciones</h6>
+              <small class="text-muted cursor-pointer" onclick="markAllAsRead()">
+                Marcar leídas
+              </small>
+            </div>
+          </li>
+
+          <!-- Default message -->
+          <li class="text-center p-4 text-muted">
+            <small>No tienes notificaciones nuevas</small>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Perfil -->
+      <div class="dropdown">
+        <button
+          class="btn btn-link text-dark dropdown-toggle d-flex align-items-center gap-2"
+          type="button"
+          data-bs-toggle="dropdown"
+        >
+          <div
+            class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+            style="width: 40px; height: 40px;"
+          >
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <span class="fw-semibold" id="admin-name">Admin</span>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#">Perfil</a></li>
+          <li><a class="dropdown-item" href="#">Configuración</a></li>
+          <li><hr class="dropdown-divider" /></li>
+          <li>
+            <a class="dropdown-item text-danger" href="#" id="logout-btn">
+              Cerrar sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Script del lado del cliente -->
+<script is:client="load">
+  const adminNameElement = document.getElementById("admin-name");
+  const logoutBtn = document.getElementById("logout-btn");
+  const notificationBadge = document.getElementById("notificationBadge");
+  const notificationList = document.getElementById("notificationList");
+
+  // LOGOUT
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+        sessionStorage.removeItem("gmexpress_admin_verified");
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Error signing out:", error);
+      }
+    });
+  }
+
+  // USER NAME
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const fullName = `${data.firstName} ${data.lastNamePaterno}`.trim();
+          adminNameElement.textContent = fullName || user.email || "Admin";
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+
+      subscribeToNotifications();
+    }
+  });
+
+  // Notifications Listener
+  function subscribeToNotifications() {
+    const q = query(
+      collection(db, "notifications"),
+      orderBy("createdAt", "desc"),
+      limit(10)
+    );
+
+    onSnapshot(q, (snapshot) => {
+      const notifications = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const unread = notifications.filter((n) => !n.read).length;
+
+      // Badge
+      if (unread > 0) {
+        notificationBadge.textContent = unread;
+        notificationBadge.classList.remove("d-none");
+      } else {
+        notificationBadge.classList.add("d-none");
+      }
+
+      // Reset UL (preservar header)
+      const header = notificationList.firstElementChild.cloneNode(true);
+      notificationList.innerHTML = "";
+      notificationList.appendChild(header);
+
+      if (notifications.length === 0) {
+        notificationList.innerHTML += `
+          <li class="text-center p-4 text-muted">
+            <small>No tienes notificaciones nuevas</small>
+          </li>
+        `;
+      } else {
+        notifications.forEach((notif) => {
+          const li = document.createElement("li");
+          li.className = "border-bottom";
+
+          li.innerHTML = `
+            <div class="dropdown-item p-3 ${notif.read ? "" : "bg-light"}" style="cursor:pointer;">
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-${
+                  notif.type === "warning"
+                    ? "exclamation-circle text-warning"
+                    : "info-circle text-info"
+                } mt-1"></i>
+
+                <div class="flex-grow-1" data-notif-click="${notif.id}">
+                  <p class="mb-0 fw-semibold small">${notif.title}</p>
+                  <p class="mb-0 text-muted small">${notif.message}</p>
+                  <small class="text-muted" style="font-size:0.7rem;">
+                    ${formatTimeAgo(notif.createdAt?.toDate())}
+                  </small>
+                </div>
+
+                ${
+                  !notif.read
+                    ? `
+                  <button class="btn btn-sm btn-link text-muted p-0 ms-2" data-notif-mark="${notif.id}">
+                    <i class="bi bi-check2"></i>
+                  </button>
+                `
+                    : ""
+                }
+              </div>
+            </div>
+          `;
+
+          // Click en contenido
+          li.querySelector(`[data-notif-click="${notif.id}"]`).onclick = () => {
+            markAsRead(notif.id);
+            if (notif.title.includes("Solicitud")) {
+              window.location.href = "/admin/pedidos";
+            }
+          };
+
+          // Marcar leído botón
+          const btn = li.querySelector(`[data-notif-mark="${notif.id}"]`);
+          if (btn) {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              markAsRead(notif.id);
+            };
+          }
+
+          notificationList.appendChild(li);
+        });
+      }
+    });
+  }
+
+  async function markAsRead(id) {
+    try {
+      await updateDoc(doc(db, "notifications", id), { read: true });
+    } catch (error) {
+      console.error("Error marking read:", error);
+    }
+  }
+
+  // Marcar todas
+  window.markAllAsRead = async function () {
+    try {
+      const q = query(collection(db, "notifications"), where("read", "==", false));
+      const snapshot = await getDocs(q);
+      const batch = writeBatch(db);
+
+      snapshot.docs.forEach((docx) => {
+        batch.update(docx.ref, { read: true });
+      });
+
+      await batch.commit();
+    } catch (error) {
+      console.error("Error marking all:", error);
+    }
+  };
+
+  function formatTimeAgo(date) {
+    if (!date) return "";
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+
+    if (diff < 60) return "Hace un momento";
+    if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} h`;
+
+    return date.toLocaleDateString();
+  }
+</script>

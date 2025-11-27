@@ -1,9 +1,13 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import "../../../styles/global.css";
+import AdminGuard from "../../../components/admin/AdminGuard.astro";
+import AdminHeader from "../../../components/admin/AdminHeader.astro";
+import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 ---
 
 <Layout title="GMExpress - Admin Dashboard - Pedidos">
+  <AdminGuard />
   <!-- Bootstrap CSS -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -18,114 +22,12 @@ import "../../../styles/global.css";
 
   <div class="admin-dashboard min-vh-100">
     <!-- Sidebar -->
-    <div class="sidebar bg-dark text-white vh-100 position-fixed">
-      <div class="p-4">
-        <div class="d-flex align-items-center mb-4">
-          <img
-            src="/images/Logo-horizontal.png"
-            alt="GMExpress Logo"
-            class="img-fluid"
-            style="max-height: 50px; filter: brightness(0) invert(1);"
-          />
-        </div>
-        <hr class="text-white-50" />
-        <nav class="nav flex-column gap-2">
-          <a
-            href="/admin"
-            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
-          >
-            <i class="bi bi-speedometer2"></i>
-            <span>Dashboard</span>
-          </a>
-          <a
-            href="/admin/productos"
-            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
-          >
-            <i class="bi bi-box-seam"></i>
-            <span>Productos</span>
-          </a>
-          <a
-            href="/admin/servicios"
-            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
-          >
-            <i class="bi bi-gear"></i>
-            <span>Servicios</span>
-          </a>
-          <a
-            href="/admin/usuarios"
-            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
-          >
-            <i class="bi bi-people"></i>
-            <span>Usuarios</span>
-          </a>
-          <a
-            href="/admin/pedidos"
-            class="nav-link text-white active-link d-flex align-items-center gap-2 rounded"
-          >
-            <i class="bi bi-cart-check"></i>
-            <span>Pedidos</span>
-          </a>
-          <hr class="text-white-50" />
-          <a
-            href="/"
-            class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
-          >
-            <i class="bi bi-house"></i>
-            <span>Volver al sitio</span>
-          </a>
-          <a
-            href="#"
-            class="nav-link text-danger d-flex align-items-center gap-2 rounded hover-item"
-          >
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Cerrar sesión</span>
-          </a>
-        </nav>
-      </div>
-    </div>
+    <AdminSidebar activePath="/admin/pedidos" />
 
     <!-- Main Content -->
     <div class="main-content">
       <!-- Top Bar -->
-      <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-        <div class="container-fluid">
-          <h4 class="mb-0 text-dark fw-bold">Gestión de Pedidos</h4>
-          <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-link text-dark position-relative">
-              <i class="bi bi-bell fs-5"></i>
-              <span
-                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-              >
-                3
-              </span>
-            </button>
-            <div class="dropdown">
-              <button
-                class="btn btn-link text-dark dropdown-toggle d-flex align-items-center gap-2"
-                type="button"
-                data-bs-toggle="dropdown"
-              >
-                <div
-                  class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                  style="width: 40px; height: 40px;"
-                >
-                  <i class="bi bi-person-fill"></i>
-                </div>
-                <span class="fw-semibold">Admin</span>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#">Perfil</a></li>
-                <li><a class="dropdown-item" href="#">Configuración</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item text-danger" href="#">Cerrar sesión</a
-                  >
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AdminHeader title="Gestión de Pedidos" />
 
       <!-- Content Area -->
       <div class="p-4">
@@ -435,7 +337,7 @@ import "../../../styles/global.css";
             <div class="card border-0 shadow-sm mb-4">
               <div class="card-body">
                 <div class="row g-3 align-items-center">
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <div class="input-group">
                       <span class="input-group-text bg-white border-end-0">
                         <i class="bi bi-search"></i>
@@ -443,29 +345,35 @@ import "../../../styles/global.css";
                       <input
                         type="text"
                         class="form-control border-start-0 ps-0"
-                        placeholder="Buscar por cliente o solicitud..."
+                        placeholder="Buscar..."
                         id="searchSolicitudes"
                       />
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-2">
                     <select class="form-select" id="estadoFilter">
-                      <option value="">Todos los estados</option>
+                      <option value="">Estado</option>
                       <option value="Pendiente">Pendiente</option>
                       <option value="En Proceso">En Proceso</option>
                       <option value="Completada">Completada</option>
                     </select>
                   </div>
                   <div class="col-md-3">
+                    <select class="form-select" id="servicioFilter">
+                      <option value="">Servicio</option>
+                      <!-- Se llenará dinámicamente -->
+                    </select>
+                  </div>
+                  <div class="col-md-2">
                     <select class="form-select" id="fechaFilter">
-                      <option value="">Todas las fechas</option>
+                      <option value="">Fecha</option>
                       <option value="hoy">Hoy</option>
                       <option value="semana">Esta semana</option>
                       <option value="mes">Este mes</option>
                     </select>
                   </div>
                   <div class="col-md-2 text-end">
-                    <button class="btn btn-outline-primary">
+                    <button class="btn btn-outline-primary w-100" onclick="applySolicitudesFilters()">
                       <i class="bi bi-funnel me-2"></i>Filtrar
                     </button>
                   </div>
@@ -565,14 +473,6 @@ import "../../../styles/global.css";
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     }
 
-    .sidebar {
-      width: 260px;
-      left: 0;
-      top: 0;
-      z-index: 1000;
-      background: linear-gradient(180deg, #1a2e3d 0%, #0a1929 100%);
-    }
-
     .main-content {
       margin-left: 260px;
       min-height: 100vh;
@@ -639,17 +539,16 @@ import "../../../styles/global.css";
     }
 
     @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-
       .main-content {
         margin-left: 0;
       }
     }
   </style>
 
-  <script is:inline>
+  <script>
+    import { db } from "../../../firebase/client";
+    import { doc, updateDoc, addDoc, collection, serverTimestamp, query, orderBy, onSnapshot } from "firebase/firestore";
+
     // Mock data de pedidos
     const pedidos = [
   {
@@ -1138,17 +1037,28 @@ import "../../../styles/global.css";
         month: "2-digit",
         year: "numeric",
       });
+    }
+
+    // Update pedidos statistics
+    function updatePedidosStats() {
+      const proceso = pedidos.filter(p => p.estado === 'En Proceso').length;
+      const transito = pedidos.filter(p => p.estado === 'En Tránsito').length;
+      const recibidos = pedidos.filter(p => p.estado === 'Recibido').length;
+      
+      const procesoEl = document.getElementById("pedidos-proceso");
+      const transitoEl = document.getElementById("pedidos-transito");
+      const recibidosEl = document.getElementById("pedidos-recibidos");
       const totalEl = document.getElementById("pedidos-total");
 
-      if (procesoEl) procesoEl.textContent = proceso;
-      if (transitoEl) transitoEl.textContent = transito;
-      if (recibidosEl) recibidosEl.textContent = recibidos;
-      if (totalEl) totalEl.textContent = pedidos.length;
+      if (procesoEl) procesoEl.textContent = proceso.toString();
+      if (transitoEl) transitoEl.textContent = transito.toString();
+      if (recibidosEl) recibidosEl.textContent = recibidos.toString();
+      if (totalEl) totalEl.textContent = pedidos.length.toString();
 
       const showingEl = document.getElementById("showing-pedidos-count");
       const totalCountEl = document.getElementById("total-pedidos-count");
-      if (showingEl) showingEl.textContent = filteredPedidos.length;
-      if (totalCountEl) totalCountEl.textContent = pedidos.length;
+      if (showingEl) showingEl.textContent = filteredPedidos.length.toString();
+      if (totalCountEl) totalCountEl.textContent = pedidos.length.toString();
     }
 
     // Ver detalle del pedido
@@ -1344,100 +1254,108 @@ import "../../../styles/global.css";
         checkboxes.forEach((cb) => (cb.checked = e.target.checked));
       });
 
-    // Mock data de solicitudes
-    const solicitudes = [
-  {
-    id: 123,
-    cliente: "Empresa ABC S.A.",
-    email: "contacto@empresaabc.com",
-    telefono: "+56 9 1234 5678",
-    empresa: "Empresa ABC S.A.",
-    ciudad: "Santiago",
-    servicio: "Catering para Eventos",
-    fecha: "2025-11-15",
-    estado: "Pendiente",
-    prioridad: "Alta",
-    numeroPersonas: 150,
-    fechaEstimada: "2025-12-10",
-    descripcion:
-      "Necesitamos servicio de catering para evento corporativo de 150 personas. Incluye desayuno, almuerzo y coffee break.",
-  },
-  {
-    id: 122,
-    cliente: "Tech Solutions Ltda.",
-    email: "eventos@techsolutions.cl",
-    telefono: "+56 9 8765 4321",
-    empresa: "Tech Solutions Ltda.",
-    ciudad: "Quilicura",
-    servicio: "Comedores Industriales",
-    fecha: "2025-11-14",
-    estado: "En Proceso",
-    prioridad: "Media",
-    numeroPersonas: 80,
-    fechaEstimada: "2025-12-01",
-    descripcion:
-      "Solicitud de presupuesto para implementar servicio de comedor industrial para 80 empleados, 5 días a la semana.",
-  },
-  {
-    id: 121,
-    cliente: "Constructora Del Sur",
-    email: "admin@constructoradelsur.cl",
-    telefono: "+56 9 5555 1234",
-    empresa: "Constructora Del Sur SpA",
-    ciudad: "Las Condes",
-    servicio: "Almuerzos Ejecutivos",
-    fecha: "2025-11-13",
-    estado: "Pendiente",
-    prioridad: "Alta",
-    numeroPersonas: 25,
-    fechaEstimada: "2025-11-20",
-    descripcion:
-      "Requerimos servicio de almuerzos ejecutivos para equipo de 25 personas en obra de construcción.",
-  },
-  {
-    id: 120,
-    cliente: "Universidad Central",
-    email: "servicios@ucentral.cl",
-    telefono: "+56 2 2222 3333",
-    empresa: "Universidad Central de Chile",
-    ciudad: "Santiago Centro",
-    servicio: "Servicio de Cafetería",
-    fecha: "2025-11-12",
-    estado: "Completada",
-    prioridad: "Baja",
-    numeroPersonas: 300,
-    fechaEstimada: "2025-11-25",
-    descripcion:
-      "Implementación de cafetería para campus universitario con atención de 300 estudiantes diarios.",
-    cotizacionEnviada: "$3.200.000/mes",
-    fechaRespuesta: "2025-11-13",
-  },
-  {
-    id: 119,
-    cliente: "StartUp Innovadora SpA",
-    email: "hr@startupinnovadora.com",
-    telefono: "+56 9 9999 8888",
-    empresa: "StartUp Innovadora SpA",
-    ciudad: "Providencia",
-    servicio: "Vending Machines",
-    fecha: "2025-11-10",
-    estado: "En Proceso",
-    prioridad: "Media",
-    numeroPersonas: 50,
-    fechaEstimada: "2025-11-18",
-    descripcion:
-      "Solicitud de instalación de 3 máquinas expendedoras con snacks saludables para oficina de 50 empleados.",
-  },
-];
-
+    // Inicializar solicitudes
+    let solicitudes = [];
+    let filteredSolicitudes = [];
     let selectedSolicitud = null;
+
+    // Fetch Solicitudes (Real-time)
+    function fetchSolicitudes() {
+        // Remove orderBy to avoid index issues for now
+        const q = query(collection(db, "solicitudes"));
+        
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            solicitudes = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    docId: doc.id, // Firestore document ID for updates
+                    id: data.id || doc.id, // Custom ID or fallback to doc ID
+                    cliente: data.nombre || "Cliente Sin Nombre",
+                    email: data.email || "",
+                    telefono: data.telefono || "",
+                    empresa: data.empresa || "",
+                    ciudad: data.ciudad || "",
+                    servicio: data.servicio || "",
+                    fecha: data.fecha || new Date().toISOString().split('T')[0],
+                    estado: data.estado || "Pendiente",
+                    prioridad: data.prioridad || "Media",
+                    numeroPersonas: data.numeroPersonas || 0,
+                    fechaEstimada: data.fechaEstimada || "",
+                    descripcion: data.descripcion || "",
+                    cotizacionEnviada: data.cotizacionEnviada || "",
+                    fechaRespuesta: data.fechaRespuesta || "",
+                    createdAt: data.createdAt // Keep for sorting
+                };
+            });
+
+            // Sort client-side
+            solicitudes.sort((a, b) => {
+                const dateA = a.createdAt ? a.createdAt.seconds : new Date(a.fecha).getTime() / 1000;
+                const dateB = b.createdAt ? b.createdAt.seconds : new Date(b.fecha).getTime() / 1000;
+                return dateB - dateA;
+            });
+            
+            // Apply current filters to new data
+            applySolicitudesFilters();
+        }, (error) => {
+            console.error("Error fetching solicitudes:", error);
+            const list = document.getElementById("solicitudesList");
+            if (list) {
+                list.innerHTML = `
+                    <div class="text-center p-4 text-danger">
+                        <small>Error al cargar solicitudes: ${error.message}</small>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    /* MOCK DATA ORIGINAL (COMENTADO POR SOLICITUD DEL USUARIO)
+    const solicitudesMock = [
+      {
+        id: 123,
+        cliente: "Empresa ABC S.A.",
+        email: "contacto@empresaabc.com",
+        telefono: "+56 9 1234 5678",
+        empresa: "Empresa ABC S.A.",
+        ciudad: "Santiago",
+        servicio: "Catering para Eventos",
+        fecha: "2025-11-15",
+        estado: "Pendiente",
+        prioridad: "Alta",
+        numeroPersonas: 150,
+        fechaEstimada: "2025-12-10",
+        descripcion: "Necesitamos servicio de catering para evento corporativo de 150 personas. Incluye desayuno, almuerzo y coffee break.",
+      },
+      // ... otros datos mock
+    ];
+    */
+
+
 
     // Renderizar lista de solicitudes
     function renderSolicitudesList() {
       const list = document.getElementById("solicitudesList");
+      if (!list) return;
       list.innerHTML = "";
 
-      solicitudes.forEach((sol) => {
+      // Ordenar: Pendientes primero
+      const sortedSolicitudes = [...filteredSolicitudes].sort((a, b) => {
+        if (a.estado === "Pendiente" && b.estado !== "Pendiente") return -1;
+        if (a.estado !== "Pendiente" && b.estado === "Pendiente") return 1;
+        return new Date(b.fecha) - new Date(a.fecha);
+      });
+
+      if (sortedSolicitudes.length === 0) {
+        list.innerHTML = `
+          <div class="text-center p-4 text-muted">
+            <small>No se encontraron solicitudes</small>
+          </div>
+        `;
+        return;
+      }
+
+      sortedSolicitudes.forEach((sol) => {
         const badgeClass =
           sol.estado === "Pendiente"
             ? "bg-warning text-dark"
@@ -1460,7 +1378,7 @@ import "../../../styles/global.css";
             <div>
               <h6 class="mb-1 fw-bold">
                 ${prioridadIcon}
-                Solicitud #${sol.id}
+                Solicitud #${sol.id.toString().slice(-6)}
               </h6>
               <p class="mb-1 small text-muted">
                 <i class="bi bi-building me-1"></i>${sol.cliente}
@@ -1481,14 +1399,50 @@ import "../../../styles/global.css";
       updateStats();
     }
 
-    // Seleccionar solicitud
-    function selectSolicitud(id) {
-      selectedSolicitud = solicitudes.find((s) => s.id === id);
+    // Aplicar filtros de solicitudes
+    function applySolicitudesFilters() {
+      const searchTerm = document.getElementById("searchSolicitudes")?.value.toLowerCase() || "";
+      const estadoFilter = document.getElementById("estadoFilter")?.value || "";
+      const fechaFilter = document.getElementById("fechaFilter")?.value || "";
+      const servicioFilter = document.getElementById("servicioFilter")?.value || "";
+
+      filteredSolicitudes = solicitudes.filter((sol) => {
+        const matchSearch =
+          sol.cliente.toLowerCase().includes(searchTerm) ||
+          sol.id.toString().includes(searchTerm) ||
+          sol.email.toLowerCase().includes(searchTerm) ||
+          sol.empresa.toLowerCase().includes(searchTerm);
+        
+        const matchEstado = !estadoFilter || sol.estado === estadoFilter;
+        const matchServicio = !servicioFilter || sol.servicio === servicioFilter;
+        
+        let matchFecha = true;
+        if (fechaFilter) {
+            const solDate = new Date(sol.fecha);
+            const today = new Date();
+            if (fechaFilter === "hoy") {
+                matchFecha = solDate.toDateString() === today.toDateString();
+            } else if (fechaFilter === "semana") {
+                const weekAgo = new Date(today.setDate(today.getDate() - 7));
+                matchFecha = solDate >= weekAgo;
+            } else if (fechaFilter === "mes") {
+                matchFecha = solDate.getMonth() === new Date().getMonth() && solDate.getFullYear() === new Date().getFullYear();
+            }
+        }
+
+        return matchSearch && matchEstado && matchFecha && matchServicio;
+      });
+
       renderSolicitudesList();
-      renderDetalle();
     }
 
-    // Renderizar detalle de solicitud
+    // Select solicitud to view details
+    function selectSolicitud(id) {
+      selectedSolicitud = solicitudes.find(s => s.id === id);
+      renderDetalle();
+      renderSolicitudesList(); // Re-render to update active state
+    }
+
     function renderDetalle() {
       const detalle = document.getElementById("solicitudDetalle");
       if (!selectedSolicitud) {
@@ -1650,6 +1604,7 @@ import "../../../styles/global.css";
 
     // Formatear fecha
     function formatFecha(fecha) {
+      if (!fecha) return "-";
       const date = new Date(fecha);
       return date.toLocaleDateString("es-CL", {
         year: "numeric",
@@ -1687,14 +1642,51 @@ import "../../../styles/global.css";
     }
 
     // Cambiar estado
-    window.cambiarEstado = function (nuevoEstado) {
+    window.cambiarEstado = async function (nuevoEstado) {
       if (selectedSolicitud && selectedSolicitud.estado !== nuevoEstado) {
-        selectedSolicitud.estado = nuevoEstado;
-        renderSolicitudesList();
-        renderDetalle();
-        showToast(`Estado actualizado a: ${nuevoEstado}`, "success");
+        const oldEstado = selectedSolicitud.estado;
+        
+        try {
+            // Actualizar en Firestore using the actual Firestore document ID
+            const solicitudRef = doc(db, "solicitudes", selectedSolicitud.docId);
+            await updateDoc(solicitudRef, {
+                estado: nuevoEstado
+            });
+
+            // Actualizar localmente
+            selectedSolicitud.estado = nuevoEstado;
+            renderSolicitudesList();
+            renderDetalle();
+            showToast(`Estado actualizado a: ${nuevoEstado}`, "success");
+
+            // Crear notificación
+            await createNotification(
+                "Estado Actualizado", 
+                `La solicitud #${selectedSolicitud.id} cambió de ${oldEstado} a ${nuevoEstado}`,
+                "info"
+            );
+
+        } catch (error) {
+            console.error("Error actualizando estado:", error);
+            showToast("Error al actualizar estado", "error");
+        }
       }
     };
+
+    // Crear notificación en Firestore
+    async function createNotification(title, message, type = "info") {
+        try {
+            await addDoc(collection(db, "notifications"), {
+                title,
+                message,
+                type,
+                read: false,
+                createdAt: serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error creating notification:", error);
+        }
+    }
 
     // Exportar PDF
     window.exportarPDF = function () {
@@ -1748,7 +1740,8 @@ import "../../../styles/global.css";
 
     // Inicializar
     renderPedidosTable();
-    renderSolicitudesList();
+    fetchSolicitudes(); // Fetch real-time data
+    // renderSolicitudesList(); // Removed as it's called in fetchSolicitudes
     if (solicitudes.length > 0) {
       selectSolicitud(solicitudes[0].id);
     }

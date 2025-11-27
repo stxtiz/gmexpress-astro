@@ -1,0 +1,112 @@
+---
+interface Props {
+  activePath: string;
+}
+
+const { activePath } = Astro.props;
+
+const menuItems = [
+  { path: "/admin", icon: "bi-speedometer2", label: "Dashboard" },
+  { path: "/admin/productos", icon: "bi-box-seam", label: "Productos" },
+  { path: "/admin/servicios", icon: "bi-gear", label: "Servicios" },
+  { path: "/admin/usuarios", icon: "bi-people", label: "Usuarios" },
+  { path: "/admin/pedidos", icon: "bi-cart-check", label: "Pedidos" },
+];
+---
+
+<div class="sidebar bg-dark text-white vh-100 position-fixed">
+  <div class="p-4">
+    <div class="d-flex align-items-center mb-4">
+      <img
+        src="/images/Logo-horizontal.png"
+        alt="GMExpress Logo"
+        class="img-fluid"
+        style="max-height: 50px; filter: brightness(0) invert(1);"
+      />
+    </div>
+    <hr class="text-white-50" />
+    <nav class="nav flex-column gap-2">
+      {
+        menuItems.map((item) => (
+          <a
+            href={item.path}
+            class:list={[
+              "nav-link d-flex align-items-center gap-2 rounded",
+              activePath === item.path
+                ? "text-white active-link"
+                : "text-white-50 hover-item",
+            ]}
+          >
+            <i class={`bi ${item.icon}`} />
+            <span>{item.label}</span>
+          </a>
+        ))
+      }
+      <hr class="text-white-50" />
+      <a
+        href="/"
+        class="nav-link text-white-50 d-flex align-items-center gap-2 rounded hover-item"
+      >
+        <i class="bi bi-house"></i>
+        <span>Volver al sitio</span>
+      </a>
+      <a
+        href="#"
+        class="nav-link text-danger d-flex align-items-center gap-2 rounded hover-item"
+        id="sidebar-logout-btn"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Cerrar sesión</span>
+      </a>
+    </nav>
+  </div>
+</div>
+
+<style>
+  .sidebar {
+    width: 260px;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    background: linear-gradient(180deg, #1a2e3d 0%, #0a1929 100%);
+  }
+
+  .hover-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .active-link {
+    background-color: #79c043 !important;
+    color: white !important;
+  }
+
+  .active-link:hover {
+    background-color: #6ab03a !important;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+  }
+</style>
+
+<script>
+  import { auth } from "../../firebase/client";
+  import { signOut } from "firebase/auth";
+
+  const logoutBtn = document.getElementById("sidebar-logout-btn");
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+        sessionStorage.removeItem("gmexpress_admin_verified");
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Error signing out:", error);
+      }
+    });
+  }
+</script>

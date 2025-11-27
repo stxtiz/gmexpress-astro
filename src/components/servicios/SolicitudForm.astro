@@ -1,9 +1,35 @@
 ---
+import { db } from "../../firebase/client";
+import { collection, addDoc, serverTimestamp, getDocs, query, where } from "firebase/firestore";
+
 interface Props {
   servicioPreseleccionado?: string;
 }
 
 const { servicioPreseleccionado } = Astro.props;
+
+// Fetch dynamic services
+let dynamicServices = [];
+try {
+  const q = query(
+    collection(db, "services"), 
+    where("hasPrice", "==", false),
+    where("activo", "==", true)
+  );
+  const snapshot = await getDocs(q);
+  dynamicServices = snapshot.docs.map(doc => doc.data().name);
+} catch (error) {
+  console.error("Error fetching services:", error);
+  // Fallback to default services if fetch fails
+  dynamicServices = [
+    "Catering para Eventos",
+    "Servicio de Cafetería",
+    "Comedores Industriales",
+    "Almuerzos Ejecutivos",
+    "Vending Machines",
+    "Asesoría Gastronómica"
+  ];
+}
 ---
 
 <div
@@ -31,36 +57,14 @@ const { servicioPreseleccionado } = Astro.props;
           class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
         >
           <option value="">Selecciona un servicio</option>
-          <option
-            value="Catering para Eventos"
-            selected={servicioPreseleccionado === "Catering para Eventos"}
-            >Catering para Eventos</option
-          >
-          <option
-            value="Servicio de Cafetería"
-            selected={servicioPreseleccionado === "Servicio de Cafetería"}
-            >Servicio de Cafetería</option
-          >
-          <option
-            value="Comedores Industriales"
-            selected={servicioPreseleccionado === "Comedores Industriales"}
-            >Comedores Industriales</option
-          >
-          <option
-            value="Almuerzos Ejecutivos"
-            selected={servicioPreseleccionado === "Almuerzos Ejecutivos"}
-            >Almuerzos Ejecutivos</option
-          >
-          <option
-            value="Vending Machines"
-            selected={servicioPreseleccionado === "Vending Machines"}
-            >Vending Machines</option
-          >
-          <option
-            value="Asesoría Gastronómica"
-            selected={servicioPreseleccionado === "Asesoría Gastronómica"}
-            >Asesoría Gastronómica</option
-          >
+          {dynamicServices.map((servicio) => (
+            <option
+              value={servicio}
+              selected={servicioPreseleccionado === servicio}
+            >
+              {servicio}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -240,10 +244,22 @@ const { servicioPreseleccionado } = Astro.props;
 </div>
 
 <script>
+  import { db } from "../../firebase/client";
+  import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
   // Manejar envío del formulario
   const form = document.getElementById("solicitudForm");
-  form?.addEventListener("submit", (e) => {
+  const submitBtn = form?.querySelector("button[type='submit']") as HTMLButtonElement | null;
+  const originalBtnContent = submitBtn?.innerHTML;
+
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    if (!submitBtn) return;
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando...`;
 
     const formData = new FormData(form as HTMLFormElement);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -253,19 +269,40 @@ const { servicioPreseleccionado } = Astro.props;
       data[key] = value;
     });
 
-    console.log("Datos de la solicitud:", data);
+    try {
+      // Guardar en Firestore
+      await addDoc(collection(db, "solicitudes"), {
+        ...data,
+        fecha: new Date().toISOString().split('T')[0], // Fecha de creación
+        createdAt: serverTimestamp(),
+        estado: "Pendiente", // Estado inicial
+        id: `SOL-${Date.now().toString().slice(-6)}` // ID simple generado
+      });
 
-    // Simular envío (mockup)
-    alert(
-      "¡Solicitud enviada exitosamente!\n\n" +
-        `Servicio: ${data.servicio}\n` +
-        `Empresa: ${data.empresa}\n` +
-        `Contacto: ${data.nombre}\n\n` +
-        "Nos pondremos en contacto contigo en las próximas 24 horas.\n\n" +
-        "(Esta es una versión mockup)",
-    );
+      // Crear notificación para el admin
+      await addDoc(collection(db, "notifications"), {
+        title: "Nueva Solicitud de Cotización",
+        message: `Nueva solicitud de ${data.servicio} por ${data.nombre} (${data.empresa})`,
+        type: "warning", // Warning para destacar (amarillo)
+        read: false,
+        createdAt: serverTimestamp()
+      });
 
-    // Opcional: Redirigir
-    window.location.href = "/servicios";
+      // Éxito
+      alert(
+        "¡Solicitud enviada exitosamente!\n\n" +
+          "Nos pondremos en contacto contigo en las próximas 24 horas."
+      );
+
+      // Redirigir
+      window.location.href = "/servicios";
+    } catch (error) {
+      console.error("Error al enviar solicitud:", error);
+      alert("Hubo un error al enviar la solicitud. Por favor intenta nuevamente.");
+    } finally {
+      // Reset button
+      submitBtn.disabled = false;
+      if (originalBtnContent) submitBtn.innerHTML = originalBtnContent;
+    }
   });
 </script>

@@ -30,5 +30,10 @@
     "prettier-plugin-astro": "^0.14.1",
     "typescript-eslint": "^8.48.0",
     "vitest": "^4.0.14"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm"
   }
 }

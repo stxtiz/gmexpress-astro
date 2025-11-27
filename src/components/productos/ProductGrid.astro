@@ -1,80 +1,17 @@
 ---
 import ProductCard from "./ProductCard.astro";
 
-const products = [
-  {
-    name: "Pizza Suprema de la Casa",
-    price: "$16.990",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAKRSPegdsLOAqm9hXTzYusgTjcdhnbeY4a2__9WuU4QTNHNWiFF8bmF8XfJuJtNlFxaCV3RiMLSiyR1VQSMxWxBs4NAEu_VS4SZwbAKAu0dbkCw1UcQTNowZV9u76oXnu4BI4vRu_wwoUW-ktbrv-YHq0JHze9TqiEFtbmimU3c8A6KRelU2bXDIzP6aPImEcPlYwPNMq0EpyVa0aLp49zZq8ore8iUxJi3shMq5BGTHYdslpv302QG4DRBb1-2z3qZmNeJSQxq9Y",
-    alt: "Una pizza de pepperoni recién horneada sobre una tabla de madera.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur volutpat sapien sed risus auctor.",
-  },
-  {
-    name: "Ensalada Fresca",
-    price: "$6.990",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAIKNIod8GIjMemYogpUEaEPhubH1QJ4LgjN91_2LCnc5v_5Fjb4Ad129_i7lpzy3rhyljKawUvZ0VK3u07lPmO-FI_un3sqUnZmWAY0JBrzkwHdLDMUz1R2yAx1Oaa73-kcr-fn7nqWTWXiw8ssSe5T6wxzXIrB5BA0PLbkEs6ailr__GPPwixgz0ObduYTfPOJigntgbPfuP7Ub1maJ0FxjDCBFkOv5FWDoFOwLyTHOMvyJyqzntltPPT6FMMrIJp53PtwqJw3I4",
-    alt: "Una ensalada fresca y colorida en un bol blanco.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti in faucibus orci luctus.",
-  },
-  {
-    name: "Pizza Vegetariana",
-    price: "$12.990",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuApvlk8YkSynUsEDVSbQmWG_GwwHObdS_8VNf2e-KQdhX_5Wfi7kQxeP2C0PhvJNECiH7lVozJphaNYa7L-SSZIXQyljW6O79pM6NYEVeNiWHHNVqR-XKug-sLx9rHSmDbx8dKij4acooZjrm2zACH200DxqO1YSNJYjT2lp6bnTfJ-ZZ4c9DAn2NGk9tnyGVaNRXk6XIhVgvjsMo82uCHUCT_a-K8YLoKT13eV_WPY3sRHMs4QOJ0bObb758Odal1PpmfafHALyeM",
-    alt: "Pizza vegetariana con muchos toppings.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sit amet justo vitae sapien aliquet.",
-  },
-  {
-    name: "Cócteles Tropicales",
-    price: "$5.990",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDD7vL8Y2meqGRonlma8xaCrq6lpx0CNUNU5CXjAYxTlb-Mx9HiYDmztQJbQiB5z7JXpUFQJ3oTUDaA__2egYSznxNVLlhWdbAsFUzadHlVBdozIt9Y0yqXmniAfAwTCsHF3UIFUvhnu5uAn7DFpUnDBm9ne6OAnTjD7nithUyfysrMYKbB0WFLYF7p3-sspvZTA7j4PtTB_j2K3yh6zau_fmPET-olIiOojN2rLv-UNRl_BBS3K0e7HybF7RsH_2spfFif-tqHV60",
-    alt: "Tres cócteles coloridos en copas.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus non mi vitae elit finibus faucibus.",
-  },
-  {
-    name: "Tostada de Aguacate",
-    price: "$4.990",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDV1_qHHpu2esAkmFv_2xs-_Yd7S-wKXyKU8t9-w0nOjpSFrhbkVKk-obCgYcTTEhLQ5V195zO41CQ9S6mISawTpdEbVMCOw2sTu6uDBrqGkc9WnfrP2lynqrk71mt7lmN5lS76CfWjGiSokQTjvH_sWMU_qTTVRYhxUAdWXXbrTjXf_ogX9DOjpx0t92eSqRREpro-4nlPF8IN0ytngNDjSN7GR5zu1RoJKYFapjgBy-TdK0gi7uOeAl8wBBIWfaF3Imjfsa6G-iM",
-    alt: "Tostada con aguacate y huevo pochado.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed dolor at lorem porttitor ultrices.",
-  },
-  {
-    name: "Pancakes con Frutas",
-    price: "$7.990",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDEnZpiuC7bYj6XQzUhHf_SjoL_g83S49Vc-jRbyChfCPEtpKXOAg6zTmQZQJYskuGSxEe0PIcrOnnEkEDLQAqxdgo-FANrS_fPfB9pWFB2f6c-qGyLqZSbnIT0vlXzGKS2g72XsV5TOzKpnHXMq0MmxpqaS7KQGmwQ6ZG2jImlVBzbk_a5gZwHHTLzCfcsKtzVMNRYLUO7dLK55KzQ99y9opH4QWeB9G_GIsinbRqqBrvKgSIqC3TvSqgeiEKLG-QPqZmbIy3ueg4",
-    alt: "Pancakes con sirope y frutas.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vulputate neque vel ipsum tristique.",
-  },
-  {
-    name: "Pollo a la Parrilla",
-    price: "$10.990",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCwswJce_0QCIAcq4zljCeoj8dBaoJsvtBnHIjinniLa3nSK_VYiVegOLv9K5pBFsZheQ0zgF-u94VVfZFrYPGjhdF0VeETUD4QWlJifxlNJM9MFT-rRKJ1OQtzI6lnnhhs1jTAZBVP1zTHEoni9VxmenoQN1Fq3dRp0pw9R0rJ5MadvCXM0yktmCOsN3Tod_IpxG1XRjQkyHF3k2LpzbPj2UdSCLTEiySxrgqWT8UTNkT563yzHD69yUkmqgwTqntA1DE3g_QeX6w",
-    alt: "Pollo a la parrilla con espárragos y limón.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam erat volutpat. Morbi tincidunt purus.",
-  },
-  {
-    name: "Pizza Champiñones",
-    price: "$11.990",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuApWD6UDTvsXKCvb3jqFHObvUNiXuyc0Kug8kmexFnMdcaOiriPPrV0GovOM_Cu1_sS9pz5hA6VpxfYjglkVga65eB2bR9sDAOzsLVNrnNLK5oV9gpTKkwBkG_DRZJrICwDk25DhSZ-deICzF1Ux6qS9EIspFiWFKXhKC3wCkx87C13XrXyfzs4AKGqRPipCpj_E0s6NgOcIYMiD3O0mISANi_At22GrlWYqAgVoOVyzddY38dZybj0TR0f6AC_nXpiZh5IizJQzfY",
-    alt: "Una pizza de primer plano con diversos ingredientes.",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae dui ac arcu dapibus ullamcorper.",
-  },
-];
+interface Props {
+  products: {
+    name: string;
+    price: string;
+    image: string;
+    alt: string;
+    description: string;
+  }[];
+}
+
+const { products } = Astro.props;
 ---
 
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

@@ -24,13 +24,13 @@ const {
   class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
   data-service
 >
-  <div class="relative">
-    <img
-      class="aspect-[4/3] w-full object-cover"
-      src={image}
-      alt={alt}
+  <div class="relative w-full aspect-[4/3]">
+    <div
+      class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-110"
       data-alt={alt}
-    />
+      style={`background-image: url('${image}');`}
+    >
+    </div>
   </div>
   <div class="p-6 flex flex-col grow">
     <h3

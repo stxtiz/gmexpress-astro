@@ -1,11 +1,11 @@
 ---
 interface Props {
-  title: string;
+  name: string;
   description: string;
   image: string;
 }
 
-const { title, description, image } = Astro.props;
+const { name, description, image } = Astro.props;
 ---
 
 <div
@@ -13,13 +13,13 @@ const { title, description, image } = Astro.props;
 >
   <div
     class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-t-lg"
-    data-alt={title}
+    data-alt={name}
     style={`background-image: url('${image}');`}
   >
   </div>
   <div class="flex flex-col flex-1 justify-between p-4 pt-0 gap-4">
     <div>
-      <p class="font-medium text-secondary dark:text-text-dark">{title}</p>
+      <p class="font-medium text-secondary dark:text-text-dark">{name}</p>
       <p class="text-sm text-slate-500 dark:text-slate-400">{description}</p>
     </div>
     <a

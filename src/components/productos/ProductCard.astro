@@ -14,13 +14,13 @@ const { name, price, image, alt, description } = Astro.props;
   class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
   data-product
 >
-  <div class="relative">
-    <img
-      class="aspect-square w-full object-cover"
-      src={image}
-      alt={alt}
-      data-alt={alt}
-    />
+  <div class="relative w-full aspect-square">
+    <div
+      class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-110"
+      data-alt={name}
+      style={`background-image: url('${image}');`}
+    >
+    </div>
   </div>
   <div class="p-4 flex flex-col grow">
     <h3

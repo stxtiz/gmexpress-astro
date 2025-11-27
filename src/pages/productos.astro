@@ -6,6 +6,30 @@ import CategoryFilter from "../components/productos/CategoryFilter.astro";
 import ProductGrid from "../components/productos/ProductGrid.astro";
 import Pagination from "../components/productos/Pagination.astro";
 import "../styles/global.css";
+import { db } from "../firebase/client";
+import { collection, getDocs, query, where } from "firebase/firestore";
+
+// Fetch all active products
+const productsCollection = collection(db, "products");
+const q = query(productsCollection, where("activo", "==", true));
+const querySnapshot = await getDocs(q);
+const allProducts = querySnapshot.docs.map((doc) => ({
+  name: doc.data().name,
+  price: doc.data().price,
+  image: doc.data().image,
+  alt: doc.data().alt,
+  description: doc.data().description,
+  category: doc.data().categoria // Assuming category field exists for filtering later
+}));
+
+// Pagination Logic
+const itemsPerPage = 6;
+const currentPage = Number(Astro.url.searchParams.get('page') || 1);
+const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+
+const startIndex = (currentPage - 1) * itemsPerPage;
+const endIndex = startIndex + itemsPerPage;
+const paginatedProducts = allProducts.slice(startIndex, endIndex);
 ---
 
 <Layout title="GMExpress - Descubre Nuestros Productos">
@@ -32,10 +56,10 @@ import "../styles/global.css";
       <CategoryFilter />
 
       <!-- Grid de Productos -->
-      <ProductGrid />
+      <ProductGrid products={paginatedProducts} />
 
       <!-- Paginación -->
-      <Pagination />
+      <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl="/productos" />
     </main>
 
     <!-- Mockup Carrito lateral -->
@@ -336,13 +360,22 @@ import "../styles/global.css";
 
           const nameEl = card.querySelector("[data-product-name]");
           const priceEl = card.querySelector("[data-product-price]");
-          const imgEl = card.querySelector("img");
+          const imgDiv = card.querySelector("div[style*='background-image']");
           const descEl = card.querySelector("p.text-sm");
 
           const name = nameEl?.textContent ?? "Producto";
           const price = priceEl?.textContent ?? "$0";
-          const image = imgEl?.src ?? "";
-          const alt = imgEl?.alt ?? "";
+          
+          let image = "";
+          if (imgDiv) {
+            const style = imgDiv.getAttribute("style");
+            const match = style?.match(/url\(['"]?(.*?)['"]?\)/);
+            if (match) {
+              image = match[1];
+            }
+          }
+          
+          const alt = imgDiv?.getAttribute("data-alt") ?? "";
           const description = descEl?.textContent ?? "";
 
           showProductDetail(name, price, image, alt, description);

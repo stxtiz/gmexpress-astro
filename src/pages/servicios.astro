@@ -3,7 +3,33 @@ import Layout from "../layouts/Layout.astro";
 import ProductHeader from "../components/productos/ProductHeader.astro";
 import ProductFooter from "../components/productos/ProductFooter.astro";
 import ServiceGrid from "../components/servicios/ServiceGrid.astro";
+import Pagination from "../components/productos/Pagination.astro";
 import "../styles/global.css";
+import { db } from "../firebase/client";
+import { collection, getDocs, query, where } from "firebase/firestore";
+
+// Fetch all active services
+const servicesCollection = collection(db, "services");
+const q = query(servicesCollection, where("activo", "==", true));
+const querySnapshot = await getDocs(q);
+const allServices = querySnapshot.docs.map((doc) => ({
+  name: doc.data().name,
+  description: doc.data().description,
+  image: doc.data().image,
+  alt: doc.data().alt,
+  price: doc.data().price,
+  priceLabel: doc.data().priceLabel,
+  hasPrice: doc.data().hasPrice,
+}));
+
+// Pagination Logic
+const itemsPerPage = 6;
+const currentPage = Number(Astro.url.searchParams.get('page') || 1);
+const totalPages = Math.ceil(allServices.length / itemsPerPage);
+
+const startIndex = (currentPage - 1) * itemsPerPage;
+const endIndex = startIndex + itemsPerPage;
+const paginatedServices = allServices.slice(startIndex, endIndex);
 ---
 
 <Layout title="GMExpress - Nuestros Servicios">
@@ -28,41 +54,10 @@ import "../styles/global.css";
       </div>
 
       <!-- Grid de Servicios -->
-      <ServiceGrid />
+      <ServiceGrid services={paginatedServices} />
 
       <!-- Paginación -->
-      <div class="flex items-center justify-center p-4 mt-16">
-        <nav class="flex items-center gap-2">
-          <a
-            class="flex size-10 items-center justify-center text-text-light/50 dark:text-text-dark/50 rounded-lg hover:bg-card-light dark:hover:bg-card-dark transition-colors"
-            href="#"
-          >
-            <span class="material-symbols-outlined text-lg">chevron_left</span>
-          </a>
-          <a
-            class="text-sm font-bold leading-normal flex size-10 items-center justify-center text-white rounded-lg bg-primary"
-            href="#">1</a
-          >
-          <a
-            class="text-sm font-medium leading-normal flex size-10 items-center justify-center text-text-light dark:text-text-dark rounded-lg hover:bg-card-light dark:hover:bg-card-dark transition-colors"
-            href="#">2</a
-          >
-          <a
-            class="text-sm font-medium leading-normal flex size-10 items-center justify-center text-text-light dark:text-text-dark rounded-lg hover:bg-card-light dark:hover:bg-card-dark transition-colors"
-            href="#">3</a
-          >
-          <span
-            class="text-sm font-normal leading-normal flex size-10 items-center justify-center text-text-light/50 dark:text-text-dark/50 rounded-lg"
-            >...</span
-          >
-          <a
-            class="flex size-10 items-center justify-center text-text-light/50 dark:text-text-dark/50 rounded-lg hover:bg-card-light dark:hover:bg-card-dark transition-colors"
-            href="#"
-          >
-            <span class="material-symbols-outlined text-lg">chevron_right</span>
-          </a>
-        </nav>
-      </div>
+      <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl="/servicios" />
     </main>
 
     <!-- Carrito lateral compartido -->
@@ -378,14 +373,23 @@ import "../styles/global.css";
           const nameEl = card.querySelector("[data-service-name]");
           const priceEl = card.querySelector("[data-service-price]");
           const priceLabelEl = card.querySelector("[data-price-label]");
-          const imgEl = card.querySelector("img");
+          const imgDiv = card.querySelector("div[style*='background-image']");
           const descEl = card.querySelector("p.text-sm");
 
           const name = nameEl?.textContent ?? "Servicio";
           const price = priceEl?.textContent ?? "";
           const priceLabel = priceLabelEl?.textContent ?? "";
-          const image = imgEl?.src ?? "";
-          const alt = imgEl?.alt ?? "";
+          
+          let image = "";
+          if (imgDiv) {
+            const style = imgDiv.getAttribute("style");
+            const match = style?.match(/url\(['"]?(.*?)['"]?\)/);
+            if (match) {
+              image = match[1];
+            }
+          }
+
+          const alt = imgDiv?.getAttribute("data-alt") ?? "";
           const description = descEl?.textContent ?? "";
 
           // Detectar si tiene precio

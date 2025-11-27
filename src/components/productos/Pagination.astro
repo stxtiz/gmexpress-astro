@@ -1,50 +1,46 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+
+const { currentPage, totalPages, baseUrl } = Astro.props;
+
+const prevUrl = currentPage > 1 ? `${baseUrl}?page=${currentPage - 1}` : "#";
+const nextUrl = currentPage < totalPages ? `${baseUrl}?page=${currentPage + 1}` : "#";
+
+function getPageUrl(page: number) {
+  return `${baseUrl}?page=${page}`;
+}
+---
+
 <div class="mt-12 flex items-center justify-center">
   <nav aria-label="Pagination" class="flex items-center gap-2">
     <a
-      class="flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700"
-      href="#"
+      class={`flex h-10 w-10 items-center justify-center rounded-lg border border-border-light dark:border-border-dark ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600' : 'bg-card-light dark:bg-card-dark hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+      href={prevUrl}
+      aria-disabled={currentPage === 1}
     >
       <span class="material-symbols-outlined">chevron_left</span>
     </a>
 
-    <a
-      aria-current="page"
-      class="text-sm font-bold flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white"
-      href="#"
-    >
-      1
-    </a>
+    {
+      Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        <a
+          aria-current={page === currentPage ? "page" : undefined}
+          class={`text-sm font-bold flex h-10 w-10 items-center justify-center rounded-lg ${page === currentPage ? 'bg-primary text-white' : 'bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+          href={getPageUrl(page)}
+        >
+          {page}
+        </a>
+      ))
+    }
 
     <a
-      class="text-sm font-medium flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700"
-      href="#"
-    >
-      2
-    </a>
-
-    <a
-      class="text-sm font-medium flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700"
-      href="#"
-    >
-      3
-    </a>
-
-    <span
-      class="text-sm flex h-10 w-10 items-center justify-center text-text-light/70 dark:text-text-dark/70"
-    >
-      ...
-    </span>
-
-    <a
-      class="text-sm font-medium flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700"
-      href="#"
-    >
-      10
-    </a>
-
-    <a
-      class="flex h-10 w-10 items-center justify-center rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-200 dark:hover:bg-gray-700"
-      href="#"
+      class={`flex h-10 w-10 items-center justify-center rounded-lg border border-border-light dark:border-border-dark ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600' : 'bg-card-light dark:bg-card-dark hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+      href={nextUrl}
+      aria-disabled={currentPage === totalPages}
     >
       <span class="material-symbols-outlined">chevron_right</span>
     </a>

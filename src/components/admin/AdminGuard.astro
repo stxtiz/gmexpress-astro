@@ -1,0 +1,51 @@
+<div id="admin-guard" class="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
+  <div class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 text-muted">Verificando permisos...</p>
+  </div>
+</div>
+
+<script is:inline>
+  // Immediate check for cache - runs synchronously
+  const CACHE_KEY = 'gmexpress_admin_verified';
+  if (sessionStorage.getItem(CACHE_KEY) === 'true') {
+    const guard = document.getElementById('admin-guard');
+    if (guard) guard.style.display = 'none';
+  }
+</script>
+
+<script>
+  import { auth, db } from "../../firebase/client";
+  import { onAuthStateChanged } from "firebase/auth";
+  import { doc, getDoc } from "firebase/firestore";
+
+  const guard = document.getElementById('admin-guard');
+  const CACHE_KEY = 'gmexpress_admin_verified';
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      sessionStorage.removeItem(CACHE_KEY);
+      window.location.href = "/";
+      return;
+    }
+
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists() && userDoc.data().role === 'admin') {
+        // Is admin, remove guard and cache
+        if (guard) guard.remove();
+        sessionStorage.setItem(CACHE_KEY, 'true');
+      } else {
+        // Not admin, redirect and clear cache
+        sessionStorage.removeItem(CACHE_KEY);
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      sessionStorage.removeItem(CACHE_KEY);
+      window.location.href = "/";
+    }
+  });
+</script>
