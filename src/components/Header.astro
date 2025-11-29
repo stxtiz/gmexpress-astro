@@ -7,7 +7,7 @@
     <div class="flex items-center gap-2 text-text-light dark:text-text-dark">
       <img
         alt="GMExpress Logo"
-        class="h-12 w-auto brightness-0 invert"
+        class="h-12 w-auto dark:brightness-0 dark:invert"
         src="/images/Logo-horizontal.png"
       />
     </div>
@@ -29,7 +29,9 @@
           class="text-sm font-medium text-secondary hover:text-primary dark:text-white dark:hover:text-primary transition-colors flex items-center gap-1"
         >
           Catálogo
-          <span class="material-symbols-outlined text-xs opacity-60">expand_more</span>
+          <span class="material-symbols-outlined text-xs opacity-60"
+            >expand_more</span
+          >
         </button>
         <div
           class="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-secondary rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
@@ -68,7 +70,9 @@
 
       <!-- User Menu -->
       <div id="user-menu" class="hidden items-center gap-3">
-        <span id="user-name" class="text-sm font-medium text-secondary dark:text-white"></span>
+        <span
+          id="user-name"
+          class="text-sm font-medium text-secondary dark:text-white"></span>
         <button
           id="logoutBtn"
           class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 border border-red-500 text-red-500 text-sm font-bold tracking-wide hover:bg-red-50 transition-colors"
@@ -108,7 +112,10 @@
       <form id="loginForm" class="flex flex-col gap-4">
         <!-- Email -->
         <div class="flex flex-col gap-2">
-          <label for="loginEmail" class="text-sm font-medium text-secondary dark:text-text-dark">
+          <label
+            for="loginEmail"
+            class="text-sm font-medium text-secondary dark:text-text-dark"
+          >
             Correo Electrónico
           </label>
           <input
@@ -123,7 +130,10 @@
 
         <!-- Contraseña -->
         <div class="flex flex-col gap-2">
-          <label for="loginPassword" class="text-sm font-medium text-secondary dark:text-text-dark">
+          <label
+            for="loginPassword"
+            class="text-sm font-medium text-secondary dark:text-text-dark"
+          >
             Contraseña
           </label>
           <input
@@ -166,10 +176,13 @@
         <!-- Divider -->
         <div class="relative my-2">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-slate-200 dark:border-slate-800"></div>
+            <div class="w-full border-t border-slate-200 dark:border-slate-800">
+            </div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400">
+            <span
+              class="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400"
+            >
               o
             </span>
           </div>
@@ -179,7 +192,10 @@
         <div class="text-center">
           <p class="text-sm text-slate-600 dark:text-slate-400">
             ¿No tienes una cuenta?
-            <a href="/registro" class="text-primary hover:underline font-medium ml-1">
+            <a
+              href="/registro"
+              class="text-primary hover:underline font-medium ml-1"
+            >
               Regístrate aquí
             </a>
           </p>
@@ -208,38 +224,43 @@
 
 <script>
   import { auth, db } from "../firebase/client";
-  import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+  import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+  } from "firebase/auth";
   import { doc, getDoc } from "firebase/firestore";
 
-  const loginBtn = document.getElementById('loginBtn');
-  const loginModal = document.getElementById('loginModal');
-  const closeModal = document.getElementById('closeModal');
-  const loginForm = document.getElementById('loginForm');
-  const guestMenu = document.getElementById('guest-menu');
-  const userMenu = document.getElementById('user-menu');
-  const userNameDisplay = document.getElementById('user-name');
-  const logoutBtn = document.getElementById('logoutBtn');
+  const loginBtn = document.getElementById("loginBtn");
+  const loginModal = document.getElementById("loginModal");
+  const closeModal = document.getElementById("closeModal");
+  const loginForm = document.getElementById("loginForm");
+  const guestMenu = document.getElementById("guest-menu");
+  const userMenu = document.getElementById("user-menu");
+  const userNameDisplay = document.getElementById("user-name");
+  const logoutBtn = document.getElementById("logoutBtn");
 
   // Auth State Observer
   onAuthStateChanged(auth, (user) => {
     if (user) {
       // User is signed in
-      guestMenu?.classList.add('hidden');
-      guestMenu?.classList.remove('flex');
-      userMenu?.classList.remove('hidden');
-      userMenu?.classList.add('flex');
-      if (userNameDisplay) userNameDisplay.textContent = `Hola, ${user.displayName || 'Usuario'}`;
+      guestMenu?.classList.add("hidden");
+      guestMenu?.classList.remove("flex");
+      userMenu?.classList.remove("hidden");
+      userMenu?.classList.add("flex");
+      if (userNameDisplay)
+        userNameDisplay.textContent = `Hola, ${user.displayName || "Usuario"}`;
     } else {
       // User is signed out
-      guestMenu?.classList.remove('hidden');
-      guestMenu?.classList.add('flex');
-      userMenu?.classList.add('hidden');
-      userMenu?.classList.remove('flex');
+      guestMenu?.classList.remove("hidden");
+      guestMenu?.classList.add("flex");
+      userMenu?.classList.add("hidden");
+      userMenu?.classList.remove("flex");
     }
   });
 
   // Logout
-  logoutBtn?.addEventListener('click', async () => {
+  logoutBtn?.addEventListener("click", async () => {
     try {
       await signOut(auth);
       window.location.href = "/";
@@ -249,49 +270,56 @@
   });
 
   // Abrir modal
-  loginBtn?.addEventListener('click', () => {
-    loginModal?.classList.remove('hidden');
-    loginModal?.classList.add('flex');
-    document.body.style.overflow = 'hidden';
+  loginBtn?.addEventListener("click", () => {
+    loginModal?.classList.remove("hidden");
+    loginModal?.classList.add("flex");
+    document.body.style.overflow = "hidden";
   });
 
   // Cerrar modal
   const closeLoginModal = () => {
-    loginModal?.classList.add('hidden');
-    loginModal?.classList.remove('flex');
-    document.body.style.overflow = 'auto';
+    loginModal?.classList.add("hidden");
+    loginModal?.classList.remove("flex");
+    document.body.style.overflow = "auto";
   };
 
-  closeModal?.addEventListener('click', closeLoginModal);
+  closeModal?.addEventListener("click", closeLoginModal);
 
   // Cerrar al hacer click fuera del modal
-  loginModal?.addEventListener('click', (e) => {
+  loginModal?.addEventListener("click", (e) => {
     if (e.target === loginModal) {
       closeLoginModal();
     }
   });
 
   // Cerrar con la tecla ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !loginModal?.classList.contains('hidden')) {
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !loginModal?.classList.contains("hidden")) {
       closeLoginModal();
     }
   });
 
   // Manejar el submit del formulario (Login)
-  loginForm?.addEventListener('submit', async (e) => {
+  loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
-    const email = (document.getElementById('loginEmail') as HTMLInputElement).value;
-    const password = (document.getElementById('loginPassword') as HTMLInputElement).value;
+
+    const email = (document.getElementById("loginEmail") as HTMLInputElement)
+      .value;
+    const password = (
+      document.getElementById("loginPassword") as HTMLInputElement
+    ).value;
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const user = userCredential.user;
 
       // Check for admin role
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists() && userDoc.data().role === 'admin') {
+      if (userDoc.exists() && userDoc.data().role === "admin") {
         window.location.href = "/admin";
       } else {
         closeLoginModal();

@@ -187,23 +187,16 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           <div class="card-footer bg-white border-top-0">
             <div class="d-flex justify-content-between align-items-center">
               <span class="text-muted small"
-                >Mostrando <span id="showing-count">8</span> de <span
-                  id="total-count">8</span
+                >Mostrando <span id="showing-count">0</span> de <span
+                  id="total-count">0</span
                 > productos</span
               >
               <nav>
-                <ul class="pagination pagination-sm mb-0">
-                  <li class="page-item disabled">
-                    <a class="page-link" href="#">Anterior</a>
-                  </li>
-                  <li class="page-item active">
-                    <a class="page-link" href="#">1</a>
-                  </li>
-                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">Siguiente</a>
-                  </li>
+                <ul
+                  class="pagination pagination-sm mb-0"
+                  id="pagination-container"
+                >
+                  <!-- Paginación dinámica -->
                 </ul>
               </nav>
             </div>
@@ -536,7 +529,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       doc,
       onSnapshot,
       query,
-      orderBy
+      orderBy,
     } from "firebase/firestore";
 
     const productsCollection = collection(db, "products");
@@ -579,23 +572,47 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     let deleteId: string | null = null;
     let filteredProducts: Product[] = [];
 
+    // Paginación
+    const ITEMS_PER_PAGE = 10;
+    let currentPage = 1;
+
     onSnapshot(q, (snapshot) => {
-      productos = snapshot.docs.map(doc => ({
+      productos = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       })) as Product[];
       filteredProducts = [...productos];
+      currentPage = 1;
       renderTable();
       updateStats();
     });
 
+    // Obtener badge de estado según activo y stock
+    function getEstadoBadge(producto: Product): string {
+      if (!producto.activo) {
+        return '<span class="badge bg-secondary">Inactivo</span>';
+      }
+      if (producto.stock <= 0) {
+        return '<span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>Sin Stock</span>';
+      }
+      return '<span class="badge bg-success">Activo</span>';
+    }
+
     // Renderizar tabla
     function renderTable(productList: Product[] = filteredProducts) {
-      const tbody = document.getElementById("productosTableBody") as HTMLTableSectionElement;
+      const tbody = document.getElementById(
+        "productosTableBody",
+      ) as HTMLTableSectionElement;
       if (!tbody) return;
       tbody.innerHTML = "";
 
-      productList.forEach((producto) => {
+      // Calcular paginación
+      const totalPages = Math.ceil(productList.length / ITEMS_PER_PAGE);
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const paginatedProducts = productList.slice(startIndex, endIndex);
+
+      paginatedProducts.forEach((producto) => {
         const tr = document.createElement("tr");
         const stockClass =
           producto.stock < 20
@@ -625,9 +642,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
             <span class="badge ${stockClass} stock-badge">${producto.stock} uds</span>
           </td>
           <td class="px-4">
-            <span class="badge ${producto.activo ? "bg-success" : "bg-secondary"}">
-              ${producto.activo ? "Activo" : "Inactivo"}
-            </span>
+            ${getEstadoBadge(producto)}
           </td>
           <td class="px-4 text-end">
             <button class="btn btn-sm btn-action btn-outline-primary me-1" onclick="window.viewProducto('${producto.id}')" title="Ver">
@@ -643,12 +658,58 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         `;
         tbody.appendChild(tr);
       });
-      
+
       // Update counts
       const showingCount = document.getElementById("showing-count");
       const totalCount = document.getElementById("total-count");
-      if(showingCount) showingCount.textContent = productList.length.toString();
-      if(totalCount) totalCount.textContent = productos.length.toString();
+      if (showingCount)
+        showingCount.textContent = paginatedProducts.length.toString();
+      if (totalCount) totalCount.textContent = productList.length.toString();
+
+      // Render pagination
+      renderPagination(totalPages);
+    }
+
+    // Renderizar paginación
+    function renderPagination(totalPages: number) {
+      const container = document.getElementById("pagination-container");
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      // Botón Anterior
+      const prevLi = document.createElement("li");
+      prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+      prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage - 1}">Anterior</a>`;
+      container.appendChild(prevLi);
+
+      // Números de página
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${currentPage === i ? "active" : ""}`;
+        li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+        container.appendChild(li);
+      }
+
+      // Botón Siguiente
+      const nextLi = document.createElement("li");
+      nextLi.className = `page-item ${currentPage === totalPages ? "disabled" : ""}`;
+      nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage + 1}">Siguiente</a>`;
+      container.appendChild(nextLi);
+
+      // Event listeners
+      container.querySelectorAll(".page-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const page = parseInt((e.target as HTMLElement).dataset.page || "1");
+          if (page >= 1 && page <= totalPages && page !== currentPage) {
+            currentPage = page;
+            renderTable();
+          }
+        });
+      });
     }
 
     // Actualizar estadísticas
@@ -658,19 +719,24 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const categorias = document.getElementById("categorias");
       const precioPromedio = document.getElementById("precio-promedio");
 
-      if (totalProductos) totalProductos.textContent = productos.length.toString();
-      if (productosActivos) productosActivos.textContent = productos.filter((p) => p.activo).length.toString();
-      
-      const uniqueCategories = new Set(productos.map(p => p.categoria));
+      if (totalProductos)
+        totalProductos.textContent = productos.length.toString();
+      if (productosActivos)
+        productosActivos.textContent = productos
+          .filter((p) => p.activo)
+          .length.toString();
+
+      const uniqueCategories = new Set(productos.map((p) => p.categoria));
       if (categorias) categorias.textContent = uniqueCategories.size.toString();
 
       if (precioPromedio && productos.length > 0) {
         const total = productos.reduce((sum, p) => {
-           const priceVal = parseFloat(p.price.toString().replace(/[^0-9]/g, '')) || 0;
-           return sum + priceVal;
+          const priceVal =
+            parseFloat(p.price.toString().replace(/[^0-9]/g, "")) || 0;
+          return sum + priceVal;
         }, 0);
         const avg = Math.round(total / productos.length);
-        precioPromedio.textContent = "$" + avg.toLocaleString('es-CL');
+        precioPromedio.textContent = "$" + avg.toLocaleString("es-CL");
       }
     }
 
@@ -680,18 +746,18 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const label = document.getElementById("productoModalLabel");
       const form = document.getElementById("productoForm") as HTMLFormElement;
       const activo = document.getElementById("activo") as HTMLInputElement;
-      
-      if(label) label.textContent = "Nuevo Producto";
-      if(form) form.reset();
-      if(activo) activo.checked = true;
+
+      if (label) label.textContent = "Nuevo Producto";
+      if (form) form.reset();
+      if (activo) activo.checked = true;
     };
 
     window.viewProducto = function (id: string) {
       const producto = productos.find((p) => p.id === id);
       if (producto) {
         const modalBody = document.getElementById("viewModalBody");
-        if(modalBody) {
-            modalBody.innerHTML = `
+        if (modalBody) {
+          modalBody.innerHTML = `
                 <div class="row">
                     <div class="col-md-6">
                         <img src="${producto.image}" class="img-fluid rounded" alt="${producto.alt}">
@@ -703,12 +769,14 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                         <hr>
                         <p><strong>Precio:</strong> ${producto.price}</p>
                         <p><strong>Stock:</strong> ${producto.stock}</p>
-                        <p><strong>Estado:</strong> ${producto.activo ? 'Activo' : 'Inactivo'}</p>
+                        <p><strong>Estado:</strong> ${producto.activo ? "Activo" : "Inactivo"}</p>
                     </div>
                 </div>
             `;
-            const modal = new bootstrap.Modal(document.getElementById("viewModal"));
-            modal.show();
+          const modal = new bootstrap.Modal(
+            document.getElementById("viewModal"),
+          );
+          modal.show();
         }
       }
     };
@@ -717,18 +785,30 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const producto = productos.find((p) => p.id === id);
       if (producto) {
         editingId = id;
-        document.getElementById("productoModalLabel")!.textContent = "Editar Producto";
-        (document.getElementById("nombre") as HTMLInputElement).value = producto.name;
-        (document.getElementById("categoria") as HTMLSelectElement).value = producto.categoria;
-        (document.getElementById("descripcion") as HTMLTextAreaElement).value = producto.description;
-        (document.getElementById("precio") as HTMLInputElement).value = producto.price.replace('$', '').replace(/\./g, '');
-        (document.getElementById("stock") as HTMLInputElement).value = producto.stock.toString();
-        (document.getElementById("imagen") as HTMLInputElement).value = producto.image;
-        (document.getElementById("alt") as HTMLInputElement).value = producto.alt;
-        (document.getElementById("activo") as HTMLInputElement).checked = producto.activo;
-        (document.getElementById("destacado") as HTMLInputElement).checked = producto.destacado;
+        document.getElementById("productoModalLabel")!.textContent =
+          "Editar Producto";
+        (document.getElementById("nombre") as HTMLInputElement).value =
+          producto.name;
+        (document.getElementById("categoria") as HTMLSelectElement).value =
+          producto.categoria;
+        (document.getElementById("descripcion") as HTMLTextAreaElement).value =
+          producto.description;
+        (document.getElementById("precio") as HTMLInputElement).value =
+          producto.price.replace("$", "").replace(/\./g, "");
+        (document.getElementById("stock") as HTMLInputElement).value =
+          producto.stock.toString();
+        (document.getElementById("imagen") as HTMLInputElement).value =
+          producto.image;
+        (document.getElementById("alt") as HTMLInputElement).value =
+          producto.alt;
+        (document.getElementById("activo") as HTMLInputElement).checked =
+          producto.activo;
+        (document.getElementById("destacado") as HTMLInputElement).checked =
+          producto.destacado;
 
-        const modal = new bootstrap.Modal(document.getElementById("productoModal"));
+        const modal = new bootstrap.Modal(
+          document.getElementById("productoModal"),
+        );
         modal.show();
       }
     };
@@ -737,8 +817,11 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const producto = productos.find((p) => p.id === id);
       if (producto) {
         deleteId = id;
-        document.getElementById("deleteProductName").textContent = producto.name;
-        const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+        const deleteNameEl = document.getElementById("deleteProductName");
+        if (deleteNameEl) deleteNameEl.textContent = producto.name;
+        const modal = new bootstrap.Modal(
+          document.getElementById("deleteModal"),
+        );
         modal.show();
       }
     };
@@ -746,34 +829,56 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     window.confirmDelete = async function () {
       if (deleteId) {
         try {
-            await deleteDoc(doc(db, "products", deleteId));
-            const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
-            modal.hide();
-            showToast("Producto eliminado exitosamente", "success");
+          await deleteDoc(doc(db, "products", deleteId));
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("deleteModal"),
+          );
+          modal.hide();
+          showToast("Producto eliminado exitosamente", "success");
         } catch (e) {
-            console.error("Error deleting document: ", e);
-            alert("Error al eliminar el producto");
+          console.error("Error deleting document: ", e);
+          alert("Error al eliminar el producto");
         }
       }
     };
 
     window.saveProducto = async function () {
-      const nombre = (document.getElementById("nombre") as HTMLInputElement).value;
-      const categoria = (document.getElementById("categoria") as HTMLSelectElement).value;
-      const descripcion = (document.getElementById("descripcion") as HTMLTextAreaElement).value;
-      const precioRaw = (document.getElementById("precio") as HTMLInputElement).value;
-      const stock = parseInt((document.getElementById("stock") as HTMLInputElement).value);
-      const imagen = (document.getElementById("imagen") as HTMLInputElement).value;
+      const nombre = (document.getElementById("nombre") as HTMLInputElement)
+        .value;
+      const categoria = (
+        document.getElementById("categoria") as HTMLSelectElement
+      ).value;
+      const descripcion = (
+        document.getElementById("descripcion") as HTMLTextAreaElement
+      ).value;
+      const precioRaw = (document.getElementById("precio") as HTMLInputElement)
+        .value;
+      const stock = parseInt(
+        (document.getElementById("stock") as HTMLInputElement).value,
+      );
+      const imagen = (document.getElementById("imagen") as HTMLInputElement)
+        .value;
       const alt = (document.getElementById("alt") as HTMLInputElement).value;
-      const activo = (document.getElementById("activo") as HTMLInputElement).checked;
-      const destacado = (document.getElementById("destacado") as HTMLInputElement).checked;
+      const activo = (document.getElementById("activo") as HTMLInputElement)
+        .checked;
+      const destacado = (
+        document.getElementById("destacado") as HTMLInputElement
+      ).checked;
 
-      if (!nombre || !categoria || !descripcion || !precioRaw || !stock || !imagen || !alt) {
+      if (
+        !nombre ||
+        !categoria ||
+        !descripcion ||
+        !precioRaw ||
+        !stock ||
+        !imagen ||
+        !alt
+      ) {
         alert("Por favor, completa todos los campos obligatorios");
         return;
       }
-      
-      const precio = "$" + parseInt(precioRaw).toLocaleString('es-CL');
+
+      const precio = "$" + parseInt(precioRaw).toLocaleString("es-CL");
 
       const productoData = {
         name: nombre,
@@ -785,51 +890,78 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         alt,
         activo,
         destacado,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        createdAt: null as Date | null,
       };
 
       try {
-          if (editingId) {
-            await updateDoc(doc(db, "products", editingId), productoData);
-            showToast("Producto actualizado exitosamente", "success");
-          } else {
-            productoData.createdAt = new Date();
-            await addDoc(productsCollection, productoData);
-            showToast("Producto creado exitosamente", "success");
-          }
-          
-          const modal = bootstrap.Modal.getInstance(document.getElementById("productoModal"));
-          modal.hide();
+        if (editingId) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { createdAt: _, ...updateData } = productoData;
+          await updateDoc(doc(db, "products", editingId), updateData);
+          showToast("Producto actualizado exitosamente", "success");
+        } else {
+          productoData.createdAt = new Date();
+          await addDoc(productsCollection, productoData);
+          showToast("Producto creado exitosamente", "success");
+        }
+
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("productoModal"),
+        );
+        modal?.hide();
       } catch (e) {
-          console.error("Error saving document: ", e);
-          alert("Error al guardar el producto");
+        console.error("Error saving document: ", e);
+        alert("Error al guardar el producto");
       }
     };
 
     // Filtros
     document.getElementById("searchInput")?.addEventListener("input", (e) => {
       const term = (e.target as HTMLInputElement).value.toLowerCase();
-      filterProducts(term, (document.getElementById("categoryFilter") as HTMLSelectElement).value, (document.getElementById("statusFilter") as HTMLSelectElement).value);
+      filterProducts(
+        term,
+        (document.getElementById("categoryFilter") as HTMLSelectElement).value,
+        (document.getElementById("statusFilter") as HTMLSelectElement).value,
+      );
     });
 
-    document.getElementById("categoryFilter")?.addEventListener("change", (e) => {
-      filterProducts((document.getElementById("searchInput") as HTMLInputElement).value.toLowerCase(), (e.target as HTMLSelectElement).value, (document.getElementById("statusFilter") as HTMLSelectElement).value);
-    });
+    document
+      .getElementById("categoryFilter")
+      ?.addEventListener("change", (e) => {
+        filterProducts(
+          (
+            document.getElementById("searchInput") as HTMLInputElement
+          ).value.toLowerCase(),
+          (e.target as HTMLSelectElement).value,
+          (document.getElementById("statusFilter") as HTMLSelectElement).value,
+        );
+      });
 
     document.getElementById("statusFilter")?.addEventListener("change", (e) => {
-      filterProducts((document.getElementById("searchInput") as HTMLInputElement).value.toLowerCase(), (document.getElementById("categoryFilter") as HTMLSelectElement).value, (e.target as HTMLSelectElement).value);
+      filterProducts(
+        (
+          document.getElementById("searchInput") as HTMLInputElement
+        ).value.toLowerCase(),
+        (document.getElementById("categoryFilter") as HTMLSelectElement).value,
+        (e.target as HTMLSelectElement).value,
+      );
     });
 
     function filterProducts(term: string, category: string, status: string) {
-      filteredProducts = productos.filter(p => {
-        const matchesTerm = p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term);
+      filteredProducts = productos.filter((p) => {
+        const matchesTerm =
+          p.name.toLowerCase().includes(term) ||
+          p.description.toLowerCase().includes(term);
         const matchesCategory = category === "" || p.categoria === category;
-        const matchesStatus = status === "" || 
-          (status === "activo" && p.activo) || 
+        const matchesStatus =
+          status === "" ||
+          (status === "activo" && p.activo) ||
           (status === "inactivo" && !p.activo);
-        
+
         return matchesTerm && matchesCategory && matchesStatus;
       });
+      currentPage = 1; // Reset a página 1 al filtrar
       renderTable(filteredProducts);
     }
 
@@ -849,8 +981,12 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     // Select all checkbox
     document.getElementById("selectAll")?.addEventListener("change", (e) => {
-      const checkboxes = document.querySelectorAll(".product-checkbox") as NodeListOf<HTMLInputElement>;
-      checkboxes.forEach((cb) => (cb.checked = (e.target as HTMLInputElement).checked));
+      const checkboxes = document.querySelectorAll(
+        ".product-checkbox",
+      ) as NodeListOf<HTMLInputElement>;
+      checkboxes.forEach(
+        (cb) => (cb.checked = (e.target as HTMLInputElement).checked),
+      );
     });
   </script>
 

@@ -225,27 +225,16 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
               <div class="card-footer bg-white border-top-0">
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="text-muted small"
-                    >Mostrando <span id="showing-pedidos-count">12</span> de <span
-                      id="total-pedidos-count">12</span
+                    >Mostrando <span id="showing-pedidos-count">0</span> de <span
+                      id="total-pedidos-count">0</span
                     > pedidos</span
                   >
                   <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                      <li class="page-item disabled">
-                        <a class="page-link" href="#">Anterior</a>
-                      </li>
-                      <li class="page-item active">
-                        <a class="page-link" href="#">1</a>
-                      </li>
-                      <li class="page-item">
-                        <a class="page-link" href="#">2</a>
-                      </li>
-                      <li class="page-item">
-                        <a class="page-link" href="#">3</a>
-                      </li>
-                      <li class="page-item">
-                        <a class="page-link" href="#">Siguiente</a>
-                      </li>
+                    <ul
+                      class="pagination pagination-sm mb-0"
+                      id="pedidos-pagination-container"
+                    >
+                      <!-- Paginación dinámica -->
                     </ul>
                   </nav>
                 </div>
@@ -404,6 +393,15 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                     >
                       <!-- Se llenará dinámicamente -->
                     </div>
+                  </div>
+                  <div class="card-footer bg-white border-0 py-2">
+                    <nav aria-label="Paginación de solicitudes">
+                      <ul
+                        class="pagination pagination-sm mb-0 justify-content-center"
+                        id="solicitudes-pagination-container"
+                      >
+                      </ul>
+                    </nav>
                   </div>
                 </div>
               </div>
@@ -571,8 +569,14 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     // ============================================
 
     // Array de pedidos que se llenará con datos de Firestore
-    let pedidos = [];
-    let filteredPedidos = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let pedidos: any[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let filteredPedidos: any[] = [];
+
+    // Paginación de pedidos
+    const PEDIDOS_PER_PAGE = 10;
+    let currentPedidosPage = 1;
 
     // Formatear precio - maneja números y strings
     function formatPrecio(precio: number | string | undefined): string {
@@ -629,7 +633,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
               subtotal: formatPrecio(data.subtotal),
               iva: formatPrecio(data.iva),
               total: formatPrecio(data.total),
-              productos: (data.productos || []).map((p) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              productos: (data.productos || []).map((p: any) => {
                 const cantidad = p.quantity || p.cantidad || 1;
                 const precioNum = precioToNumber(p.price || p.precio);
                 return {
@@ -684,7 +689,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     // Renderizar tabla de pedidos
-    function renderPedidosTable(pedidosList = pedidos) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function renderPedidosTable(pedidosList: any[] = pedidos) {
       const tbody = document.getElementById("pedidosTableBody");
       if (!tbody) return;
 
@@ -701,10 +707,17 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           </tr>
         `;
         updatePedidosStats();
+        renderPedidosPagination(0);
         return;
       }
 
-      pedidosList.forEach((pedido) => {
+      // Calcular paginación
+      const totalPages = Math.ceil(pedidosList.length / PEDIDOS_PER_PAGE);
+      const startIndex = (currentPedidosPage - 1) * PEDIDOS_PER_PAGE;
+      const endIndex = startIndex + PEDIDOS_PER_PAGE;
+      const paginatedPedidos = pedidosList.slice(startIndex, endIndex);
+
+      paginatedPedidos.forEach((pedido) => {
         const badgeClass =
           pedido.estado === "En Proceso"
             ? "bg-info"
@@ -758,11 +771,54 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         tbody.appendChild(tr);
       });
 
-      updatePedidosStats();
+      updatePedidosStats(paginatedPedidos.length, pedidosList.length);
+      renderPedidosPagination(totalPages);
+    }
+
+    // Renderizar paginación de pedidos
+    function renderPedidosPagination(totalPages: number) {
+      const container = document.getElementById("pedidos-pagination-container");
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      // Botón Anterior
+      const prevLi = document.createElement("li");
+      prevLi.className = `page-item ${currentPedidosPage === 1 ? "disabled" : ""}`;
+      prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPedidosPage - 1}">Anterior</a>`;
+      container.appendChild(prevLi);
+
+      // Números de página
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${currentPedidosPage === i ? "active" : ""}`;
+        li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+        container.appendChild(li);
+      }
+
+      // Botón Siguiente
+      const nextLi = document.createElement("li");
+      nextLi.className = `page-item ${currentPedidosPage === totalPages ? "disabled" : ""}`;
+      nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPedidosPage + 1}">Siguiente</a>`;
+      container.appendChild(nextLi);
+
+      // Event listeners
+      container.querySelectorAll(".page-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const page = parseInt((e.target as HTMLElement).dataset.page || "1");
+          if (page >= 1 && page <= totalPages && page !== currentPedidosPage) {
+            currentPedidosPage = page;
+            renderPedidosTable(filteredPedidos);
+          }
+        });
+      });
     }
 
     // Formatear fecha
-    function formatFechaPedido(fecha) {
+    function formatFechaPedido(fecha: string | Date | null): string {
       if (!fecha) return "-";
       const date = new Date(fecha);
       return date.toLocaleDateString("es-CL", {
@@ -773,7 +829,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     // Update pedidos statistics
-    function updatePedidosStats() {
+    function updatePedidosStats(showingCount?: number, totalFiltered?: number) {
       const proceso = pedidos.filter((p) => p.estado === "En Proceso").length;
       const transito = pedidos.filter((p) => p.estado === "En Tránsito").length;
       const recibidos = pedidos.filter((p) => p.estado === "Recibido").length;
@@ -790,12 +846,17 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
       const showingEl = document.getElementById("showing-pedidos-count");
       const totalCountEl = document.getElementById("total-pedidos-count");
-      if (showingEl) showingEl.textContent = filteredPedidos.length.toString();
-      if (totalCountEl) totalCountEl.textContent = pedidos.length.toString();
+      if (showingEl)
+        showingEl.textContent = (
+          showingCount ?? filteredPedidos.length
+        ).toString();
+      if (totalCountEl)
+        totalCountEl.textContent = (totalFiltered ?? pedidos.length).toString();
     }
 
     // Ver detalle del pedido
-    window.verDetallePedido = function (docId) {
+    // @ts-ignore - window functions for inline onclick
+    window.verDetallePedido = function (docId: string) {
       const pedido = pedidos.find((p) => p.docId === docId);
       if (!pedido) return;
 
@@ -811,6 +872,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                 : "bg-secondary";
 
       const detalle = document.getElementById("detallePedidoBody");
+      if (!detalle) return;
       detalle.innerHTML = `
         <div class="mb-4 pb-3 border-bottom">
           <div class="d-flex justify-content-between align-items-start">
@@ -874,7 +936,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
               <tbody>
                 ${pedido.productos
                   .map(
-                    (p) => `
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (p: any) => `
                   <tr>
                     <td>${p.nombre}</td>
                     <td class="text-center">${p.cantidad}</td>
@@ -936,7 +999,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     };
 
     // Cambiar estado del pedido
-    window.cambiarEstadoPedido = async function (docId) {
+    // @ts-ignore - window functions for inline onclick
+    window.cambiarEstadoPedido = async function (docId: string) {
       const pedido = pedidos.find((p) => p.docId === docId);
       if (!pedido) return;
 
@@ -965,12 +1029,17 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         );
       } catch (error) {
         console.error("Error actualizando estado del pedido:", error);
-        showToast("Error al actualizar estado: " + error.message, "danger");
+        showToast(
+          "Error al actualizar estado: " +
+            (error instanceof Error ? error.message : "Error desconocido"),
+          "danger",
+        );
       }
     };
 
     // Imprimir pedido
-    window.imprimirPedido = function (docId) {
+    // @ts-ignore - window functions for inline onclick
+    window.imprimirPedido = function (docId: string) {
       const pedido = pedidos.find((p) => p.docId === docId);
       if (pedido) {
         showToast(
@@ -983,9 +1052,12 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     // Aplicar filtros de pedidos
     function applyPedidosFilters() {
       const searchTerm =
-        document.getElementById("searchPedidos")?.value.toLowerCase() || "";
+        (
+          document.getElementById("searchPedidos") as HTMLInputElement
+        )?.value.toLowerCase() || "";
       const estadoFilter =
-        document.getElementById("estadoPedidoFilter")?.value || "";
+        (document.getElementById("estadoPedidoFilter") as HTMLSelectElement)
+          ?.value || "";
 
       filteredPedidos = pedidos.filter((pedido) => {
         const matchSearch =
@@ -997,6 +1069,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         return matchSearch && matchEstado;
       });
 
+      currentPedidosPage = 1; // Reset a página 1 al filtrar
       renderPedidosTable(filteredPedidos);
     }
 
@@ -1012,14 +1085,23 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     document
       .getElementById("selectAllPedidos")
       ?.addEventListener("change", (e) => {
-        const checkboxes = document.querySelectorAll(".pedido-checkbox");
-        checkboxes.forEach((cb) => (cb.checked = e.target.checked));
+        const target = e.target as HTMLInputElement;
+        const checkboxes =
+          document.querySelectorAll<HTMLInputElement>(".pedido-checkbox");
+        checkboxes.forEach((cb) => (cb.checked = target.checked));
       });
 
     // Inicializar solicitudes
-    let solicitudes = [];
-    let filteredSolicitudes = [];
-    let selectedSolicitud = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let solicitudes: any[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let filteredSolicitudes: any[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let selectedSolicitud: any = null;
+
+    // Paginación de solicitudes
+    const SOLICITUDES_PER_PAGE = 10;
+    let currentSolicitudesPage = 1;
 
     // Fetch Solicitudes (Real-time)
     function fetchSolicitudes() {
@@ -1102,7 +1184,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     ];
     */
 
-    // Renderizar lista de solicitudes
+    // Renderizar lista de solicitudes con paginación
     function renderSolicitudesList() {
       const list = document.getElementById("solicitudesList");
       if (!list) return;
@@ -1112,7 +1194,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const sortedSolicitudes = [...filteredSolicitudes].sort((a, b) => {
         if (a.estado === "Pendiente" && b.estado !== "Pendiente") return -1;
         if (a.estado !== "Pendiente" && b.estado === "Pendiente") return 1;
-        return new Date(b.fecha) - new Date(a.fecha);
+        return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
       });
 
       if (sortedSolicitudes.length === 0) {
@@ -1121,10 +1203,22 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
             <small>No se encontraron solicitudes</small>
           </div>
         `;
+        renderSolicitudesPagination(0);
         return;
       }
 
-      sortedSolicitudes.forEach((sol) => {
+      // Calcular paginación
+      const totalPages = Math.ceil(
+        sortedSolicitudes.length / SOLICITUDES_PER_PAGE,
+      );
+      const startIndex = (currentSolicitudesPage - 1) * SOLICITUDES_PER_PAGE;
+      const endIndex = startIndex + SOLICITUDES_PER_PAGE;
+      const paginatedSolicitudes = sortedSolicitudes.slice(
+        startIndex,
+        endIndex,
+      );
+
+      paginatedSolicitudes.forEach((sol) => {
         const badgeClass =
           sol.estado === "Pendiente"
             ? "bg-warning text-dark"
@@ -1166,16 +1260,78 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       });
 
       updateStats();
+      renderSolicitudesPagination(totalPages);
+    }
+
+    // Renderizar paginación de solicitudes
+    function renderSolicitudesPagination(totalPages: number) {
+      const container = document.getElementById(
+        "solicitudes-pagination-container",
+      );
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      // Botón Anterior
+      const prevLi = document.createElement("li");
+      prevLi.className = `page-item ${currentSolicitudesPage === 1 ? "disabled" : ""}`;
+      prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentSolicitudesPage - 1}">«</a>`;
+      container.appendChild(prevLi);
+
+      // Números de página (mostrar máximo 5)
+      let startPage = Math.max(1, currentSolicitudesPage - 2);
+      let endPage = Math.min(totalPages, startPage + 4);
+      if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${currentSolicitudesPage === i ? "active" : ""}`;
+        li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+        container.appendChild(li);
+      }
+
+      // Botón Siguiente
+      const nextLi = document.createElement("li");
+      nextLi.className = `page-item ${currentSolicitudesPage === totalPages ? "disabled" : ""}`;
+      nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentSolicitudesPage + 1}">»</a>`;
+      container.appendChild(nextLi);
+
+      // Event listeners
+      container.querySelectorAll(".page-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const page = parseInt((e.target as HTMLElement).dataset.page || "1");
+          if (
+            page >= 1 &&
+            page <= totalPages &&
+            page !== currentSolicitudesPage
+          ) {
+            currentSolicitudesPage = page;
+            renderSolicitudesList();
+          }
+        });
+      });
     }
 
     // Aplicar filtros de solicitudes
     function applySolicitudesFilters() {
       const searchTerm =
-        document.getElementById("searchSolicitudes")?.value.toLowerCase() || "";
-      const estadoFilter = document.getElementById("estadoFilter")?.value || "";
-      const fechaFilter = document.getElementById("fechaFilter")?.value || "";
+        (
+          document.getElementById("searchSolicitudes") as HTMLInputElement
+        )?.value.toLowerCase() || "";
+      const estadoFilter =
+        (document.getElementById("estadoFilter") as HTMLSelectElement)?.value ||
+        "";
+      const fechaFilter =
+        (document.getElementById("fechaFilter") as HTMLSelectElement)?.value ||
+        "";
       const servicioFilter =
-        document.getElementById("servicioFilter")?.value || "";
+        (document.getElementById("servicioFilter") as HTMLSelectElement)
+          ?.value || "";
 
       filteredSolicitudes = solicitudes.filter((sol) => {
         const matchSearch =
@@ -1207,11 +1363,13 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         return matchSearch && matchEstado && matchFecha && matchServicio;
       });
 
+      // Reset a primera página al filtrar
+      currentSolicitudesPage = 1;
       renderSolicitudesList();
     }
 
     // Select solicitud to view details
-    function selectSolicitud(id) {
+    function selectSolicitud(id: string | number) {
       selectedSolicitud = solicitudes.find((s) => s.id === id);
       renderDetalle();
       renderSolicitudesList(); // Re-render to update active state
@@ -1219,6 +1377,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     function renderDetalle() {
       const detalle = document.getElementById("solicitudDetalle");
+      if (!detalle) return;
+
       if (!selectedSolicitud) {
         detalle.innerHTML = `
           <div class="text-center py-5">
@@ -1377,7 +1537,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     // Formatear fecha
-    function formatFecha(fecha) {
+    function formatFecha(fecha: string | Date): string {
       if (!fecha) return "-";
       const date = new Date(fecha);
       return date.toLocaleDateString("es-CL", {
@@ -1388,6 +1548,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     // Contactar cliente
+    // @ts-ignore - window functions for inline onclick
     window.contactarCliente = function () {
       if (selectedSolicitud) {
         window.location.href = `mailto:${selectedSolicitud.email}?subject=Solicitud #${selectedSolicitud.id} - ${selectedSolicitud.servicio}`;
@@ -1427,7 +1588,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     // Cambiar estado
-    window.cambiarEstado = async function (nuevoEstado) {
+    // @ts-ignore - window functions for inline onclick
+    window.cambiarEstado = async function (nuevoEstado: string) {
       if (selectedSolicitud && selectedSolicitud.estado !== nuevoEstado) {
         const oldEstado = selectedSolicitud.estado;
 
@@ -1458,7 +1620,11 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     };
 
     // Crear notificación en Firestore
-    async function createNotification(title, message, type = "info") {
+    async function createNotification(
+      title: string,
+      message: string,
+      type = "info",
+    ) {
       try {
         await addDoc(collection(db, "notifications"), {
           title,
@@ -1473,12 +1639,13 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     // Exportar PDF
+    // @ts-ignore - window functions for inline onclick
     window.exportarPDF = function () {
       showToast("Exportando a PDF... (Función en desarrollo)", "info");
     };
 
     // Toast notification
-    function showToast(message, type = "info") {
+    function showToast(message: string, type = "info") {
       const toast = document.createElement("div");
       toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
       toast.style.zIndex = "9999";
@@ -1495,31 +1662,16 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       }, 3000);
     }
 
-    // Búsqueda
+    // Búsqueda - ahora usa applySolicitudesFilters para mantener paginación
     document
       .getElementById("searchSolicitudes")
-      ?.addEventListener("input", (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const items = document.querySelectorAll(".solicitud-card");
-
-        items.forEach((item) => {
-          const text = item.textContent.toLowerCase();
-          item.style.display = text.includes(searchTerm) ? "" : "none";
-        });
+      ?.addEventListener("input", () => {
+        applySolicitudesFilters();
       });
 
-    // Filtros
-    document.getElementById("estadoFilter")?.addEventListener("change", (e) => {
-      const estado = e.target.value;
-      const items = document.querySelectorAll(".solicitud-card");
-
-      items.forEach((item) => {
-        if (!estado || item.textContent.includes(estado)) {
-          item.style.display = "";
-        } else {
-          item.style.display = "none";
-        }
-      });
+    // Filtros - ahora usa applySolicitudesFilters para mantener paginación
+    document.getElementById("estadoFilter")?.addEventListener("change", () => {
+      applySolicitudesFilters();
     });
 
     // Inicializar

@@ -165,23 +165,16 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           <div class="card-footer bg-white border-top-0">
             <div class="d-flex justify-content-between align-items-center">
               <span class="text-muted small"
-                >Mostrando <span id="showing-count">6</span> de <span
-                  id="total-count">6</span
+                >Mostrando <span id="showing-count">0</span> de <span
+                  id="total-count">0</span
                 > servicios</span
               >
               <nav>
-                <ul class="pagination pagination-sm mb-0">
-                  <li class="page-item disabled">
-                    <a class="page-link" href="#">Anterior</a>
-                  </li>
-                  <li class="page-item active">
-                    <a class="page-link" href="#">1</a>
-                  </li>
-                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">Siguiente</a>
-                  </li>
+                <ul
+                  class="pagination pagination-sm mb-0"
+                  id="pagination-container"
+                >
+                  <!-- Paginación dinámica -->
                 </ul>
               </nav>
             </div>
@@ -462,7 +455,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       doc,
       onSnapshot,
       query,
-      orderBy
+      orderBy,
     } from "firebase/firestore";
 
     const servicesCollection = collection(db, "services");
@@ -509,24 +502,36 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     let deleteId: string | null = null;
     let filteredServices: Service[] = [];
 
+    // Paginación
+    const ITEMS_PER_PAGE = 10;
+    let currentPage = 1;
+
     onSnapshot(q, (snapshot) => {
-      servicios = snapshot.docs.map(doc => ({
+      servicios = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       })) as Service[];
       filteredServices = [...servicios];
+      currentPage = 1;
       renderTable();
       updateStats();
     });
 
     // Renderizar tabla
-    // Renderizar tabla
     function renderTable(serviceList: Service[] = filteredServices) {
-      const tbody = document.getElementById("serviciosTableBody") as HTMLTableSectionElement;
+      const tbody = document.getElementById(
+        "serviciosTableBody",
+      ) as HTMLTableSectionElement;
       if (!tbody) return;
       tbody.innerHTML = "";
 
-      serviceList.forEach((servicio) => {
+      // Calcular paginación
+      const totalPages = Math.ceil(serviceList.length / ITEMS_PER_PAGE);
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const paginatedServices = serviceList.slice(startIndex, endIndex);
+
+      paginatedServices.forEach((servicio) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="px-4">
@@ -539,7 +544,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
             <div class="fw-semibold text-dark">${servicio.name}</div>
           </td>
           <td class="px-4">
-            <div class="text-muted small" style="max-width: 300px;">${servicio.description ? servicio.description.substring(0, 80) : ''}...</div>
+            <div class="text-muted small" style="max-width: 300px;">${servicio.description ? servicio.description.substring(0, 80) : ""}...</div>
           </td>
           <td class="px-4">
             ${
@@ -567,11 +572,57 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         `;
         tbody.appendChild(tr);
       });
-      
+
       const showingCount = document.getElementById("showing-count");
       const totalCount = document.getElementById("total-count");
-      if(showingCount) showingCount.textContent = serviceList.length.toString();
-      if(totalCount) totalCount.textContent = servicios.length.toString();
+      if (showingCount)
+        showingCount.textContent = paginatedServices.length.toString();
+      if (totalCount) totalCount.textContent = serviceList.length.toString();
+
+      // Render pagination
+      renderPagination(totalPages);
+    }
+
+    // Renderizar paginación
+    function renderPagination(totalPages: number) {
+      const container = document.getElementById("pagination-container");
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      // Botón Anterior
+      const prevLi = document.createElement("li");
+      prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+      prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage - 1}">Anterior</a>`;
+      container.appendChild(prevLi);
+
+      // Números de página
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${currentPage === i ? "active" : ""}`;
+        li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+        container.appendChild(li);
+      }
+
+      // Botón Siguiente
+      const nextLi = document.createElement("li");
+      nextLi.className = `page-item ${currentPage === totalPages ? "disabled" : ""}`;
+      nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage + 1}">Siguiente</a>`;
+      container.appendChild(nextLi);
+
+      // Event listeners
+      container.querySelectorAll(".page-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const page = parseInt((e.target as HTMLElement).dataset.page || "1");
+          if (page >= 1 && page <= totalPages && page !== currentPage) {
+            currentPage = page;
+            renderTable();
+          }
+        });
+      });
     }
 
     // Actualizar estadísticas
@@ -581,25 +632,37 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const conPrecio = document.getElementById("con-precio");
       const sinPrecio = document.getElementById("sin-precio");
 
-      if(totalServicios) totalServicios.textContent = servicios.length.toString();
-      if(serviciosActivos) serviciosActivos.textContent = servicios.filter((s) => s.activo).length.toString();
-      if(conPrecio) conPrecio.textContent = servicios.filter((s) => s.hasPrice).length.toString();
-      if(sinPrecio) sinPrecio.textContent = servicios.filter((s) => !s.hasPrice).length.toString();
+      if (totalServicios)
+        totalServicios.textContent = servicios.length.toString();
+      if (serviciosActivos)
+        serviciosActivos.textContent = servicios
+          .filter((s) => s.activo)
+          .length.toString();
+      if (conPrecio)
+        conPrecio.textContent = servicios
+          .filter((s) => s.hasPrice)
+          .length.toString();
+      if (sinPrecio)
+        sinPrecio.textContent = servicios
+          .filter((s) => !s.hasPrice)
+          .length.toString();
     }
 
     // Toggle price fields
     // Toggle price fields
-    window.togglePriceFields = function() {
-      const hasPrice = (document.getElementById("hasPrice") as HTMLInputElement).checked;
+    window.togglePriceFields = function () {
+      const hasPrice = (document.getElementById("hasPrice") as HTMLInputElement)
+        .checked;
       const priceField = document.getElementById("priceField");
       const priceLabelField = document.getElementById("priceLabelField");
-      
-      if(priceField) priceField.style.display = hasPrice ? "block" : "none";
-      if(priceLabelField) priceLabelField.style.display = hasPrice ? "block" : "none";
-      
+
+      if (priceField) priceField.style.display = hasPrice ? "block" : "none";
+      if (priceLabelField)
+        priceLabelField.style.display = hasPrice ? "block" : "none";
+
       const precioInput = document.getElementById("precio") as HTMLInputElement;
-      if(precioInput) precioInput.required = hasPrice;
-    }
+      if (precioInput) precioInput.required = hasPrice;
+    };
 
     // Abrir modal para crear
     window.openCreateModal = function () {
@@ -608,13 +671,13 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const form = document.getElementById("servicioForm") as HTMLFormElement;
       const activo = document.getElementById("activo") as HTMLInputElement;
       const hasPrice = document.getElementById("hasPrice") as HTMLInputElement;
-      
-      if(label) label.textContent = "Nuevo Servicio";
-      if(form) form.reset();
-      if(activo) activo.checked = true;
-      if(hasPrice) {
-          hasPrice.checked = false;
-          window.togglePriceFields();
+
+      if (label) label.textContent = "Nuevo Servicio";
+      if (form) form.reset();
+      if (activo) activo.checked = true;
+      if (hasPrice) {
+        hasPrice.checked = false;
+        window.togglePriceFields();
       }
     };
 
@@ -623,7 +686,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         alert(
-          `Servicio: ${servicio.name}\n\nDescripción: ${servicio.description}\n\nPrecio: ${servicio.hasPrice ? servicio.price : "Consultar"}\n\nEstado: ${servicio.activo ? "Activo" : "Inactivo"}`
+          `Servicio: ${servicio.name}\n\nDescripción: ${servicio.description}\n\nPrecio: ${servicio.hasPrice ? servicio.price : "Consultar"}\n\nEstado: ${servicio.activo ? "Activo" : "Inactivo"}`,
         );
       }
     };
@@ -633,22 +696,33 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         editingId = id;
-        document.getElementById("servicioModalLabel")!.textContent = "Editar Servicio";
-        (document.getElementById("nombre") as HTMLInputElement).value = servicio.name;
-        (document.getElementById("descripcion") as HTMLTextAreaElement).value = servicio.description;
-        (document.getElementById("imagen") as HTMLInputElement).value = servicio.image;
-        (document.getElementById("alt") as HTMLInputElement).value = servicio.alt;
-        (document.getElementById("hasPrice") as HTMLInputElement).checked = servicio.hasPrice;
-        (document.getElementById("activo") as HTMLInputElement).checked = servicio.activo;
+        document.getElementById("servicioModalLabel")!.textContent =
+          "Editar Servicio";
+        (document.getElementById("nombre") as HTMLInputElement).value =
+          servicio.name;
+        (document.getElementById("descripcion") as HTMLTextAreaElement).value =
+          servicio.description;
+        (document.getElementById("imagen") as HTMLInputElement).value =
+          servicio.image;
+        (document.getElementById("alt") as HTMLInputElement).value =
+          servicio.alt;
+        (document.getElementById("hasPrice") as HTMLInputElement).checked =
+          servicio.hasPrice;
+        (document.getElementById("activo") as HTMLInputElement).checked =
+          servicio.activo;
 
         if (servicio.hasPrice) {
-          (document.getElementById("precio") as HTMLInputElement).value = servicio.price.toString().replace('$', '').replace(/\./g, '');
-          (document.getElementById("priceLabel") as HTMLInputElement).value = servicio.priceLabel || "";
+          (document.getElementById("precio") as HTMLInputElement).value =
+            servicio.price.toString().replace("$", "").replace(/\./g, "");
+          (document.getElementById("priceLabel") as HTMLInputElement).value =
+            servicio.priceLabel || "";
         }
 
         window.togglePriceFields();
 
-        const modal = new bootstrap.Modal(document.getElementById("servicioModal"));
+        const modal = new bootstrap.Modal(
+          document.getElementById("servicioModal"),
+        );
         modal.show();
       }
     };
@@ -659,54 +733,71 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const servicio = servicios.find((s) => s.id === id);
       if (servicio) {
         deleteId = id;
-        document.getElementById("deleteServiceName").textContent = servicio.name;
-        const modal = new bootstrap.Modal(document.getElementById("deleteModal"));
+        const deleteNameEl = document.getElementById("deleteServiceName");
+        if (deleteNameEl) deleteNameEl.textContent = servicio.name;
+        const modal = new bootstrap.Modal(
+          document.getElementById("deleteModal"),
+        );
         modal.show();
       }
     };
 
     // Confirmar eliminación
     window.confirmDelete = async function () {
-      if(deleteId) {
-          try {
-            await deleteDoc(doc(db, "services", deleteId));
-            const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
-            modal.hide();
-            showToast("Servicio eliminado exitosamente", "success");
-          } catch(e) {
-            console.error("Error deleting service:", e);
-            alert("Error al eliminar el servicio");
-          }
+      if (deleteId) {
+        try {
+          await deleteDoc(doc(db, "services", deleteId));
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("deleteModal"),
+          );
+          modal?.hide();
+          showToast("Servicio eliminado exitosamente", "success");
+        } catch (e) {
+          console.error("Error deleting service:", e);
+          alert("Error al eliminar el servicio");
+        }
       }
     };
 
     // Guardar servicio
     // Guardar servicio
     window.saveServicio = async function () {
-      const nombre = (document.getElementById("nombre") as HTMLInputElement).value;
-      const descripcion = (document.getElementById("descripcion") as HTMLTextAreaElement).value;
-      const imagen = (document.getElementById("imagen") as HTMLInputElement).value;
+      const nombre = (document.getElementById("nombre") as HTMLInputElement)
+        .value;
+      const descripcion = (
+        document.getElementById("descripcion") as HTMLTextAreaElement
+      ).value;
+      const imagen = (document.getElementById("imagen") as HTMLInputElement)
+        .value;
       const alt = (document.getElementById("alt") as HTMLInputElement).value;
-      const hasPrice = (document.getElementById("hasPrice") as HTMLInputElement).checked;
-      const activo = (document.getElementById("activo") as HTMLInputElement).checked;
-      
+      const hasPrice = (document.getElementById("hasPrice") as HTMLInputElement)
+        .checked;
+      const activo = (document.getElementById("activo") as HTMLInputElement)
+        .checked;
+
       let precio = "";
       let priceLabel = "";
-      
-      if(hasPrice) {
-          const precioRaw = (document.getElementById("precio") as HTMLInputElement).value;
-          precio = "$" + parseInt(precioRaw).toLocaleString('es-CL');
-          priceLabel = (document.getElementById("priceLabel") as HTMLInputElement).value;
+
+      if (hasPrice) {
+        const precioRaw = (
+          document.getElementById("precio") as HTMLInputElement
+        ).value;
+        precio = "$" + parseInt(precioRaw).toLocaleString("es-CL");
+        priceLabel = (document.getElementById("priceLabel") as HTMLInputElement)
+          .value;
       }
 
       if (!nombre || !descripcion || !imagen || !alt) {
         alert("Por favor, completa todos los campos obligatorios");
         return;
       }
-      
-      if (hasPrice && !(document.getElementById("precio") as HTMLInputElement).value) {
-          alert("Por favor, ingresa el precio");
-          return;
+
+      if (
+        hasPrice &&
+        !(document.getElementById("precio") as HTMLInputElement).value
+      ) {
+        alert("Por favor, ingresa el precio");
+        return;
       }
 
       const servicioData = {
@@ -718,38 +809,45 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         price: precio,
         priceLabel,
         activo,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        createdAt: null as Date | null,
       };
 
       try {
-          if (editingId) {
-            await updateDoc(doc(db, "services", editingId), servicioData);
-            showToast("Servicio actualizado exitosamente", "success");
-          } else {
-            servicioData.createdAt = new Date();
-            await addDoc(servicesCollection, servicioData);
-            showToast("Servicio creado exitosamente", "success");
-          }
-          
-          const modal = bootstrap.Modal.getInstance(document.getElementById("servicioModal"));
-          modal.hide();
-      } catch(e) {
-          console.error("Error saving service:", e);
-          alert("Error al guardar el servicio");
+        if (editingId) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { createdAt: _, ...updateData } = servicioData;
+          await updateDoc(doc(db, "services", editingId), updateData);
+          showToast("Servicio actualizado exitosamente", "success");
+        } else {
+          servicioData.createdAt = new Date();
+          await addDoc(servicesCollection, servicioData);
+          showToast("Servicio creado exitosamente", "success");
+        }
+
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("servicioModal"),
+        );
+        modal?.hide();
+      } catch (e) {
+        console.error("Error saving service:", e);
+        alert("Error al guardar el servicio");
       }
     };
-    
+
     // Search filter
     document.getElementById("searchInput")?.addEventListener("input", (e) => {
-        const term = (e.target as HTMLInputElement).value.toLowerCase();
-        filteredServices = servicios.filter(s => 
-            s.name.toLowerCase().includes(term) || 
-            s.description.toLowerCase().includes(term)
-        );
-        renderTable(filteredServices);
+      const term = (e.target as HTMLInputElement).value.toLowerCase();
+      filteredServices = servicios.filter(
+        (s) =>
+          s.name.toLowerCase().includes(term) ||
+          s.description.toLowerCase().includes(term),
+      );
+      currentPage = 1; // Reset a página 1 al filtrar
+      renderTable(filteredServices);
     });
 
-    function showToast(message, type = "info") {
+    function showToast(message: string, type = "info") {
       const toast = document.createElement("div");
       toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
       toast.style.zIndex = "9999";
