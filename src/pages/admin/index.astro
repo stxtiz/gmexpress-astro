@@ -321,7 +321,6 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
       query,
       orderBy,
       limit,
-      where,
     } from "firebase/firestore";
 
     // ============================================
@@ -482,14 +481,20 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
         if (!topProductsList) return;
 
         // Contar ventas por producto
+        interface ProductoEnPedido {
+          nombre?: string;
+          name?: string;
+          cantidad?: number;
+          quantity?: number;
+        }
         const ventasPorProducto: Record<
           string,
           { nombre: string; cantidad: number }
         > = {};
 
         snap.docs.forEach((doc) => {
-          const productos = doc.data().productos || [];
-          productos.forEach((p: any) => {
+          const productos: ProductoEnPedido[] = doc.data().productos || [];
+          productos.forEach((p) => {
             const nombre = p.nombre || p.name || "Producto";
             if (!ventasPorProducto[nombre]) {
               ventasPorProducto[nombre] = { nombre, cantidad: 0 };

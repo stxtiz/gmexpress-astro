@@ -109,11 +109,13 @@ const { title } = Astro.props;
           </li>
           <li>
             <a class="dropdown-item py-2" href="/admin"
-              ><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+              ><i class="bi bi-speedometer2 me-2"></i>Dashboard</a
+            >
           </li>
           <li>
             <a class="dropdown-item py-2" href="/admin/pedidos"
-              ><i class="bi bi-cart-check me-2"></i>Pedidos</a>
+              ><i class="bi bi-cart-check me-2"></i>Pedidos</a
+            >
           </li>
           <li><hr class="dropdown-divider" /></li>
           <li>
@@ -250,9 +252,11 @@ const { title } = Astro.props;
           if (dropdownUserEmail)
             dropdownUserEmail.textContent = user.email || "";
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error fetching user data:", error);
-        console.error("Error details:", error.message, error.code);
+        if (error instanceof Error) {
+          console.error("Error details:", error.message);
+        }
         if (adminNameElement)
           adminNameElement.textContent = user.email?.split("@")[0] || "Admin";
         if (dropdownUserName)

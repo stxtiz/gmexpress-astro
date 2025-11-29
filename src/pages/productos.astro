@@ -201,7 +201,6 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
         addDoc,
         doc,
         getDoc,
-        updateDoc,
         serverTimestamp,
         runTransaction,
       } from "firebase/firestore";
@@ -219,7 +218,6 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
         priceToNumber,
         calculateSubtotal,
         calculateIVA,
-        calculateTotal,
         type CartItem,
       } from "../stores/cart";
 
@@ -239,8 +237,23 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
       // ============================================
       // ESTADO DE AUTENTICACIÓN
       // ============================================
-      let currentUser: any = null;
-      let userData: any = null;
+      interface FirebaseUser {
+        uid: string;
+        email: string | null;
+        displayName: string | null;
+      }
+      interface UserData {
+        firstName?: string;
+        lastNamePaterno?: string;
+        lastNameMaterno?: string;
+        phone?: string;
+        address?: string;
+        comuna?: string;
+        region?: string;
+        email?: string;
+      }
+      let currentUser: FirebaseUser | null = null;
+      let userData: UserData | null = null;
 
       // Escuchar cambios en autenticación
       onAuthStateChanged(auth, async (user) => {
@@ -579,7 +592,7 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
           setTimeout(() => {
             showCheckoutConfirmation();
           }, 500);
-        } catch (error: any) {
+        } catch {
           if (errorDiv) {
             errorDiv.textContent =
               "Credenciales incorrectas. Intenta de nuevo.";
@@ -693,12 +706,13 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
           // Verificar stock Y PRECIOS usando transacción
           await runTransaction(db, async (transaction) => {
             // Primero, leer todos los productos para verificar stock y precios reales
-            const stockChecks: {
-              ref: any;
+            interface StockCheck {
+              ref: ReturnType<typeof doc>;
               current: number;
               required: number;
               name: string;
-            }[] = [];
+            }
+            const stockChecks: StockCheck[] = [];
 
             for (const item of cart) {
               if (item.type === "producto") {
