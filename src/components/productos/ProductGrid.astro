@@ -1,13 +1,25 @@
 ---
+/**
+ * ============================================
+ * GMEXPRESS - GRID DE PRODUCTOS
+ * ============================================
+ *
+ * Componente que renderiza una grilla de productos.
+ * Pasa todos los datos necesarios incluyendo ID y stock
+ * para el funcionamiento del carrito.
+ */
+
 import ProductCard from "./ProductCard.astro";
 
 interface Props {
   products: {
+    id: string; // ID del documento en Firestore
     name: string;
     price: string;
     image: string;
     alt: string;
     description: string;
+    stock?: number; // Stock disponible
   }[];
 }
 

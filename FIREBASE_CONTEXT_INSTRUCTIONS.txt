@@ -26,13 +26,14 @@ Las instancias exportadas son:
                           COLECCIONES EN FIRESTORE
 ================================================================================
 
-El proyecto utiliza 5 colecciones principales:
+El proyecto utiliza 6 colecciones principales:
 
 1. users
 2. products
 3. services
 4. solicitudes
 5. notifications
+6. pedidos (NUEVO)
 
 ================================================================================
                         1. COLECCIÓN: users
@@ -406,5 +407,265 @@ CONTRASEÑA:
    - Solicitudes: orderBy("createdAt", "desc") - cliente
 
 ================================================================================
-                               FIN DEL DOCUMENTO
+                        6. COLECCIÓN: pedidos (NUEVO)
+================================================================================
+
+PROPÓSITO: Almacenar pedidos/órdenes de compra realizados por clientes desde el carrito.
+
+RUTA: /pedidos/{pedidoId}
+
+ESTRUCTURA DEL DOCUMENTO:
+{
+  id: string,                  // ID personalizado (ej: "PED-123456")
+  userId: string,              // UID del usuario que realizó el pedido
+  userEmail: string,           // Email del usuario
+  userName: string,            // Nombre completo del usuario
+  productos: [                 // Array de productos en el pedido
+    {
+      id: string,              // ID del producto
+      name: string,            // Nombre del producto
+      price: string,           // Precio formateado (ej: "$16.990")
+      quantity: number,        // Cantidad solicitada
+      subtotal: number         // price * quantity (calculado)
+    }
+  ],
+  servicios: [                 // Array de servicios en el pedido
+    {
+      id: string,              // ID del servicio
+      name: string,            // Nombre del servicio
+      price: string            // Precio formateado o "Cotizar"
+    }
+  ],
+  total: number,               // Total del pedido en número
+  estado: string,              // Estado: "Pendiente" | "En Proceso" | "Enviado" | "Recibido"
+  notas: string,               // Notas adicionales del cliente (opcional)
+  createdAt: Timestamp,        // Fecha de creación (serverTimestamp())
+  
+  // CAMPOS DE AUDITORÍA (agregados automáticamente)
+  updatedAt: Timestamp,        // Última actualización (serverTimestamp())
+  updatedBy: string            // UID del admin que actualizó el estado
+}
+
+CÓMO SE CREA:
+- Archivo: src/pages/productos.astro (modal de checkout)
+- Proceso:
+  1. Usuario agrega productos/servicios al carrito (store nanostores)
+  2. Usuario abre modal de checkout
+  3. Se verifica autenticación (requiere login)
+  4. Se ejecuta TRANSACCIÓN de Firestore:
+     a. Se leen los precios ACTUALES de cada producto desde DB
+     b. Se comparan con los precios del carrito (seguridad anti-manipulación)
+     c. Si hay diferencias, se alerta al usuario
+     d. Se calcula el total con precios verificados del servidor
+     e. Se crea el pedido con addDoc()
+  5. Se crea notificación automática para admin
+  6. Se limpia el carrito local
+
+SEGURIDAD - VERIFICACIÓN DE PRECIOS:
+Para prevenir manipulación de precios desde el cliente, se implementa una transacción:
+
+```javascript
+await runTransaction(db, async (transaction) => {
+  // Leer precios actuales de cada producto
+  for (const item of items) {
+    const productRef = doc(db, "products", item.id);
+    const productDoc = await transaction.get(productRef);
+    const currentPrice = productDoc.data().price;
+    
+    // Comparar con precio del carrito
+    if (currentPrice !== item.price) {
+      throw new Error("Precio ha cambiado");
+    }
+  }
+  
+  // Crear pedido con precios verificados
+  const pedidoRef = doc(collection(db, "pedidos"));
+  transaction.set(pedidoRef, pedidoData);
+});
+```
+
+CÓMO SE GESTIONA:
+- Archivo: src/pages/admin/pedidos/index.astro (pestaña "Pedidos")
+- Los administradores pueden:
+  - Ver lista de pedidos en tiempo real (onSnapshot)
+  - Ver detalle completo de cada pedido (productos, servicios, totales)
+  - Cambiar estado del pedido (genera log de auditoría)
+  - Filtrar por estado y fecha
+
+CAMPOS DE AUDITORÍA:
+Cada cambio de estado registra:
+- updatedAt: Timestamp del cambio
+- updatedBy: UID del administrador que realizó el cambio
+
+Ejemplo de actualización:
+```javascript
+await updateDoc(doc(db, "pedidos", pedidoId), {
+  estado: nuevoEstado,
+  updatedAt: serverTimestamp(),
+  updatedBy: currentUser.uid
+});
+```
+
+REGLAS DE SEGURIDAD:
+- CREATE: Solo usuarios autenticados
+- READ: Solo Admin o el propietario del pedido
+- UPDATE: Solo Admin
+- DELETE: Solo Admin
+
+================================================================================
+                        7. CARRITO DE COMPRAS (STORE)
+================================================================================
+
+PROPÓSITO: Estado local para gestionar el carrito de compras del usuario.
+
+ARCHIVO: src/stores/cart.ts
+TECNOLOGÍA: Nanostores (estado reactivo para Astro)
+
+ESTRUCTURA DEL STORE:
+```typescript
+import { atom, computed } from 'nanostores';
+
+// Items en el carrito (productos + servicios)
+export const cartItems = atom<CartItem[]>([]);
+
+// Contador computado de items
+export const cartCount = computed(cartItems, items => items.length);
+
+// Acciones disponibles
+export function addToCart(item: CartItem): void;
+export function removeFromCart(id: string): void;
+export function updateQuantity(id: string, quantity: number): void;
+export function clearCart(): void;
+
+// Persistencia en localStorage
+// El carrito se guarda automáticamente y se restaura al cargar la página
+```
+
+INTERFAZ CartItem:
+```typescript
+interface CartItem {
+  id: string;
+  type: 'product' | 'service';
+  name: string;
+  price: string;          // "$16.990" o "Cotizar"
+  quantity: number;       // Solo para productos
+  image?: string;
+}
+```
+
+USO EN COMPONENTES:
+```javascript
+import { cartItems, addToCart, removeFromCart, cartCount } from '../stores/cart';
+
+// Agregar producto
+addToCart({
+  id: product.id,
+  type: 'product',
+  name: product.name,
+  price: product.price,
+  quantity: 1,
+  image: product.image
+});
+
+// Suscribirse a cambios
+cartItems.subscribe(items => {
+  // Actualizar UI
+});
+
+// Leer valor actual
+const items = cartItems.get();
+```
+
+================================================================================
+                     DASHBOARD ADMIN - DATOS EN TIEMPO REAL
+================================================================================
+
+ARCHIVO: src/pages/admin/index.astro
+
+ESTADÍSTICAS DEL DASHBOARD:
+El panel de administración muestra estadísticas en tiempo real usando onSnapshot:
+
+1. USUARIOS REGISTRADOS:
+   - Query: collection(db, "users")
+   - Contador: snapshot.size
+   - Actualización: Tiempo real con onSnapshot
+
+2. PEDIDOS DEL MES:
+   - Query: collection(db, "pedidos") con filtro de fecha >= primer día del mes
+   - Contador: snapshot.size
+   - Actualización: Tiempo real con onSnapshot
+
+3. ACTIVIDAD RECIENTE:
+   - Query: collection(db, "notifications") ordenado por createdAt desc, limit(10)
+   - Muestra: Título, mensaje, tiempo relativo (formatTimeAgo)
+   - Indicador visual de no leídas
+
+4. PRODUCTOS MÁS VENDIDOS:
+   - Fuente: Colección pedidos, campo productos[]
+   - Cálculo: Agrupa por producto y suma cantidades
+   - Muestra: Top 5 productos con unidades vendidas
+
+CÓDIGO DE REFERENCIA:
+```javascript
+// Usuarios
+onSnapshot(collection(db, "users"), (snapshot) => {
+  document.getElementById("stat-users").textContent = snapshot.size.toString();
+});
+
+// Pedidos del mes
+const startOfMonth = new Date();
+startOfMonth.setDate(1);
+startOfMonth.setHours(0, 0, 0, 0);
+
+const pedidosQuery = query(
+  collection(db, "pedidos"),
+  where("createdAt", ">=", startOfMonth)
+);
+
+onSnapshot(pedidosQuery, (snapshot) => {
+  document.getElementById("stat-pedidos-mes").textContent = snapshot.size.toString();
+});
+
+// Actividad reciente (notifications)
+const notifQuery = query(
+  collection(db, "notifications"),
+  orderBy("createdAt", "desc"),
+  limit(10)
+);
+
+onSnapshot(notifQuery, (snapshot) => {
+  // Renderizar lista de actividad
+});
+```
+
+================================================================================
+                     HEADER ADMIN - PERFIL DE USUARIO
+================================================================================
+
+ARCHIVO: src/components/admin/AdminHeader.astro
+
+DROPDOWN DE PERFIL:
+Al hacer clic en el icono de usuario se muestra:
+- Avatar con inicial del nombre
+- Nombre completo
+- Email
+- Rol (badge Admin/Usuario)
+- Teléfono
+- Último inicio de sesión
+- Botón de cerrar sesión
+
+DATOS MOSTRADOS:
+```javascript
+// Desde documento de Firestore (/users/{uid})
+const firstName = data.firstName || data.nombre;
+const lastName = data.lastNamePaterno || data.apellidoPaterno;
+const phone = data.phone || data.telefono;
+const role = data.role;
+
+// Desde Firebase Auth metadata
+const lastLogin = user.metadata.lastSignInTime;
+```
+
+================================================================================
+                              FIN DEL DOCUMENTO
 ================================================================================

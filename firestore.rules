@@ -2,52 +2,120 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper functions
+    // ============================================
+    // FUNCIONES HELPER DE SEGURIDAD
+    // ============================================
+    
+    // Verifica si el usuario está autenticado
     function isAuthenticated() {
       return request.auth != null;
     }
     
+    // Verifica si el usuario es administrador
+    // Requiere: usuario autenticado + documento en /users con role='admin'
     function isAdmin() {
       return isAuthenticated() &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
+    // Verifica si el usuario es el propietario del documento
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Products collection - Public read, Admin write
+    // ============================================
+    // COLECCIÓN: products
+    // Lectura pública, escritura solo admin
+    // ============================================
     match /products/{productId} {
       allow read: if true;
+      // Solo admin puede crear/modificar/eliminar productos
       allow write: if isAdmin();
     }
 
-    // Services collection - Public read, Admin write
+    // ============================================
+    // COLECCIÓN: services
+    // Lectura pública, escritura solo admin
+    // ============================================
     match /services/{serviceId} {
       allow read: if true;
+      // Solo admin puede crear/modificar/eliminar servicios
       allow write: if isAdmin();
     }
 
-    // Users collection - Owner/Admin read/write
+    // ============================================
+    // COLECCIÓN: users
+    // Lectura/escritura: propietario o admin
+    // ============================================
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow write: if isOwner(userId) || isAdmin();
     }
 
-    // Solicitudes collection - Public create, Admin read/write
+    // ============================================
+    // COLECCIÓN: solicitudes (cotizaciones)
+    // Creación pública, gestión solo admin
+    // ============================================
     match /solicitudes/{solicitudId} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
 
-    // Notifications collection - Public create (for system events), Admin read/write
+    // ============================================
+    // COLECCIÓN: pedidos (órdenes de compra)
+    // - Creación: solo usuarios autenticados con validaciones
+    // - Lectura: propietario del pedido o admin
+    // - Actualización/Eliminación: solo admin
+    // ============================================
+    match /pedidos/{pedidoId} {
+      // Validar estructura del pedido
+      function isValidPedido() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['userId', 'cliente', 'email', 'productos', 'subtotal', 'iva', 'total', 'estado', 'createdAt'])
+          && data.userId is string
+          && data.userId.size() > 0
+          && data.email is string
+          && data.productos is list
+          && data.productos.size() > 0
+          && data.estado == 'En Proceso';  // Solo puede crear con estado inicial
+      }
+
+      // Solo usuarios autenticados pueden crear pedidos
+      // con su propio userId y estructura válida
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid
+        && isValidPedido();
+      
+      // El usuario puede leer sus propios pedidos, admin puede leer todos
+      allow read: if isAuthenticated() 
+        && (resource.data.userId == request.auth.uid || isAdmin());
+      
+      // Solo admin puede actualizar estado de pedidos
+      // Y solo puede modificar campos específicos (no userId, no productos, no totales)
+      // Requiere campos de auditoría: updatedBy y updatedAt
+      allow update: if isAdmin()
+        && request.resource.data.userId == resource.data.userId  // No puede cambiar userId
+        && request.resource.data.productos == resource.data.productos  // No puede cambiar productos
+        && request.resource.data.updatedBy == request.auth.uid  // Debe registrar quién actualiza
+        && request.resource.data.updatedAt == request.time;  // Debe registrar cuándo
+      
+      // Solo admin puede eliminar pedidos
+      allow delete: if isAdmin();
+    }
+
+    // ============================================
+    // COLECCIÓN: notifications
+    // Creación pública (eventos del sistema), gestión admin
+    // ============================================
     match /notifications/{notificationId} {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
     
-    // Default deny for any other collections
+    // ============================================
+    // REGLA POR DEFECTO: denegar todo lo demás
+    // ============================================
     match /{document=**} {
       allow read, write: if false;
     }

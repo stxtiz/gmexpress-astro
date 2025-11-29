@@ -1,8 +1,18 @@
 ---
+/**
+ * ============================================
+ * GMEXPRESS - COMPONENTE SERVICE GRID
+ * ============================================
+ *
+ * Grid responsivo que muestra las tarjetas de servicios.
+ * Ahora incluye ID para funcionalidad del carrito.
+ */
+
 import ServiceCard from "./ServiceCard.astro";
 
 interface Props {
   services: {
+    id: string; // ID del documento en Firestore
     name: string;
     description: string;
     image: string;
@@ -20,6 +30,7 @@ const { services } = Astro.props;
   {
     services.map((servicio) => (
       <ServiceCard
+        id={servicio.id}
         name={servicio.name}
         description={servicio.description}
         image={servicio.image}

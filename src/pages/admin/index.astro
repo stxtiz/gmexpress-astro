@@ -108,9 +108,9 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                   >
                     <i class="bi bi-people text-warning fs-3"></i>
                   </div>
-                  <span class="badge bg-info">+25</span>
+                  <span class="badge bg-info" id="users-badge">...</span>
                 </div>
-                <h2 class="fw-bold mb-1">142</h2>
+                <h2 class="fw-bold mb-1" id="total-users-count">...</h2>
                 <p class="text-muted mb-0 small">Usuarios Registrados</p>
               </div>
             </div>
@@ -126,9 +126,12 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                   >
                     <i class="bi bi-cart-check text-info fs-3"></i>
                   </div>
-                  <span class="badge bg-warning text-dark">15</span>
+                  <span
+                    class="badge bg-warning text-dark"
+                    id="pedidos-pendientes-badge">...</span
+                  >
                 </div>
-                <h2 class="fw-bold mb-1">58</h2>
+                <h2 class="fw-bold mb-1" id="total-pedidos-mes">...</h2>
                 <p class="text-muted mb-0 small">Pedidos del Mes</p>
               </div>
             </div>
@@ -168,77 +171,15 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body">
                 <h5 class="fw-bold mb-4">Actividad Reciente</h5>
-                <div class="activity-list">
-                  <div class="activity-item mb-3 pb-3 border-bottom">
-                    <div class="d-flex align-items-start gap-3">
-                      <div class="rounded-circle bg-success bg-opacity-10 p-2">
-                        <i class="bi bi-check-circle text-success"></i>
-                      </div>
-                      <div class="flex-grow-1">
-                        <p class="mb-1 small fw-semibold">Nuevo pedido #1234</p>
-                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">
-                          Hace 5 minutos
-                        </p>
-                      </div>
+                <div class="activity-list" id="activity-list">
+                  <!-- Se carga dinámicamente -->
+                  <div class="text-center py-4 text-muted">
+                    <div
+                      class="spinner-border spinner-border-sm me-2"
+                      role="status"
+                    >
                     </div>
-                  </div>
-                  <div class="activity-item mb-3 pb-3 border-bottom">
-                    <div class="d-flex align-items-start gap-3">
-                      <div class="rounded-circle bg-primary bg-opacity-10 p-2">
-                        <i class="bi bi-box-seam text-primary"></i>
-                      </div>
-                      <div class="flex-grow-1">
-                        <p class="mb-1 small fw-semibold">
-                          Producto actualizado
-                        </p>
-                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">
-                          Hace 1 hora
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="activity-item mb-3 pb-3 border-bottom">
-                    <div class="d-flex align-items-start gap-3">
-                      <div class="rounded-circle bg-warning bg-opacity-10 p-2">
-                        <i class="bi bi-person-plus text-warning"></i>
-                      </div>
-                      <div class="flex-grow-1">
-                        <p class="mb-1 small fw-semibold">
-                          Nuevo usuario registrado
-                        </p>
-                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">
-                          Hace 2 horas
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="activity-item mb-3 pb-3 border-bottom">
-                    <div class="d-flex align-items-start gap-3">
-                      <div class="rounded-circle bg-info bg-opacity-10 p-2">
-                        <i class="bi bi-gear text-info"></i>
-                      </div>
-                      <div class="flex-grow-1">
-                        <p class="mb-1 small fw-semibold">Servicio creado</p>
-                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">
-                          Hace 3 horas
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="activity-item">
-                    <div class="d-flex align-items-start gap-3">
-                      <div class="rounded-circle bg-danger bg-opacity-10 p-2">
-                        <i class="bi bi-exclamation-triangle text-danger"></i>
-                      </div>
-                      <div class="flex-grow-1">
-                        <p class="mb-1 small fw-semibold">
-                          Stock bajo: Pizza Suprema
-                        </p>
-                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">
-                          Hace 4 horas
-                        </p>
-                      </div>
-                    </div>
+                    <small>Cargando actividad...</small>
                   </div>
                 </div>
               </div>
@@ -255,69 +196,16 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                 <h5 class="fw-bold mb-4">Productos Más Vendidos</h5>
                 <div class="table-responsive">
                   <table class="table table-sm table-borderless">
-                    <tbody>
+                    <tbody id="top-products-list">
+                      <!-- Se carga dinámicamente -->
                       <tr>
-                        <td class="py-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <div
-                              class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
-                              style="width: 32px; height: 32px;"
-                            >
-                              <span class="fw-bold text-primary small">1</span>
-                            </div>
-                            <span class="fw-semibold">Pizza Suprema</span>
+                        <td colspan="2" class="text-center py-4 text-muted">
+                          <div
+                            class="spinner-border spinner-border-sm me-2"
+                            role="status"
+                          >
                           </div>
-                        </td>
-                        <td class="py-2 text-end">
-                          <span class="badge bg-success">245 ventas</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="py-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <div
-                              class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
-                              style="width: 32px; height: 32px;"
-                            >
-                              <span class="fw-bold text-success small">2</span>
-                            </div>
-                            <span class="fw-semibold">Ensalada Fresca</span>
-                          </div>
-                        </td>
-                        <td class="py-2 text-end">
-                          <span class="badge bg-success">189 ventas</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="py-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <div
-                              class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
-                              style="width: 32px; height: 32px;"
-                            >
-                              <span class="fw-bold text-warning small">3</span>
-                            </div>
-                            <span class="fw-semibold">Pancakes con Frutas</span>
-                          </div>
-                        </td>
-                        <td class="py-2 text-end">
-                          <span class="badge bg-success">156 ventas</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="py-2">
-                          <div class="d-flex align-items-center gap-2">
-                            <div
-                              class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
-                              style="width: 32px; height: 32px;"
-                            >
-                              <span class="fw-bold text-info small">4</span>
-                            </div>
-                            <span class="fw-semibold">Pollo a la Parrilla</span>
-                          </div>
-                        </td>
-                        <td class="py-2 text-end">
-                          <span class="badge bg-success">142 ventas</span>
+                          <small>Cargando productos...</small>
                         </td>
                       </tr>
                     </tbody>
@@ -427,43 +315,276 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
 
   <script>
     import { db } from "../../firebase/client";
-    import { collection, onSnapshot } from "firebase/firestore";
+    import {
+      collection,
+      onSnapshot,
+      query,
+      orderBy,
+      limit,
+      where,
+    } from "firebase/firestore";
 
-    // Update stats
+    // ============================================
+    // ESTADÍSTICAS EN TIEMPO REAL
+    // ============================================
+
     const productsCol = collection(db, "products");
     const servicesCol = collection(db, "services");
+    const usersCol = collection(db, "users");
+    const pedidosCol = collection(db, "pedidos");
+    const notificationsCol = collection(db, "notifications");
 
+    // Contador de productos
     onSnapshot(productsCol, (snap) => {
       const count = document.getElementById("total-products-count");
-      if(count) count.textContent = snap.size;
+      if (count) count.textContent = snap.size.toString();
     });
 
+    // Contador de servicios
     onSnapshot(servicesCol, (snap) => {
       const count = document.getElementById("total-services-count");
-      if(count) count.textContent = snap.size;
+      if (count) count.textContent = snap.size.toString();
     });
+
+    // Contador de usuarios
+    onSnapshot(usersCol, (snap) => {
+      const count = document.getElementById("total-users-count");
+      const badge = document.getElementById("users-badge");
+      if (count) count.textContent = snap.size.toString();
+      if (badge) badge.textContent = `+${snap.size}`;
+    });
+
+    // Pedidos del mes
+    onSnapshot(pedidosCol, (snap) => {
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // Filtrar pedidos del mes actual
+      const pedidosDelMes = snap.docs.filter((doc) => {
+        const data = doc.data();
+        const fecha = data.createdAt?.toDate?.() || new Date(data.fecha);
+        return fecha >= firstDayOfMonth;
+      });
+
+      // Contar pedidos pendientes (no Recibidos)
+      const pendientes = snap.docs.filter(
+        (doc) => doc.data().estado !== "Recibido",
+      ).length;
+
+      const countEl = document.getElementById("total-pedidos-mes");
+      const badgeEl = document.getElementById("pedidos-pendientes-badge");
+
+      if (countEl) countEl.textContent = pedidosDelMes.length.toString();
+      if (badgeEl) {
+        badgeEl.textContent = pendientes.toString();
+        badgeEl.className =
+          "badge text-dark " + (pendientes > 0 ? "bg-warning" : "bg-secondary");
+      }
+    });
+
+    // ============================================
+    // ACTIVIDAD RECIENTE (desde notificaciones)
+    // ============================================
+
+    const qNotifications = query(
+      notificationsCol,
+      orderBy("createdAt", "desc"),
+      limit(5),
+    );
+
+    onSnapshot(
+      qNotifications,
+      (snap) => {
+        const activityList = document.getElementById("activity-list");
+        if (!activityList) return;
+
+        if (snap.empty) {
+          activityList.innerHTML = `
+          <div class="text-center py-4 text-muted">
+            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+            <small>No hay actividad reciente</small>
+          </div>
+        `;
+          return;
+        }
+
+        activityList.innerHTML = snap.docs
+          .map((doc, index) => {
+            const data = doc.data();
+            const isLast = index === snap.docs.length - 1;
+
+            // Determinar icono y color según tipo/título
+            let iconClass = "bi-info-circle text-info";
+            let bgClass = "bg-info";
+
+            if (
+              data.title?.includes("Pedido") ||
+              data.title?.includes("pedido")
+            ) {
+              iconClass = "bi-cart-check text-success";
+              bgClass = "bg-success";
+            } else if (data.title?.includes("Solicitud")) {
+              iconClass = "bi-envelope-paper text-warning";
+              bgClass = "bg-warning";
+            } else if (
+              data.title?.includes("Usuario") ||
+              data.title?.includes("usuario")
+            ) {
+              iconClass = "bi-person-plus text-primary";
+              bgClass = "bg-primary";
+            } else if (data.title?.includes("Producto")) {
+              iconClass = "bi-box-seam text-primary";
+              bgClass = "bg-primary";
+            } else if (data.title?.includes("Error") || data.type === "error") {
+              iconClass = "bi-exclamation-triangle text-danger";
+              bgClass = "bg-danger";
+            }
+
+            return `
+          <div class="activity-item ${!isLast ? "mb-3 pb-3 border-bottom" : ""}">
+            <div class="d-flex align-items-start gap-3">
+              <div class="rounded-circle ${bgClass} bg-opacity-10 p-2">
+                <i class="bi ${iconClass}"></i>
+              </div>
+              <div class="flex-grow-1">
+                <p class="mb-1 small fw-semibold">${data.title || "Actividad"}</p>
+                <p class="mb-0 text-muted" style="font-size: 0.75rem;">
+                  ${formatTimeAgo(data.createdAt?.toDate?.())}
+                </p>
+              </div>
+            </div>
+          </div>
+        `;
+          })
+          .join("");
+      },
+      (error) => {
+        console.error("Error cargando actividad:", error);
+        const activityList = document.getElementById("activity-list");
+        if (activityList) {
+          activityList.innerHTML = `
+          <div class="text-center py-4 text-danger">
+            <small>Error al cargar actividad</small>
+          </div>
+        `;
+        }
+      },
+    );
+
+    // ============================================
+    // PRODUCTOS MÁS VENDIDOS (calculados desde pedidos)
+    // ============================================
+
+    onSnapshot(
+      pedidosCol,
+      (snap) => {
+        const topProductsList = document.getElementById("top-products-list");
+        if (!topProductsList) return;
+
+        // Contar ventas por producto
+        const ventasPorProducto: Record<
+          string,
+          { nombre: string; cantidad: number }
+        > = {};
+
+        snap.docs.forEach((doc) => {
+          const productos = doc.data().productos || [];
+          productos.forEach((p: any) => {
+            const nombre = p.nombre || p.name || "Producto";
+            if (!ventasPorProducto[nombre]) {
+              ventasPorProducto[nombre] = { nombre, cantidad: 0 };
+            }
+            ventasPorProducto[nombre].cantidad += p.cantidad || p.quantity || 1;
+          });
+        });
+
+        // Ordenar y tomar top 4
+        const topProducts = Object.values(ventasPorProducto)
+          .sort((a, b) => b.cantidad - a.cantidad)
+          .slice(0, 4);
+
+        if (topProducts.length === 0) {
+          topProductsList.innerHTML = `
+          <tr>
+            <td colspan="2" class="text-center py-4 text-muted">
+              <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+              <small>No hay ventas registradas</small>
+            </td>
+          </tr>
+        `;
+          return;
+        }
+
+        const colors = ["primary", "success", "warning", "info"];
+
+        topProductsList.innerHTML = topProducts
+          .map(
+            (product, index) => `
+        <tr>
+          <td class="py-2">
+            <div class="d-flex align-items-center gap-2">
+              <div
+                class="bg-${colors[index]} bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
+                style="width: 32px; height: 32px;"
+              >
+                <span class="fw-bold text-${colors[index]} small">${index + 1}</span>
+              </div>
+              <span class="fw-semibold">${product.nombre}</span>
+            </div>
+          </td>
+          <td class="py-2 text-end">
+            <span class="badge bg-success">${product.cantidad} ventas</span>
+          </td>
+        </tr>
+      `,
+          )
+          .join("");
+      },
+      (error) => {
+        console.error("Error cargando productos:", error);
+      },
+    );
+
+    // ============================================
+    // FUNCIONES AUXILIARES
+    // ============================================
+
+    function formatTimeAgo(date: Date | undefined): string {
+      if (!date) return "Recién";
+      const now = new Date();
+      const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+      if (diff < 60) return "Hace un momento";
+      if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
+      if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} h`;
+      if (diff < 604800) return `Hace ${Math.floor(diff / 86400)} días`;
+
+      return date.toLocaleDateString("es-CL");
+    }
 
     // Mock chart data (kept for visual consistency)
     document.addEventListener("DOMContentLoaded", function () {
-      const ctx = document.getElementById("salesChart");
+      const ctx = document.getElementById("salesChart") as HTMLCanvasElement;
       if (ctx) {
         const data = [12, 19, 15, 22, 18, 25, 20];
         const labels = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
         const canvas = ctx.getContext("2d");
-        canvas.fillStyle = "#79c043";
-        const barWidth = ctx.width / data.length;
-        const maxValue = Math.max(...data);
-
-        data.forEach((value, index) => {
-          const barHeight = (value / maxValue) * (ctx.height - 40);
-          const x = index * barWidth + 10;
-          const y = ctx.height - barHeight - 20;
-          canvas.fillRect(x, y, barWidth - 20, barHeight);
-          canvas.fillStyle = "#666";
-          canvas.font = "12px Arial";
-          canvas.fillText(labels[index], x + 5, ctx.height - 5);
+        if (canvas) {
           canvas.fillStyle = "#79c043";
-        });
+          const barWidth = ctx.width / data.length;
+          const maxValue = Math.max(...data);
+
+          data.forEach((value, index) => {
+            const barHeight = (value / maxValue) * (ctx.height - 40);
+            const x = index * barWidth + 10;
+            const y = ctx.height - barHeight - 20;
+            canvas.fillRect(x, y, barWidth - 20, barHeight);
+            canvas.fillStyle = "#666";
+            canvas.font = "12px Arial";
+            canvas.fillText(labels[index], x + 5, ctx.height - 5);
+            canvas.fillStyle = "#79c043";
+          });
+        }
       }
     });
   </script>

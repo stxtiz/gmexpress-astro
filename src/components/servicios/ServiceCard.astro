@@ -1,15 +1,37 @@
 ---
+/**
+ * ============================================
+ * GMEXPRESS - COMPONENTE SERVICE CARD
+ * ============================================
+ *
+ * Tarjeta de servicio que muestra información básica.
+ * Los servicios con hasPrice=true pueden agregarse al carrito.
+ * Los servicios sin precio redirigen a cotización.
+ *
+ * Props:
+ * - id: ID del servicio en Firestore
+ * - name: Nombre del servicio
+ * - price: Precio formateado (si aplica)
+ * - priceLabel: Etiqueta adicional del precio (ej: "/por almuerzo")
+ * - image: URL de la imagen
+ * - alt: Texto alternativo
+ * - description: Descripción del servicio
+ * - hasPrice: Si tiene precio fijo (puede agregarse al carrito)
+ */
+
 interface Props {
+  id: string; // ID del documento en Firestore
   name: string;
   price?: string;
   priceLabel?: string;
   image: string;
   alt: string;
   description: string;
-  hasPrice?: boolean;
+  hasPrice?: boolean; // Si tiene precio, puede agregarse al carrito
 }
 
 const {
+  id,
   name,
   price,
   priceLabel,
@@ -23,6 +45,8 @@ const {
 <div
   class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
   data-service
+  data-service-id={id}
+  data-has-price={hasPrice ? "true" : "false"}
 >
   <div class="relative w-full aspect-[4/3]">
     <div
@@ -31,6 +55,18 @@ const {
       style={`background-image: url('${image}');`}
     >
     </div>
+    <!-- Badge según tipo de servicio -->
+    {
+      hasPrice ? (
+        <div class="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">
+          Precio Fijo
+        </div>
+      ) : (
+        <div class="absolute top-2 right-2 bg-secondary text-white text-xs font-bold px-2 py-1 rounded-full">
+          Cotizar
+        </div>
+      )
+    }
   </div>
   <div class="p-6 flex flex-col grow">
     <h3

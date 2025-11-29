@@ -1,18 +1,43 @@
 ---
+/**
+ * ============================================
+ * GMEXPRESS - COMPONENTE PRODUCT CARD
+ * ============================================
+ *
+ * Tarjeta de producto que muestra información básica
+ * y permite agregar al carrito.
+ *
+ * Props:
+ * - id: ID del producto en Firestore (para el carrito)
+ * - name: Nombre del producto
+ * - price: Precio formateado
+ * - image: URL de la imagen
+ * - alt: Texto alternativo
+ * - description: Descripción del producto
+ * - stock: Cantidad disponible
+ */
+
 interface Props {
+  id: string; // ID del documento en Firestore
   name: string;
   price: string;
   image: string;
   alt: string;
   description: string;
+  stock?: number; // Stock disponible
 }
 
-const { name, price, image, description } = Astro.props;
+const { id, name, price, image, description, stock = 0 } = Astro.props;
+
+// Determinar si hay stock disponible
+const hasStock = stock > 0;
 ---
 
 <div
   class="group flex flex-col overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
   data-product
+  data-product-id={id}
+  data-product-stock={stock}
 >
   <div class="relative w-full aspect-square">
     <div
@@ -21,6 +46,14 @@ const { name, price, image, description } = Astro.props;
       style={`background-image: url('${image}');`}
     >
     </div>
+    <!-- Badge de stock -->
+    {
+      !hasStock && (
+        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+          Sin Stock
+        </div>
+      )
+    }
   </div>
   <div class="p-4 flex flex-col grow">
     <h3
@@ -32,15 +65,29 @@ const { name, price, image, description } = Astro.props;
     <p class="mt-1 text-sm text-text-light/80 dark:text-text-dark/80">
       {description}
     </p>
-    <p class="mt-2 text-xl font-bold text-primary" data-product-price>
-      {price}
-    </p>
+    <div class="flex items-center justify-between mt-2">
+      <p class="text-xl font-bold text-primary" data-product-price>
+        {price}
+      </p>
+      {
+        hasStock && (
+          <span class="text-xs text-green-600 dark:text-green-400">
+            {stock} disponibles
+          </span>
+        )
+      }
+    </div>
     <div class="mt-4 flex flex-col gap-2">
       <button
-        class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary/10 text-primary text-sm font-bold tracking-wide hover:bg-primary/20 transition-colors"
+        class={`flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 text-sm font-bold tracking-wide transition-colors ${
+          hasStock
+            ? "bg-primary/10 text-primary hover:bg-primary/20"
+            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+        }`}
         data-add-to-cart
+        disabled={!hasStock}
       >
-        Añadir al Carrito
+        {hasStock ? "Añadir al Carrito" : "Sin Stock"}
       </button>
       <button
         class="group/btn flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full h-10 px-4 border border-primary text-primary text-sm font-bold tracking-wide hover:bg-primary hover:text-white transition-all duration-300 hover:shadow-lg hover:scale-105"

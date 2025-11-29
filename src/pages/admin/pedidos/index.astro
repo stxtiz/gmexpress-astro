@@ -43,7 +43,9 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
               role="tab"
             >
               <i class="bi bi-cart-check me-2"></i>Pedidos
-              <span class="badge bg-primary ms-2">12</span>
+              <span class="badge bg-primary ms-2" id="pedidos-nuevos-badge"
+                >...</span
+              >
             </button>
           </li>
           <li class="nav-item" role="presentation">
@@ -56,7 +58,10 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
               role="tab"
             >
               <i class="bi bi-envelope-paper me-2"></i>Solicitudes de Cotización
-              <span class="badge bg-warning text-dark ms-2">5</span>
+              <span
+                class="badge bg-warning text-dark ms-2"
+                id="solicitudes-pendientes-badge">...</span
+              >
             </button>
           </li>
         </ul>
@@ -373,7 +378,10 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                     </select>
                   </div>
                   <div class="col-md-2 text-end">
-                    <button class="btn btn-outline-primary w-100" onclick="applySolicitudesFilters()">
+                    <button
+                      class="btn btn-outline-primary w-100"
+                      onclick="applySolicitudesFilters()"
+                    >
                       <i class="bi bi-funnel me-2"></i>Filtrar
                     </button>
                   </div>
@@ -546,428 +554,134 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
   </style>
 
   <script>
-    import { db } from "../../../firebase/client";
-    import { doc, updateDoc, addDoc, collection, serverTimestamp, query, onSnapshot } from "firebase/firestore";
+    import { db, auth } from "../../../firebase/client";
+    import {
+      doc,
+      updateDoc,
+      addDoc,
+      collection,
+      serverTimestamp,
+      query,
+      onSnapshot,
+      orderBy,
+    } from "firebase/firestore";
 
-    // Mock data de pedidos
-    const pedidos = [
-  {
-    id: 1001,
-    cliente: "Restaurante El Buen Sabor",
-    email: "pedidos@buensabor.cl",
-    telefono: "+56 9 8765 4321",
-    fecha: "2025-11-17",
-    estado: "En Proceso",
-    subtotal: "$75.588",
-    iva: "$14.362",
-    total: "$89.950",
-    productos: [
-      {
-        nombre: "Pizza Suprema de la Casa",
-        cantidad: 3,
-        precio: "$16.990",
-        subtotal: "$50.970",
-      },
-      {
-        nombre: "Ensalada Fresca",
-        cantidad: 5,
-        precio: "$6.990",
-        subtotal: "$34.950",
-      },
-      {
-        nombre: "Cócteles Tropicales",
-        cantidad: 2,
-        precio: "$5.990",
-        subtotal: "$11.980",
-      },
-    ],
-    direccion: "Av. Providencia 1234, Santiago",
-    metodoPago: "Transferencia Bancaria",
-    notas: "Entregar antes de las 14:00",
-  },
-  {
-    id: 1002,
-    cliente: "Cafetería Urban Coffee",
-    email: "compras@urbancoffee.cl",
-    telefono: "+56 9 1234 5678",
-    fecha: "2025-11-17",
-    estado: "En Tránsito",
-    subtotal: "$105.000",
-    iva: "$19.940",
-    total: "$124.940",
-    productos: [
-      {
-        nombre: "Pancakes con Frutas",
-        cantidad: 8,
-        precio: "$7.990",
-        subtotal: "$63.920",
-      },
-      {
-        nombre: "Tostada de Aguacate",
-        cantidad: 6,
-        precio: "$4.990",
-        subtotal: "$29.940",
-      },
-      {
-        nombre: "Pizza Vegetariana",
-        cantidad: 2,
-        precio: "$12.990",
-        subtotal: "$25.980",
-      },
-    ],
-    direccion: "Manuel Montt 890, Providencia",
-    metodoPago: "Efectivo",
-    notas: "Llamar al llegar",
-  },
-  {
-    id: 1003,
-    cliente: "Empresa Tech Solutions",
-    email: "admin@techsolutions.cl",
-    telefono: "+56 2 2345 6789",
-    fecha: "2025-11-16",
-    estado: "Recibido",
-    subtotal: "$157.084",
-    iva: "$29.846",
-    total: "$186.930",
-    productos: [
-      {
-        nombre: "Pizza Suprema de la Casa",
-        cantidad: 5,
-        precio: "$16.990",
-        subtotal: "$84.950",
-      },
-      {
-        nombre: "Pollo a la Parrilla",
-        cantidad: 4,
-        precio: "$10.990",
-        subtotal: "$43.960",
-      },
-      {
-        nombre: "Pizza Champiñones",
-        cantidad: 3,
-        precio: "$11.990",
-        subtotal: "$35.970",
-      },
-      {
-        nombre: "Ensalada Fresca",
-        cantidad: 2,
-        precio: "$6.990",
-        subtotal: "$13.980",
-      },
-    ],
-    direccion: "Edificio Costanera Center, Piso 15",
-    metodoPago: "Tarjeta de Crédito",
-    notas: "Pedido para almuerzo corporativo",
-  },
-  {
-    id: 1004,
-    cliente: "Hotel Grand Palace",
-    email: "eventos@grandpalace.cl",
-    telefono: "+56 2 9876 5432",
-    fecha: "2025-11-17",
-    estado: "En Proceso",
-    subtotal: "$197.395",
-    iva: "$37.485",
-    total: "$234.880",
-    productos: [
-      {
-        nombre: "Pizza Suprema de la Casa",
-        cantidad: 8,
-        precio: "$16.990",
-        subtotal: "$135.920",
-      },
-      {
-        nombre: "Cócteles Tropicales",
-        cantidad: 12,
-        precio: "$5.990",
-        subtotal: "$71.880",
-      },
-      {
-        nombre: "Ensalada Fresca",
-        cantidad: 4,
-        precio: "$6.990",
-        subtotal: "$27.960",
-      },
-    ],
-    direccion: "Av. Kennedy 5555, Las Condes",
-    metodoPago: "Factura 30 días",
-    notas: "Evento corporativo - Salón Principal",
-  },
-  {
-    id: 1005,
-    cliente: "Clínica Santa María",
-    email: "compras@clinicasm.cl",
-    telefono: "+56 2 5555 1234",
-    fecha: "2025-11-16",
-    estado: "En Tránsito",
-    subtotal: "$122.622",
-    iva: "$23.298",
-    total: "$145.920",
-    productos: [
-      {
-        nombre: "Ensalada Fresca",
-        cantidad: 10,
-        precio: "$6.990",
-        subtotal: "$69.900",
-      },
-      {
-        nombre: "Pollo a la Parrilla",
-        cantidad: 6,
-        precio: "$10.990",
-        subtotal: "$65.940",
-      },
-      {
-        nombre: "Tostada de Aguacate",
-        cantidad: 2,
-        precio: "$4.990",
-        subtotal: "$9.980",
-      },
-    ],
-    direccion: "Av. Santa María 500, Providencia",
-    metodoPago: "Transferencia Bancaria",
-    notas: "Para área de nutrición",
-  },
-  {
-    id: 1006,
-    cliente: "Universidad de Chile",
-    email: "casino@uchile.cl",
-    telefono: "+56 2 2222 3333",
-    fecha: "2025-11-15",
-    estado: "Recibido",
-    subtotal: "$251.050",
-    iva: "$47.700",
-    total: "$298.750",
-    productos: [
-      {
-        nombre: "Pizza Suprema de la Casa",
-        cantidad: 10,
-        precio: "$16.990",
-        subtotal: "$169.900",
-      },
-      {
-        nombre: "Pizza Vegetariana",
-        cantidad: 8,
-        precio: "$12.990",
-        subtotal: "$103.920",
-      },
-      {
-        nombre: "Cócteles Tropicales",
-        cantidad: 5,
-        precio: "$5.990",
-        subtotal: "$29.950",
-      },
-    ],
-    direccion: "Campus Juan Gómez Millas, Ñuñoa",
-    metodoPago: "Orden de Compra",
-    notas: "Entrega en Casino Central",
-  },
-  {
-    id: 1007,
-    cliente: "Oficina Legal Martínez & Asociados",
-    email: "administracion@martinezlegal.cl",
-    telefono: "+56 9 4444 7777",
-    fecha: "2025-11-17",
-    estado: "En Proceso",
-    subtotal: "$64.655",
-    iva: "$12.285",
-    total: "$76.940",
-    productos: [
-      {
-        nombre: "Pancakes con Frutas",
-        cantidad: 4,
-        precio: "$7.990",
-        subtotal: "$31.960",
-      },
-      {
-        nombre: "Pizza Champiñones",
-        cantidad: 3,
-        precio: "$11.990",
-        subtotal: "$35.970",
-      },
-      {
-        nombre: "Ensalada Fresca",
-        cantidad: 1,
-        precio: "$6.990",
-        subtotal: "$6.990",
-      },
-    ],
-    direccion: "Nueva Tajamar 481, Las Condes",
-    metodoPago: "Tarjeta de Débito",
-    notas: "Reunión de socios",
-  },
-  {
-    id: 1008,
-    cliente: "Gym FitLife",
-    email: "nutricion@fitlife.cl",
-    telefono: "+56 9 7777 8888",
-    fecha: "2025-11-16",
-    estado: "En Tránsito",
-    subtotal: "$79.731",
-    iva: "$15.149",
-    total: "$94.880",
-    productos: [
-      {
-        nombre: "Ensalada Fresca",
-        cantidad: 8,
-        precio: "$6.990",
-        subtotal: "$55.920",
-      },
-      {
-        nombre: "Pollo a la Parrilla",
-        cantidad: 3,
-        precio: "$10.990",
-        subtotal: "$32.970",
-      },
-      {
-        nombre: "Tostada de Aguacate",
-        cantidad: 1,
-        precio: "$4.990",
-        subtotal: "$4.990",
-      },
-    ],
-    direccion: "Av. Apoquindo 3000, Las Condes",
-    metodoPago: "Efectivo",
-    notas: "Plan nutricional clientes premium",
-  },
-  {
-    id: 1009,
-    cliente: "Constructora Del Norte",
-    email: "logistica@delnorte.cl",
-    telefono: "+56 2 8888 9999",
-    fecha: "2025-11-17",
-    estado: "En Proceso",
-    subtotal: "$141.092",
-    iva: "$26.788",
-    total: "$167.880",
-    productos: [
-      {
-        nombre: "Pizza Suprema de la Casa",
-        cantidad: 6,
-        precio: "$16.990",
-        subtotal: "$101.940",
-      },
-      {
-        nombre: "Pollo a la Parrilla",
-        cantidad: 5,
-        precio: "$10.990",
-        subtotal: "$54.950",
-      },
-      {
-        nombre: "Cócteles Tropicales",
-        cantidad: 2,
-        precio: "$5.990",
-        subtotal: "$11.980",
-      },
-    ],
-    direccion: "Obra Edificio Las Torres, La Reina",
-    metodoPago: "Transferencia Bancaria",
-    notas: "Almuerzo para personal en obra",
-  },
-  {
-    id: 1010,
-    cliente: "Escuela Arturo Prat",
-    email: "direccion@escuelaprat.cl",
-    telefono: "+56 2 3333 4444",
-    fecha: "2025-11-15",
-    estado: "Recibido",
-    subtotal: "$94.840",
-    iva: "$18.020",
-    total: "$112.860",
-    productos: [
-      {
-        nombre: "Pizza Vegetariana",
-        cantidad: 6,
-        precio: "$12.990",
-        subtotal: "$77.940",
-      },
-      {
-        nombre: "Pancakes con Frutas",
-        cantidad: 3,
-        precio: "$7.990",
-        subtotal: "$23.970",
-      },
-      {
-        nombre: "Ensalada Fresca",
-        cantidad: 1,
-        precio: "$6.990",
-        subtotal: "$6.990",
-      },
-    ],
-    direccion: "Los Leones 234, Providencia",
-    metodoPago: "Transferencia Bancaria",
-    notas: "Día del Profesor",
-  },
-  {
-    id: 1011,
-    cliente: "StartUp InnovaApp",
-    email: "team@innovaapp.com",
-    telefono: "+56 9 5555 6666",
-    fecha: "2025-11-16",
-    estado: "En Tránsito",
-    subtotal: "$75.563",
-    iva: "$14.357",
-    total: "$89.920",
-    productos: [
-      {
-        nombre: "Pizza Champiñones",
-        cantidad: 4,
-        precio: "$11.990",
-        subtotal: "$47.960",
-      },
-      {
-        nombre: "Tostada de Aguacate",
-        cantidad: 6,
-        precio: "$4.990",
-        subtotal: "$29.940",
-      },
-      {
-        nombre: "Cócteles Tropicales",
-        cantidad: 2,
-        precio: "$5.990",
-        subtotal: "$11.980",
-      },
-    ],
-    direccion: "Coworking Space, Av. Italia 1234",
-    metodoPago: "Tarjeta de Crédito",
-    notas: "Team lunch viernes",
-  },
-  {
-    id: 1012,
-    cliente: "Clínica Dental Sonrisa",
-    email: "recepcion@sonrisa.cl",
-    telefono: "+56 2 6666 7777",
-    fecha: "2025-11-17",
-    estado: "En Proceso",
-    subtotal: "$46.176",
-    iva: "$8.774",
-    total: "$54.950",
-    productos: [
-      {
-        nombre: "Ensalada Fresca",
-        cantidad: 4,
-        precio: "$6.990",
-        subtotal: "$27.960",
-      },
-      {
-        nombre: "Pancakes con Frutas",
-        cantidad: 2,
-        precio: "$7.990",
-        subtotal: "$15.980",
-      },
-      {
-        nombre: "Pollo a la Parrilla",
-        cantidad: 1,
-        precio: "$10.990",
-        subtotal: "$10.990",
-      },
-    ],
-    direccion: "Av. Las Condes 12345, Las Condes",
-    metodoPago: "Efectivo",
-    notas: "Cumpleaños del equipo",
-  },
-];
+    // ============================================
+    // GESTIÓN DE PEDIDOS - DATOS REALES DE FIREBASE
+    // ============================================
 
-    let filteredPedidos = [...pedidos];
+    // Array de pedidos que se llenará con datos de Firestore
+    let pedidos = [];
+    let filteredPedidos = [];
+
+    // Formatear precio - maneja números y strings
+    function formatPrecio(precio: number | string | undefined): string {
+      if (precio === undefined || precio === null) return "$0";
+
+      // Si ya es un string formateado (ej: "$16.990"), devolverlo tal cual
+      if (typeof precio === "string") {
+        if (precio.startsWith("$")) return precio;
+        // Si es string numérico, parsearlo
+        const num = parseInt(precio.replace(/[^0-9]/g, ""), 10);
+        if (!isNaN(num)) return "$" + num.toLocaleString("es-CL");
+        return "$0";
+      }
+
+      // Si es número
+      if (typeof precio === "number" && !isNaN(precio)) {
+        return "$" + precio.toLocaleString("es-CL");
+      }
+
+      return "$0";
+    }
+
+    // Extraer número de precio formateado
+    function precioToNumber(precio: string | number | undefined): number {
+      if (precio === undefined || precio === null) return 0;
+      if (typeof precio === "number") return precio;
+      const num = parseInt(precio.replace(/[^0-9]/g, ""), 10);
+      return isNaN(num) ? 0 : num;
+    }
+
+    // Fetch Pedidos en tiempo real desde Firestore
+    function fetchPedidos() {
+      const q = query(collection(db, "pedidos"), orderBy("createdAt", "desc"));
+
+      onSnapshot(
+        q,
+        (snapshot) => {
+          pedidos = snapshot.docs.map((docSnap) => {
+            const data = docSnap.data();
+            return {
+              docId: docSnap.id,
+              id: data.id || docSnap.id.slice(-6).toUpperCase(),
+              cliente: data.cliente || "Cliente",
+              email: data.email || "",
+              telefono: data.telefono || "",
+              fecha:
+                data.fecha ||
+                (data.createdAt
+                  ? new Date(data.createdAt.seconds * 1000)
+                      .toISOString()
+                      .split("T")[0]
+                  : new Date().toISOString().split("T")[0]),
+              estado: data.estado || "En Proceso",
+              subtotal: formatPrecio(data.subtotal),
+              iva: formatPrecio(data.iva),
+              total: formatPrecio(data.total),
+              productos: (data.productos || []).map((p) => {
+                const cantidad = p.quantity || p.cantidad || 1;
+                const precioNum = precioToNumber(p.price || p.precio);
+                return {
+                  nombre: p.name || p.nombre || "Producto",
+                  cantidad: cantidad,
+                  precio: formatPrecio(p.price || p.precio),
+                  subtotal: formatPrecio(precioNum * cantidad),
+                };
+              }),
+              direccion: data.direccion || "",
+              metodoPago: data.metodoPago || "No especificado",
+              notas: data.notas || "",
+              userId: data.userId || "",
+            };
+          });
+
+          filteredPedidos = [...pedidos];
+          renderPedidosTable(filteredPedidos);
+          updatePedidosBadge();
+        },
+        (error) => {
+          console.error("Error fetching pedidos:", error);
+          const tbody = document.getElementById("pedidosTableBody");
+          if (tbody) {
+            tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="text-center py-4 text-danger">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                Error al cargar pedidos: ${error.message}
+              </td>
+            </tr>
+          `;
+          }
+        },
+      );
+    }
+
+    // Actualizar badge del tab de pedidos (solo pedidos NO completados/recibidos)
+    function updatePedidosBadge() {
+      const badge = document.getElementById("pedidos-nuevos-badge");
+      if (badge) {
+        // Contar solo pedidos que NO están "Recibido" (pendientes de atención)
+        const pendientes = pedidos.filter(
+          (p) => p.estado !== "Recibido",
+        ).length;
+        badge.textContent = pendientes.toString();
+
+        // Cambiar color según cantidad
+        badge.className =
+          "badge ms-2 " + (pendientes > 0 ? "bg-danger" : "bg-secondary");
+      }
+    }
 
     // Renderizar tabla de pedidos
     function renderPedidosTable(pedidosList = pedidos) {
@@ -976,18 +690,36 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
       tbody.innerHTML = "";
 
+      if (pedidosList.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-5 text-muted">
+              <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+              <p class="mt-3">No hay pedidos registrados</p>
+              <small>Los pedidos realizados desde la tienda aparecerán aquí</small>
+            </td>
+          </tr>
+        `;
+        updatePedidosStats();
+        return;
+      }
+
       pedidosList.forEach((pedido) => {
         const badgeClass =
           pedido.estado === "En Proceso"
             ? "bg-info"
             : pedido.estado === "En Tránsito"
               ? "bg-warning text-dark"
-              : "bg-success";
+              : pedido.estado === "Recibido"
+                ? "bg-success"
+                : pedido.estado === "Cancelado"
+                  ? "bg-danger"
+                  : "bg-secondary";
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="px-4">
-            <input type="checkbox" class="form-check-input pedido-checkbox" value="${pedido.id}" />
+            <input type="checkbox" class="form-check-input pedido-checkbox" value="${pedido.docId}" />
           </td>
           <td class="px-4">
             <div class="fw-semibold text-dark">#${pedido.id}</div>
@@ -1012,13 +744,13 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
             </span>
           </td>
           <td class="px-4 text-end">
-            <button class="btn btn-sm btn-action btn-outline-primary me-1" onclick="verDetallePedido(${pedido.id})" title="Ver Detalle">
+            <button class="btn btn-sm btn-action btn-outline-primary me-1" onclick="verDetallePedido('${pedido.docId}')" title="Ver Detalle">
               <i class="bi bi-eye"></i>
             </button>
-            <button class="btn btn-sm btn-action btn-outline-warning me-1" onclick="cambiarEstadoPedido(${pedido.id})" title="Cambiar Estado">
+            <button class="btn btn-sm btn-action btn-outline-warning me-1" onclick="cambiarEstadoPedido('${pedido.docId}')" title="Cambiar Estado">
               <i class="bi bi-arrow-repeat"></i>
             </button>
-            <button class="btn btn-sm btn-action btn-outline-success" onclick="imprimirPedido(${pedido.id})" title="Imprimir">
+            <button class="btn btn-sm btn-action btn-outline-success" onclick="imprimirPedido('${pedido.docId}')" title="Imprimir">
               <i class="bi bi-printer"></i>
             </button>
           </td>
@@ -1031,6 +763,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     // Formatear fecha
     function formatFechaPedido(fecha) {
+      if (!fecha) return "-";
       const date = new Date(fecha);
       return date.toLocaleDateString("es-CL", {
         day: "2-digit",
@@ -1041,10 +774,10 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     // Update pedidos statistics
     function updatePedidosStats() {
-      const proceso = pedidos.filter(p => p.estado === 'En Proceso').length;
-      const transito = pedidos.filter(p => p.estado === 'En Tránsito').length;
-      const recibidos = pedidos.filter(p => p.estado === 'Recibido').length;
-      
+      const proceso = pedidos.filter((p) => p.estado === "En Proceso").length;
+      const transito = pedidos.filter((p) => p.estado === "En Tránsito").length;
+      const recibidos = pedidos.filter((p) => p.estado === "Recibido").length;
+
       const procesoEl = document.getElementById("pedidos-proceso");
       const transitoEl = document.getElementById("pedidos-transito");
       const recibidosEl = document.getElementById("pedidos-recibidos");
@@ -1062,8 +795,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     // Ver detalle del pedido
-    window.verDetallePedido = function (id) {
-      const pedido = pedidos.find((p) => p.id === id);
+    window.verDetallePedido = function (docId) {
+      const pedido = pedidos.find((p) => p.docId === docId);
       if (!pedido) return;
 
       const badgeClass =
@@ -1071,7 +804,11 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           ? "bg-info"
           : pedido.estado === "En Tránsito"
             ? "bg-warning text-dark"
-            : "bg-success";
+            : pedido.estado === "Recibido"
+              ? "bg-success"
+              : pedido.estado === "Cancelado"
+                ? "bg-danger"
+                : "bg-secondary";
 
       const detalle = document.getElementById("detallePedidoBody");
       detalle.innerHTML = `
@@ -1108,13 +845,13 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
             <div class="col-md-6">
               <div class="bg-light rounded p-3">
                 <p class="text-muted mb-1 small">Teléfono</p>
-                <p class="mb-0">${pedido.telefono}</p>
+                <p class="mb-0">${pedido.telefono || "No especificado"}</p>
               </div>
             </div>
             <div class="col-md-6">
               <div class="bg-light rounded p-3">
                 <p class="text-muted mb-1 small">Dirección de Entrega</p>
-                <p class="mb-0">${pedido.direccion}</p>
+                <p class="mb-0">${pedido.direccion || "No especificada"}</p>
               </div>
             </div>
           </div>
@@ -1199,23 +936,48 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     };
 
     // Cambiar estado del pedido
-    window.cambiarEstadoPedido = function (id) {
-      const pedido = pedidos.find((p) => p.id === id);
+    window.cambiarEstadoPedido = async function (docId) {
+      const pedido = pedidos.find((p) => p.docId === docId);
       if (!pedido) return;
 
       const estados = ["En Proceso", "En Tránsito", "Recibido"];
       const currentIndex = estados.indexOf(pedido.estado);
       const nextIndex = (currentIndex + 1) % estados.length;
+      const nuevoEstado = estados[nextIndex];
 
-      pedido.estado = estados[nextIndex];
+      try {
+        // Actualizar en Firestore con audit log
+        const pedidoRef = doc(db, "pedidos", docId);
+        await updateDoc(pedidoRef, {
+          estado: nuevoEstado,
+          updatedBy: auth.currentUser?.uid,
+          updatedAt: serverTimestamp(),
+        });
 
-      renderPedidosTable(filteredPedidos);
-      showToast(`Estado actualizado a: ${pedido.estado}`, "success");
+        // El onSnapshot actualizará automáticamente la UI
+        showToast(`Estado actualizado a: ${nuevoEstado}`, "success");
+
+        // Crear notificación
+        await createNotification(
+          "Pedido Actualizado",
+          `El pedido #${pedido.id} cambió a estado: ${nuevoEstado}`,
+          "info",
+        );
+      } catch (error) {
+        console.error("Error actualizando estado del pedido:", error);
+        showToast("Error al actualizar estado: " + error.message, "danger");
+      }
     };
 
     // Imprimir pedido
-    window.imprimirPedido = function () {
-      showToast("Generando PDF del pedido... (Función en desarrollo)", "info");
+    window.imprimirPedido = function (docId) {
+      const pedido = pedidos.find((p) => p.docId === docId);
+      if (pedido) {
+        showToast(
+          `Generando PDF del pedido #${pedido.id}... (Función en desarrollo)`,
+          "info",
+        );
+      }
     };
 
     // Aplicar filtros de pedidos
@@ -1228,7 +990,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       filteredPedidos = pedidos.filter((pedido) => {
         const matchSearch =
           pedido.cliente.toLowerCase().includes(searchTerm) ||
-          pedido.id.toString().includes(searchTerm) ||
+          pedido.id.toString().toLowerCase().includes(searchTerm) ||
           pedido.email.toLowerCase().includes(searchTerm);
         const matchEstado = !estadoFilter || pedido.estado === estadoFilter;
 
@@ -1261,54 +1023,62 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     // Fetch Solicitudes (Real-time)
     function fetchSolicitudes() {
-        // Remove orderBy to avoid index issues for now
-        const q = query(collection(db, "solicitudes"));
-        
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            solicitudes = snapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    docId: doc.id, // Firestore document ID for updates
-                    id: data.id || doc.id, // Custom ID or fallback to doc ID
-                    cliente: data.nombre || "Cliente Sin Nombre",
-                    email: data.email || "",
-                    telefono: data.telefono || "",
-                    empresa: data.empresa || "",
-                    ciudad: data.ciudad || "",
-                    servicio: data.servicio || "",
-                    fecha: data.fecha || new Date().toISOString().split('T')[0],
-                    estado: data.estado || "Pendiente",
-                    prioridad: data.prioridad || "Media",
-                    numeroPersonas: data.numeroPersonas || 0,
-                    fechaEstimada: data.fechaEstimada || "",
-                    descripcion: data.descripcion || "",
-                    cotizacionEnviada: data.cotizacionEnviada || "",
-                    fechaRespuesta: data.fechaRespuesta || "",
-                    createdAt: data.createdAt // Keep for sorting
-                };
-            });
+      // Remove orderBy to avoid index issues for now
+      const q = query(collection(db, "solicitudes"));
 
-            // Sort client-side
-            solicitudes.sort((a, b) => {
-                const dateA = a.createdAt ? a.createdAt.seconds : new Date(a.fecha).getTime() / 1000;
-                const dateB = b.createdAt ? b.createdAt.seconds : new Date(b.fecha).getTime() / 1000;
-                return dateB - dateA;
-            });
-            
-            // Apply current filters to new data
-            applySolicitudesFilters();
-        }, (error) => {
-            console.error("Error fetching solicitudes:", error);
-            const list = document.getElementById("solicitudesList");
-            if (list) {
-                list.innerHTML = `
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          solicitudes = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              docId: doc.id, // Firestore document ID for updates
+              id: data.id || doc.id, // Custom ID or fallback to doc ID
+              cliente: data.nombre || "Cliente Sin Nombre",
+              email: data.email || "",
+              telefono: data.telefono || "",
+              empresa: data.empresa || "",
+              ciudad: data.ciudad || "",
+              servicio: data.servicio || "",
+              fecha: data.fecha || new Date().toISOString().split("T")[0],
+              estado: data.estado || "Pendiente",
+              prioridad: data.prioridad || "Media",
+              numeroPersonas: data.numeroPersonas || 0,
+              fechaEstimada: data.fechaEstimada || "",
+              descripcion: data.descripcion || "",
+              cotizacionEnviada: data.cotizacionEnviada || "",
+              fechaRespuesta: data.fechaRespuesta || "",
+              createdAt: data.createdAt, // Keep for sorting
+            };
+          });
+
+          // Sort client-side
+          solicitudes.sort((a, b) => {
+            const dateA = a.createdAt
+              ? a.createdAt.seconds
+              : new Date(a.fecha).getTime() / 1000;
+            const dateB = b.createdAt
+              ? b.createdAt.seconds
+              : new Date(b.fecha).getTime() / 1000;
+            return dateB - dateA;
+          });
+
+          // Apply current filters to new data
+          applySolicitudesFilters();
+        },
+        (error) => {
+          console.error("Error fetching solicitudes:", error);
+          const list = document.getElementById("solicitudesList");
+          if (list) {
+            list.innerHTML = `
                     <div class="text-center p-4 text-danger">
                         <small>Error al cargar solicitudes: ${error.message}</small>
                     </div>
                 `;
-            }
-        });
+          }
+        },
+      );
     }
 
     /* MOCK DATA ORIGINAL (COMENTADO POR SOLICITUD DEL USUARIO)
@@ -1331,8 +1101,6 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       // ... otros datos mock
     ];
     */
-
-
 
     // Renderizar lista de solicitudes
     function renderSolicitudesList() {
@@ -1402,10 +1170,12 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     // Aplicar filtros de solicitudes
     function applySolicitudesFilters() {
-      const searchTerm = document.getElementById("searchSolicitudes")?.value.toLowerCase() || "";
+      const searchTerm =
+        document.getElementById("searchSolicitudes")?.value.toLowerCase() || "";
       const estadoFilter = document.getElementById("estadoFilter")?.value || "";
       const fechaFilter = document.getElementById("fechaFilter")?.value || "";
-      const servicioFilter = document.getElementById("servicioFilter")?.value || "";
+      const servicioFilter =
+        document.getElementById("servicioFilter")?.value || "";
 
       filteredSolicitudes = solicitudes.filter((sol) => {
         const matchSearch =
@@ -1413,22 +1183,25 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           sol.id.toString().includes(searchTerm) ||
           sol.email.toLowerCase().includes(searchTerm) ||
           sol.empresa.toLowerCase().includes(searchTerm);
-        
+
         const matchEstado = !estadoFilter || sol.estado === estadoFilter;
-        const matchServicio = !servicioFilter || sol.servicio === servicioFilter;
-        
+        const matchServicio =
+          !servicioFilter || sol.servicio === servicioFilter;
+
         let matchFecha = true;
         if (fechaFilter) {
-            const solDate = new Date(sol.fecha);
-            const today = new Date();
-            if (fechaFilter === "hoy") {
-                matchFecha = solDate.toDateString() === today.toDateString();
-            } else if (fechaFilter === "semana") {
-                const weekAgo = new Date(today.setDate(today.getDate() - 7));
-                matchFecha = solDate >= weekAgo;
-            } else if (fechaFilter === "mes") {
-                matchFecha = solDate.getMonth() === new Date().getMonth() && solDate.getFullYear() === new Date().getFullYear();
-            }
+          const solDate = new Date(sol.fecha);
+          const today = new Date();
+          if (fechaFilter === "hoy") {
+            matchFecha = solDate.toDateString() === today.toDateString();
+          } else if (fechaFilter === "semana") {
+            const weekAgo = new Date(today.setDate(today.getDate() - 7));
+            matchFecha = solDate >= weekAgo;
+          } else if (fechaFilter === "mes") {
+            matchFecha =
+              solDate.getMonth() === new Date().getMonth() &&
+              solDate.getFullYear() === new Date().getFullYear();
+          }
         }
 
         return matchSearch && matchEstado && matchFecha && matchServicio;
@@ -1439,7 +1212,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     // Select solicitud to view details
     function selectSolicitud(id) {
-      selectedSolicitud = solicitudes.find(s => s.id === id);
+      selectedSolicitud = solicitudes.find((s) => s.id === id);
       renderDetalle();
       renderSolicitudesList(); // Re-render to update active state
     }
@@ -1621,7 +1394,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       }
     };
 
-    // Actualizar estadísticas
+    // Actualizar estadísticas de solicitudes
     function updateStats() {
       const pendientes = solicitudes.filter(
         (s) => s.estado === "Pendiente",
@@ -1633,60 +1406,70 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         (s) => s.estado === "Completada",
       ).length;
 
-      document.getElementById("solicitudes-pendientes").textContent =
-        pendientes;
-      document.getElementById("solicitudes-proceso").textContent = proceso;
-      document.getElementById("solicitudes-completadas").textContent =
-        completadas;
-      document.getElementById("solicitudes-total").textContent =
-        solicitudes.length;
+      const pendientesEl = document.getElementById("solicitudes-pendientes");
+      const procesoEl = document.getElementById("solicitudes-proceso");
+      const completadasEl = document.getElementById("solicitudes-completadas");
+      const totalEl = document.getElementById("solicitudes-total");
+      const badgeEl = document.getElementById("solicitudes-pendientes-badge");
+
+      if (pendientesEl) pendientesEl.textContent = pendientes.toString();
+      if (procesoEl) procesoEl.textContent = proceso.toString();
+      if (completadasEl) completadasEl.textContent = completadas.toString();
+      if (totalEl) totalEl.textContent = solicitudes.length.toString();
+
+      // Actualizar badge del tab (solo pendientes, que requieren atención)
+      if (badgeEl) {
+        badgeEl.textContent = pendientes.toString();
+        badgeEl.className =
+          "badge text-dark ms-2 " +
+          (pendientes > 0 ? "bg-warning" : "bg-secondary");
+      }
     }
 
     // Cambiar estado
     window.cambiarEstado = async function (nuevoEstado) {
       if (selectedSolicitud && selectedSolicitud.estado !== nuevoEstado) {
         const oldEstado = selectedSolicitud.estado;
-        
+
         try {
-            // Actualizar en Firestore using the actual Firestore document ID
-            const solicitudRef = doc(db, "solicitudes", selectedSolicitud.docId);
-            await updateDoc(solicitudRef, {
-                estado: nuevoEstado
-            });
+          // Actualizar en Firestore using the actual Firestore document ID
+          const solicitudRef = doc(db, "solicitudes", selectedSolicitud.docId);
+          await updateDoc(solicitudRef, {
+            estado: nuevoEstado,
+          });
 
-            // Actualizar localmente
-            selectedSolicitud.estado = nuevoEstado;
-            renderSolicitudesList();
-            renderDetalle();
-            showToast(`Estado actualizado a: ${nuevoEstado}`, "success");
+          // Actualizar localmente
+          selectedSolicitud.estado = nuevoEstado;
+          renderSolicitudesList();
+          renderDetalle();
+          showToast(`Estado actualizado a: ${nuevoEstado}`, "success");
 
-            // Crear notificación
-            await createNotification(
-                "Estado Actualizado", 
-                `La solicitud #${selectedSolicitud.id} cambió de ${oldEstado} a ${nuevoEstado}`,
-                "info"
-            );
-
+          // Crear notificación
+          await createNotification(
+            "Estado Actualizado",
+            `La solicitud #${selectedSolicitud.id} cambió de ${oldEstado} a ${nuevoEstado}`,
+            "info",
+          );
         } catch (error) {
-            console.error("Error actualizando estado:", error);
-            showToast("Error al actualizar estado", "error");
+          console.error("Error actualizando estado:", error);
+          showToast("Error al actualizar estado", "error");
         }
       }
     };
 
     // Crear notificación en Firestore
     async function createNotification(title, message, type = "info") {
-        try {
-            await addDoc(collection(db, "notifications"), {
-                title,
-                message,
-                type,
-                read: false,
-                createdAt: serverTimestamp()
-            });
-        } catch (error) {
-            console.error("Error creating notification:", error);
-        }
+      try {
+        await addDoc(collection(db, "notifications"), {
+          title,
+          message,
+          type,
+          read: false,
+          createdAt: serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Error creating notification:", error);
+      }
     }
 
     // Exportar PDF
@@ -1740,9 +1523,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     });
 
     // Inicializar
-    renderPedidosTable();
-    fetchSolicitudes(); // Fetch real-time data
-    // renderSolicitudesList(); // Removed as it's called in fetchSolicitudes
+    fetchPedidos(); // Fetch pedidos desde Firestore (tiempo real)
+    fetchSolicitudes(); // Fetch solicitudes desde Firestore (tiempo real)
     if (solicitudes.length > 0) {
       selectSolicitud(solicitudes[0].id);
     }
