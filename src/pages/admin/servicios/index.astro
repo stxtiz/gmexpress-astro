@@ -402,10 +402,16 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     .service-img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
+      width: 60px !important;
+      height: 60px !important;
+      min-width: 60px !important;
+      min-height: 60px !important;
+      max-width: 60px !important;
+      max-height: 60px !important;
+      object-fit: cover !important;
       border-radius: 8px;
+      flex-shrink: 0;
+      display: block;
     }
 
     .btn-action {
@@ -538,7 +544,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
             <input type="checkbox" class="form-check-input" />
           </td>
           <td class="px-4">
-            <img src="${servicio.image}" alt="${servicio.alt}" class="service-img" />
+            <img src="${servicio.image}" alt="${servicio.alt}" class="service-img" width="60" height="60" style="width:60px;height:60px;max-width:60px;max-height:60px;object-fit:cover;" />
           </td>
           <td class="px-4">
             <div class="fw-semibold text-dark">${servicio.name}</div>
