@@ -1,0 +1,410 @@
+================================================================================
+                    GMEXPRESS - FIREBASE DATABASE CONTEXT
+                    Documento de Contexto para IA
+================================================================================
+
+PROYECTO: GMEXPRESS-ASTRO
+DESCRIPCIÓN: Plataforma web de servicio de alimentación/catering desarrollada con Astro.js
+FIREBASE PROJECT ID: gmexpress-estesi
+TECNOLOGÍAS: Astro.js, Firebase (Firestore + Auth), TypeScript, Tailwind CSS
+
+================================================================================
+                            CONFIGURACIÓN FIREBASE
+================================================================================
+
+Archivo de configuración: src/firebase/client.ts
+
+Servicios utilizados:
+- Firebase Authentication (getAuth)
+- Cloud Firestore (getFirestore)
+
+Las instancias exportadas son:
+- db: Instancia de Firestore
+- auth: Instancia de Authentication
+
+================================================================================
+                          COLECCIONES EN FIRESTORE
+================================================================================
+
+El proyecto utiliza 5 colecciones principales:
+
+1. users
+2. products
+3. services
+4. solicitudes
+5. notifications
+
+================================================================================
+                        1. COLECCIÓN: users
+================================================================================
+
+PROPÓSITO: Almacenar información de usuarios registrados en la plataforma.
+
+RUTA: /users/{userId}
+
+ESTRUCTURA DEL DOCUMENTO:
+{
+  firstName: string,           // Nombre del usuario (ej: "Juan")
+  lastNamePaterno: string,     // Apellido paterno (ej: "Pérez")
+  lastNameMaterno: string,     // Apellido materno (ej: "González")
+  rut: string,                 // RUT chileno formateado (ej: "12.345.678-9")
+  email: string,               // Correo electrónico del usuario
+  phone: string,               // Teléfono con formato chileno (ej: "+56 9 1234 5678")
+  address: string,             // Dirección de calle y número
+  region: string,              // Región de Chile
+  comuna: string,              // Comuna de Chile
+  apartment: string,           // Departamento/oficina (opcional)
+  role: string,                // Rol del usuario: "user" | "admin"
+  createdAt: Timestamp         // Fecha de creación del usuario
+}
+
+CÓMO SE CREA:
+- Archivo: src/pages/registro.astro
+- Proceso: 
+  1. Se crea usuario en Firebase Auth con createUserWithEmailAndPassword()
+  2. Se actualiza el perfil con updateProfile() (displayName)
+  3. Se guarda documento en Firestore con setDoc(doc(db, "users", user.uid), {...})
+  4. El ID del documento es el UID del usuario de Firebase Auth
+
+REGLAS DE SEGURIDAD:
+- READ: Solo el propietario (owner) o admin pueden leer
+- WRITE: Solo el propietario (owner) o admin pueden escribir
+
+NOTAS IMPORTANTES:
+- El campo "role" por defecto es "user"
+- Los administradores tienen role: "admin"
+- El RUT se valida con algoritmo de verificación chileno
+- El teléfono se valida con regex para formato chileno
+
+================================================================================
+                        2. COLECCIÓN: products
+================================================================================
+
+PROPÓSITO: Almacenar el catálogo de productos/platos disponibles para venta.
+
+RUTA: /products/{productId}
+
+ESTRUCTURA DEL DOCUMENTO:
+{
+  name: string,                // Nombre del producto (ej: "Pizza Suprema de la Casa")
+  categoria: string,           // Categoría: "Pizza" | "Ensalada" | "Bebidas" | "Desayuno" | "Carnes"
+  description: string,         // Descripción detallada del producto
+  price: string,               // Precio formateado con $ (ej: "$16.990")
+  stock: number,               // Cantidad en inventario (número entero)
+  image: string,               // URL de la imagen del producto
+  alt: string,                 // Texto alternativo para la imagen
+  activo: boolean,             // Si el producto está disponible (true/false)
+  destacado: boolean,          // Si el producto es destacado/featured (true/false)
+  createdAt: Timestamp,        // Fecha de creación
+  updatedAt: Timestamp         // Fecha de última actualización
+}
+
+CÓMO SE GESTIONA:
+- Archivo: src/pages/admin/productos/index.astro
+- Operaciones CRUD completas:
+  - CREATE: addDoc(collection(db, "products"), productoData)
+  - READ: onSnapshot con query ordenado por "name"
+  - UPDATE: updateDoc(doc(db, "products", editingId), productoData)
+  - DELETE: deleteDoc(doc(db, "products", deleteId))
+
+CONSULTAS:
+- Lista pública: query(productsCollection, where("activo", "==", true))
+- Panel admin: query(productsCollection, orderBy("name"))
+
+REGLAS DE SEGURIDAD:
+- READ: Público (cualquiera puede leer)
+- WRITE: Solo administradores
+
+CATEGORÍAS DISPONIBLES:
+1. Pizza
+2. Ensalada
+3. Bebidas
+4. Desayuno
+5. Carnes
+
+================================================================================
+                        3. COLECCIÓN: services
+================================================================================
+
+PROPÓSITO: Almacenar los servicios de catering/alimentación que ofrece la empresa.
+
+RUTA: /services/{serviceId}
+
+ESTRUCTURA DEL DOCUMENTO:
+{
+  name: string,                // Nombre del servicio (ej: "Catering para Eventos")
+  description: string,         // Descripción del servicio
+  image: string,               // URL de la imagen del servicio
+  alt: string,                 // Texto alternativo para la imagen
+  hasPrice: boolean,           // Si tiene precio definido (true) o "Consultar" (false)
+  price: string,               // Precio formateado (ej: "$12.500") - solo si hasPrice=true
+  priceLabel: string,          // Etiqueta de precio (ej: "/ por almuerzo") - opcional
+  activo: boolean,             // Si el servicio está activo/disponible
+  createdAt: Timestamp,        // Fecha de creación
+  updatedAt: Timestamp         // Fecha de última actualización
+}
+
+CÓMO SE GESTIONA:
+- Archivo: src/pages/admin/servicios/index.astro
+- Operaciones CRUD completas:
+  - CREATE: addDoc(collection(db, "services"), servicioData)
+  - READ: onSnapshot con query ordenado por "name"
+  - UPDATE: updateDoc(doc(db, "services", editingId), servicioData)
+  - DELETE: deleteDoc(doc(db, "services", deleteId))
+
+CONSULTAS:
+- Servicios públicos: query(servicesCollection, where("activo", "==", true))
+- Servicios sin precio (para cotización): 
+  query(collection(db, "services"), where("hasPrice", "==", false), where("activo", "==", true))
+
+REGLAS DE SEGURIDAD:
+- READ: Público (cualquiera puede leer)
+- WRITE: Solo administradores
+
+================================================================================
+                        4. COLECCIÓN: solicitudes
+================================================================================
+
+PROPÓSITO: Almacenar solicitudes de cotización enviadas por clientes interesados.
+
+RUTA: /solicitudes/{solicitudId}
+
+ESTRUCTURA DEL DOCUMENTO:
+{
+  id: string,                  // ID personalizado (ej: "SOL-123456")
+  nombre: string,              // Nombre completo del contacto
+  empresa: string,             // Nombre de la empresa
+  email: string,               // Correo electrónico de contacto
+  telefono: string,            // Teléfono de contacto
+  ciudad: string,              // Ciudad del cliente
+  servicio: string,            // Tipo de servicio solicitado
+  numeroPersonas: number,      // Número de personas/empleados
+  fechaEstimada: string,       // Fecha estimada de inicio (formato: "YYYY-MM-DD")
+  descripcion: string,         // Descripción de necesidades específicas
+  fecha: string,               // Fecha de creación (formato: "YYYY-MM-DD")
+  estado: string,              // Estado: "Pendiente" | "En Proceso" | "Completada"
+  prioridad: string,           // Prioridad: "Alta" | "Media" | "Baja" (opcional)
+  createdAt: Timestamp         // Timestamp de Firebase (serverTimestamp())
+}
+
+CÓMO SE CREA:
+- Archivo: src/components/servicios/SolicitudForm.astro
+- Proceso:
+  1. Usuario completa formulario de solicitud de cotización
+  2. Se guarda con addDoc(collection(db, "solicitudes"), {...})
+  3. Se genera ID personalizado: `SOL-${Date.now().toString().slice(-6)}`
+  4. Estado inicial: "Pendiente"
+  5. Se crea notificación automática para admin
+
+CÓMO SE GESTIONA:
+- Archivo: src/pages/admin/pedidos/index.astro (pestaña "Solicitudes de Cotización")
+- Los administradores pueden:
+  - Ver lista de solicitudes en tiempo real (onSnapshot)
+  - Ver detalle de cada solicitud
+  - Cambiar estado: updateDoc(doc(db, "solicitudes", docId), { estado: nuevoEstado })
+  - Filtrar por estado, servicio, fecha
+
+REGLAS DE SEGURIDAD:
+- CREATE: Público (cualquiera puede crear)
+- READ, UPDATE, DELETE: Solo administradores
+
+================================================================================
+                        5. COLECCIÓN: notifications
+================================================================================
+
+PROPÓSITO: Sistema de notificaciones para alertar a los administradores.
+
+RUTA: /notifications/{notificationId}
+
+ESTRUCTURA DEL DOCUMENTO:
+{
+  title: string,               // Título de la notificación
+  message: string,             // Mensaje/descripción de la notificación
+  type: string,                // Tipo: "info" | "warning" | "success" | "error"
+  read: boolean,               // Si fue leída (true/false)
+  createdAt: Timestamp         // Timestamp de creación (serverTimestamp())
+}
+
+CÓMO SE CREA:
+Las notificaciones se crean automáticamente en ciertos eventos:
+
+1. Nueva solicitud de cotización:
+   - Archivo: src/components/servicios/SolicitudForm.astro
+   - Trigger: Cuando un cliente envía una solicitud
+   - Ejemplo:
+     {
+       title: "Nueva Solicitud de Cotización",
+       message: "Nueva solicitud de Catering para Eventos por Juan Pérez (Empresa ABC)",
+       type: "warning",
+       read: false,
+       createdAt: serverTimestamp()
+     }
+
+2. Cambio de estado de solicitud:
+   - Archivo: src/pages/admin/pedidos/index.astro
+   - Trigger: Cuando admin cambia estado de solicitud
+   - Ejemplo:
+     {
+       title: "Estado Actualizado",
+       message: "La solicitud #SOL-123456 cambió de Pendiente a En Proceso",
+       type: "info",
+       read: false,
+       createdAt: serverTimestamp()
+     }
+
+REGLAS DE SEGURIDAD:
+- CREATE: Público (para eventos del sistema)
+- READ, UPDATE, DELETE: Solo administradores
+
+================================================================================
+                     REGLAS DE SEGURIDAD (firestore.rules)
+================================================================================
+
+El archivo firestore.rules define las siguientes funciones helper:
+
+1. isAuthenticated(): Verifica si el usuario está autenticado
+   return request.auth != null;
+
+2. isAdmin(): Verifica si el usuario es administrador
+   - Debe estar autenticado
+   - Debe existir documento en /users/{uid}
+   - El campo "role" debe ser "admin"
+
+3. isOwner(userId): Verifica si el usuario es propietario del documento
+   return isAuthenticated() && request.auth.uid == userId;
+
+RESUMEN DE PERMISOS POR COLECCIÓN:
+┌─────────────────┬────────────────┬────────────────────────────────┐
+│ Colección       │ Lectura        │ Escritura                      │
+├─────────────────┼────────────────┼────────────────────────────────┤
+│ products        │ Público        │ Solo Admin                     │
+│ services        │ Público        │ Solo Admin                     │
+│ users           │ Owner o Admin  │ Owner o Admin                  │
+│ solicitudes     │ Solo Admin     │ CREATE: Público, resto Admin   │
+│ notifications   │ Solo Admin     │ CREATE: Público, resto Admin   │
+└─────────────────┴────────────────┴────────────────────────────────┘
+
+================================================================================
+                          PATRONES DE USO COMÚN
+================================================================================
+
+1. LECTURA EN TIEMPO REAL (onSnapshot):
+   Usado en paneles de administración para mantener datos actualizados.
+   
+   const q = query(collection(db, "products"), orderBy("name"));
+   onSnapshot(q, (snapshot) => {
+     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+     // Actualizar UI
+   });
+
+2. LECTURA ÚNICA (getDocs):
+   Usado en páginas públicas para cargar datos una vez.
+   
+   const q = query(collection(db, "products"), where("activo", "==", true));
+   const snapshot = await getDocs(q);
+   const products = snapshot.docs.map(doc => doc.data());
+
+3. CREAR DOCUMENTO (addDoc):
+   Para colecciones donde Firebase genera el ID automáticamente.
+   
+   await addDoc(collection(db, "solicitudes"), {
+     ...formData,
+     createdAt: serverTimestamp()
+   });
+
+4. CREAR/ACTUALIZAR CON ID ESPECÍFICO (setDoc):
+   Usado cuando necesitas controlar el ID del documento.
+   
+   await setDoc(doc(db, "users", user.uid), {
+     firstName: "Juan",
+     role: "user",
+     createdAt: new Date()
+   });
+
+5. ACTUALIZAR DOCUMENTO (updateDoc):
+   Para actualizar campos específicos sin sobrescribir todo.
+   
+   await updateDoc(doc(db, "products", productId), {
+     stock: 50,
+     updatedAt: new Date()
+   });
+
+6. ELIMINAR DOCUMENTO (deleteDoc):
+   
+   await deleteDoc(doc(db, "products", productId));
+
+================================================================================
+                        FLUJOS DE DATOS IMPORTANTES
+================================================================================
+
+FLUJO 1: REGISTRO DE USUARIO
+1. Usuario completa formulario en /registro
+2. Se crea cuenta en Firebase Auth (createUserWithEmailAndPassword)
+3. Se actualiza displayName en Auth (updateProfile)
+4. Se crea documento en /users/{uid} con datos adicionales
+5. Se redirige al usuario a la página principal
+
+FLUJO 2: SOLICITUD DE COTIZACIÓN
+1. Cliente completa formulario en /solicitud-cotizacion
+2. Se crea documento en /solicitudes con estado "Pendiente"
+3. Se crea notificación en /notifications
+4. Admin ve nueva solicitud en panel (tiempo real)
+5. Admin puede cambiar estado: Pendiente → En Proceso → Completada
+6. Cada cambio de estado crea nueva notificación
+
+FLUJO 3: GESTIÓN DE PRODUCTOS (ADMIN)
+1. Admin accede a /admin/productos
+2. Sistema carga productos con onSnapshot (tiempo real)
+3. Admin puede crear/editar/eliminar productos
+4. Cambios se reflejan inmediatamente en la UI
+5. Productos activos aparecen en página pública /productos
+
+FLUJO 4: GESTIÓN DE SERVICIOS (ADMIN)
+1. Admin accede a /admin/servicios
+2. Sistema carga servicios con onSnapshot (tiempo real)
+3. Admin puede crear/editar/eliminar servicios
+4. Servicios sin precio (hasPrice=false) aparecen en dropdown de cotizaciones
+5. Servicios activos aparecen en página pública /servicios
+
+================================================================================
+                              VALIDACIONES
+================================================================================
+
+RUT CHILENO:
+- Formato aceptado: "XX.XXX.XXX-X" o "X.XXX.XXX-X"
+- Se valida con algoritmo de módulo 11
+- Se formatea automáticamente al escribir
+
+TELÉFONO CHILENO:
+- Regex: /^(\+?56)?(\s?)(0?9)(\s?)[98765432]\d{7}$/
+- Acepta: +56912345678, 912345678
+
+CONTRASEÑA:
+- Mínimo 8 caracteres
+- Debe incluir mayúsculas, minúsculas y números
+- Validación delegada a Firebase Auth
+
+================================================================================
+                        CONSIDERACIONES TÉCNICAS
+================================================================================
+
+1. TIMESTAMPS:
+   - Para campos de fecha en creación: serverTimestamp()
+   - Para actualizaciones: new Date()
+
+2. PRECIOS:
+   - Se almacenan como strings formateados: "$16.990"
+   - Para cálculos, se limpia el formato: price.replace(/[^0-9]/g, '')
+
+3. IDs DE DOCUMENTOS:
+   - users: Usa el UID de Firebase Auth
+   - Otras colecciones: ID autogenerado por Firestore
+
+4. ORDENAMIENTO:
+   - Productos: orderBy("name")
+   - Servicios: orderBy("name")
+   - Solicitudes: orderBy("createdAt", "desc") - cliente
+
+================================================================================
+                               FIN DEL DOCUMENTO
+================================================================================
