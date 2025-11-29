@@ -212,48 +212,76 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                 <label for="nombre" class="form-label fw-semibold"
                   >Nombre del Servicio <span class="text-danger">*</span></label
                 >
+                <!-- Validación: mínimo 5, máximo 150 caracteres. Pattern previene caracteres peligrosos -->
                 <input
                   type="text"
                   class="form-control"
                   id="nombre"
                   placeholder="Ej: Catering para Eventos"
                   required
+                  minlength="5"
+                  maxlength="150"
+                  pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.,\-()¡!¿?&%$#@*+=:;'/]+$"
+                  title="Solo letras, números y caracteres básicos permitidos"
                 />
+                <div class="form-text text-muted">
+                  Mínimo 5, máximo 150 caracteres
+                </div>
               </div>
               <div class="col-12">
                 <label for="descripcion" class="form-label fw-semibold"
                   >Descripción <span class="text-danger">*</span></label
                 >
+                <!-- Validación: mínimo 20, máximo 2000 caracteres -->
                 <textarea
                   class="form-control"
                   id="descripcion"
                   rows="3"
                   placeholder="Describe el servicio..."
-                  required></textarea>
+                  required
+                  minlength="20"
+                  maxlength="2000"></textarea>
+                <div class="form-text text-muted">
+                  Mínimo 20, máximo 2000 caracteres
+                </div>
               </div>
               <div class="col-md-6">
                 <label for="imagen" class="form-label fw-semibold"
                   >URL de Imagen <span class="text-danger">*</span></label
                 >
+                <!-- Validación: URL válida con http/https -->
                 <input
                   type="url"
                   class="form-control"
                   id="imagen"
                   placeholder="https://ejemplo.com/imagen.jpg"
                   required
+                  maxlength="2048"
+                  pattern="^https?:\/\/.+"
+                  title="Ingrese una URL válida que comience con http:// o https://"
                 />
+                <div class="form-text text-muted">
+                  URL válida (http:// o https://)
+                </div>
               </div>
               <div class="col-md-6">
                 <label for="alt" class="form-label fw-semibold"
                   >Texto Alternativo <span class="text-danger">*</span></label
                 >
+                <!-- Validación: mínimo 5, máximo 200 caracteres -->
                 <input
                   type="text"
                   class="form-control"
                   id="alt"
                   placeholder="Descripción de la imagen"
                   required
+                  minlength="5"
+                  maxlength="200"
+                  title="Descripción alternativa para accesibilidad"
                 />
+                <div class="form-text text-muted">
+                  Mínimo 5, máximo 200 caracteres
+                </div>
               </div>
               <div class="col-12">
                 <div class="form-check form-switch">
@@ -273,24 +301,38 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                 >
                 <div class="input-group">
                   <span class="input-group-text">$</span>
+                  <!-- Validación: solo números positivos, mínimo 1, máximo 99.999.999 -->
                   <input
-                    type="text"
+                    type="number"
                     class="form-control"
                     id="precio"
-                    placeholder="12.500"
+                    placeholder="12500"
+                    min="1"
+                    max="99999999"
+                    step="1"
+                    title="Ingrese un precio válido (solo números positivos)"
                   />
+                </div>
+                <div class="form-text text-muted">
+                  Solo números enteros positivos
                 </div>
               </div>
               <div class="col-md-6" id="priceLabelField" style="display: none;">
                 <label for="priceLabel" class="form-label fw-semibold"
                   >Etiqueta de Precio</label
                 >
+                <!-- Validación: máximo 50 caracteres -->
                 <input
                   type="text"
                   class="form-control"
                   id="priceLabel"
                   placeholder="/ por almuerzo"
+                  maxlength="50"
+                  title="Etiqueta opcional para el precio"
                 />
+                <div class="form-text text-muted">
+                  Máximo 50 caracteres (opcional)
+                </div>
               </div>
               <div class="col-12">
                 <div class="form-check form-switch">
@@ -449,6 +491,91 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         margin-left: 0;
       }
     }
+
+    /* ============================================
+       ESTILOS PARA VALIDACIONES Y TOASTS
+       Animaciones y estilos personalizados
+       ============================================ */
+
+    /* Animación de entrada desde la derecha */
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Animación de salida hacia la derecha */
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    /* Animación de shake para errores */
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      10%,
+      30%,
+      50%,
+      70%,
+      90% {
+        transform: translateX(-5px);
+      }
+      20%,
+      40%,
+      60%,
+      80% {
+        transform: translateX(5px);
+      }
+    }
+
+    /* Estilos para campos con error */
+    .is-invalid {
+      border-color: #dc3545 !important;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    .is-invalid:focus {
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+
+    /* Lista de errores de validación */
+    .validation-error-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    /* Toasts personalizados */
+    #toast-container .toast {
+      min-width: 300px;
+      border-radius: 8px;
+    }
+
+    #toast-container .toast-header {
+      border-radius: 8px 8px 0 0;
+    }
+
+    /* Modal de errores de validación */
+    #validationErrorModal .modal-content {
+      border-radius: 12px;
+    }
+
+    #validationErrorModal .modal-header {
+      border-radius: 12px 12px 0 0;
+    }
   </style>
 
   <script>
@@ -467,8 +594,9 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     const servicesCollection = collection(db, "services");
     const q = query(servicesCollection, orderBy("name"));
 
-    // Definir tipos
-    // Definir tipos
+    // ============================================
+    // INTERFAZ: Definición de tipos para Servicio
+    // ============================================
     interface Service {
       id: string;
       name: string;
@@ -489,6 +617,49 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       [key: string]: any;
     }
 
+    // ============================================
+    // INTERFAZ: Resultado de validación
+    // ============================================
+    interface ValidationResult {
+      isValid: boolean;
+      errors: string[];
+    }
+
+    // ============================================
+    // CONSTANTES DE VALIDACIÓN
+    // Configuración centralizada para límites y patrones
+    // ============================================
+    const VALIDATION_CONFIG = {
+      // Límites de longitud de texto
+      NAME_MAX_LENGTH: 150, // Máximo caracteres para nombre de servicio
+      NAME_MIN_LENGTH: 5, // Mínimo caracteres para nombre
+      DESCRIPTION_MAX_LENGTH: 2000, // Máximo caracteres para descripción
+      DESCRIPTION_MIN_LENGTH: 20, // Mínimo caracteres para descripción
+      ALT_MAX_LENGTH: 200, // Máximo caracteres para texto alternativo
+      ALT_MIN_LENGTH: 5, // Mínimo caracteres para texto alternativo
+      PRICE_LABEL_MAX_LENGTH: 50, // Máximo caracteres para etiqueta de precio
+
+      // Límites numéricos
+      PRICE_MAX: 99999999, // Precio máximo ($99.999.999)
+      PRICE_MIN: 1, // Precio mínimo ($1)
+
+      // Patrones regex para validación
+      PATTERNS: {
+        // URL válida (http/https)
+        URL: /^https?:\/\/[^\s<>"{}|\\^`[\]]+$/i,
+        // Solo caracteres seguros para nombres (letras, números, espacios, acentos, ñ)
+        SAFE_TEXT: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.,\-()¡!¿?&%$#@*+=:;'"\/]+$/,
+        // Patrón para detectar posibles scripts maliciosos
+        SCRIPT_INJECTION:
+          /<script[\s\S]*?>[\s\S]*?<\/script>|javascript:|on\w+\s*=/gi,
+        // Patrón para detectar HTML peligroso
+        HTML_INJECTION:
+          /<[^>]*(iframe|object|embed|form|input|button|meta|link|style)[^>]*>/gi,
+        // Solo números para precio
+        NUMBERS_ONLY: /^\d+$/,
+      },
+    } as const;
+
     declare global {
       interface Window {
         togglePriceFields: () => void;
@@ -507,6 +678,480 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     let editingId: string | null = null;
     let deleteId: string | null = null;
     let filteredServices: Service[] = [];
+
+    // ============================================
+    // FUNCIÓN: Sanitizar texto
+    // Elimina caracteres peligrosos y previene XSS
+    // ============================================
+    function sanitizeText(input: string): string {
+      if (!input || typeof input !== "string") return "";
+
+      return (
+        input
+          // Eliminar tags HTML
+          .replace(/<[^>]*>/g, "")
+          // Escapar caracteres especiales HTML
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#x27;")
+          // Eliminar caracteres de control
+          .replace(/[\x00-\x1F\x7F]/g, "")
+          // Trim espacios
+          .trim()
+      );
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar URL
+    // Verifica que sea una URL válida y segura
+    // ============================================
+    function validateUrl(url: string): { isValid: boolean; error?: string } {
+      if (!url || typeof url !== "string") {
+        return { isValid: false, error: "URL es requerida" };
+      }
+
+      const trimmedUrl = url.trim();
+
+      // Verificar longitud máxima
+      if (trimmedUrl.length > 2048) {
+        return {
+          isValid: false,
+          error: "URL demasiado larga (máximo 2048 caracteres)",
+        };
+      }
+
+      // Verificar que sea http o https
+      if (!VALIDATION_CONFIG.PATTERNS.URL.test(trimmedUrl)) {
+        return {
+          isValid: false,
+          error: "URL debe comenzar con http:// o https://",
+        };
+      }
+
+      // Verificar que no contenga javascript:
+      if (trimmedUrl.toLowerCase().includes("javascript:")) {
+        return { isValid: false, error: "URL contiene contenido no permitido" };
+      }
+
+      // Verificar que no contenga data:
+      if (trimmedUrl.toLowerCase().includes("data:")) {
+        return {
+          isValid: false,
+          error: "URLs de tipo data: no están permitidas",
+        };
+      }
+
+      return { isValid: true };
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar precio
+    // Asegura que sea un número positivo dentro del rango permitido
+    // IMPORTANTE: Detecta números negativos ANTES de limpiar el string
+    // ============================================
+    function validatePrice(priceRaw: string): {
+      isValid: boolean;
+      value: number;
+      error?: string;
+    } {
+      if (!priceRaw || typeof priceRaw !== "string") {
+        return { isValid: false, value: 0, error: "Precio es requerido" };
+      }
+
+      const trimmedPrice = priceRaw.trim();
+
+      // ============================================
+      // VALIDACIÓN CRÍTICA: Detectar números negativos
+      // Verificar si el usuario ingresó un signo negativo
+      // ============================================
+      if (trimmedPrice.includes("-")) {
+        console.warn(
+          "[SEGURIDAD] Intento de ingresar precio negativo detectado:",
+          trimmedPrice,
+        );
+        return {
+          isValid: false,
+          value: 0,
+          error: "El precio no puede ser negativo. Ingrese un valor positivo.",
+        };
+      }
+
+      // Limpiar el valor (remover todo excepto números)
+      const cleanedPrice = trimmedPrice.replace(/[^0-9]/g, "");
+
+      // Verificar que haya números después de limpiar
+      if (cleanedPrice === "") {
+        return {
+          isValid: false,
+          value: 0,
+          error: "Precio debe contener números válidos",
+        };
+      }
+
+      // Verificar que solo contenga números
+      if (!VALIDATION_CONFIG.PATTERNS.NUMBERS_ONLY.test(cleanedPrice)) {
+        return {
+          isValid: false,
+          value: 0,
+          error: "Precio debe contener solo números positivos",
+        };
+      }
+
+      const price = parseInt(cleanedPrice, 10);
+
+      // Verificar que sea un número válido
+      if (isNaN(price)) {
+        return {
+          isValid: false,
+          value: 0,
+          error: "Precio no es un número válido",
+        };
+      }
+
+      // Verificar que sea positivo (doble verificación)
+      if (price < VALIDATION_CONFIG.PRICE_MIN) {
+        return {
+          isValid: false,
+          value: 0,
+          error: `Precio debe ser al menos $${VALIDATION_CONFIG.PRICE_MIN}`,
+        };
+      }
+
+      // Verificar que no exceda el máximo
+      if (price > VALIDATION_CONFIG.PRICE_MAX) {
+        return {
+          isValid: false,
+          value: 0,
+          error: `Precio no puede exceder $${VALIDATION_CONFIG.PRICE_MAX.toLocaleString("es-CL")}`,
+        };
+      }
+
+      return { isValid: true, value: price };
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar texto general
+    // Verifica longitud y caracteres seguros
+    // ============================================
+    function validateText(
+      text: string,
+      fieldName: string,
+      minLength: number,
+      maxLength: number,
+      allowSpecialChars: boolean = false,
+    ): { isValid: boolean; value: string; error?: string } {
+      if (!text || typeof text !== "string") {
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} es requerido`,
+        };
+      }
+
+      const trimmedText = text.trim();
+
+      // Verificar longitud mínima
+      if (trimmedText.length < minLength) {
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} debe tener al menos ${minLength} caracteres`,
+        };
+      }
+
+      // Verificar longitud máxima
+      if (trimmedText.length > maxLength) {
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} no puede exceder ${maxLength} caracteres`,
+        };
+      }
+
+      // Detectar posibles inyecciones de script
+      if (VALIDATION_CONFIG.PATTERNS.SCRIPT_INJECTION.test(trimmedText)) {
+        console.warn(
+          `[SEGURIDAD] Intento de inyección de script detectado en ${fieldName}`,
+        );
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} contiene contenido no permitido`,
+        };
+      }
+
+      // Detectar HTML peligroso
+      if (VALIDATION_CONFIG.PATTERNS.HTML_INJECTION.test(trimmedText)) {
+        console.warn(
+          `[SEGURIDAD] Intento de inyección HTML detectado en ${fieldName}`,
+        );
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} contiene HTML no permitido`,
+        };
+      }
+
+      // Si no permite caracteres especiales, validar contra patrón seguro
+      if (
+        !allowSpecialChars &&
+        !VALIDATION_CONFIG.PATTERNS.SAFE_TEXT.test(trimmedText)
+      ) {
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} contiene caracteres no permitidos`,
+        };
+      }
+
+      return { isValid: true, value: sanitizeText(trimmedText) };
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar servicio completo
+    // Ejecuta todas las validaciones y retorna errores
+    // ============================================
+    function validateServicio(data: {
+      nombre: string;
+      descripcion: string;
+      imagen: string;
+      alt: string;
+      hasPrice: boolean;
+      precioRaw?: string;
+      priceLabel?: string;
+    }): ValidationResult {
+      const errors: string[] = [];
+
+      // Validar nombre
+      const nombreValidation = validateText(
+        data.nombre,
+        "Nombre del servicio",
+        VALIDATION_CONFIG.NAME_MIN_LENGTH,
+        VALIDATION_CONFIG.NAME_MAX_LENGTH,
+      );
+      if (!nombreValidation.isValid) errors.push(nombreValidation.error!);
+
+      // Validar descripción (permitir más caracteres especiales)
+      const descripcionValidation = validateText(
+        data.descripcion,
+        "Descripción",
+        VALIDATION_CONFIG.DESCRIPTION_MIN_LENGTH,
+        VALIDATION_CONFIG.DESCRIPTION_MAX_LENGTH,
+        true, // Permitir caracteres especiales en descripción
+      );
+      if (!descripcionValidation.isValid)
+        errors.push(descripcionValidation.error!);
+
+      // Validar URL de imagen
+      const imagenValidation = validateUrl(data.imagen);
+      if (!imagenValidation.isValid)
+        errors.push(`Imagen: ${imagenValidation.error}`);
+
+      // Validar texto alternativo
+      const altValidation = validateText(
+        data.alt,
+        "Texto alternativo",
+        VALIDATION_CONFIG.ALT_MIN_LENGTH,
+        VALIDATION_CONFIG.ALT_MAX_LENGTH,
+      );
+      if (!altValidation.isValid) errors.push(altValidation.error!);
+
+      // Validar precio si el servicio tiene precio definido
+      if (data.hasPrice) {
+        if (!data.precioRaw || data.precioRaw.trim() === "") {
+          errors.push(
+            "Precio es requerido cuando el servicio tiene precio definido",
+          );
+        } else {
+          const precioValidation = validatePrice(data.precioRaw);
+          if (!precioValidation.isValid) errors.push(precioValidation.error!);
+        }
+
+        // Validar etiqueta de precio si existe
+        if (data.priceLabel && data.priceLabel.trim() !== "") {
+          const priceLabelValidation = validateText(
+            data.priceLabel,
+            "Etiqueta de precio",
+            1,
+            VALIDATION_CONFIG.PRICE_LABEL_MAX_LENGTH,
+          );
+          if (!priceLabelValidation.isValid)
+            errors.push(priceLabelValidation.error!);
+        }
+      }
+
+      return {
+        isValid: errors.length === 0,
+        errors,
+      };
+    }
+
+    // ============================================
+    // FUNCIÓN: Mostrar errores de validación
+    // Muestra los errores en un modal estilizado acorde a la UI
+    // ============================================
+    function showValidationErrors(errors: string[]): void {
+      // Crear el contenedor del modal si no existe
+      let modalContainer = document.getElementById("validationErrorModal");
+      if (!modalContainer) {
+        modalContainer = document.createElement("div");
+        modalContainer.id = "validationErrorModal";
+        modalContainer.className = "modal fade";
+        modalContainer.setAttribute("tabindex", "-1");
+        modalContainer.setAttribute("aria-hidden", "true");
+        modalContainer.innerHTML = `
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+              <div class="modal-header border-0 bg-danger bg-opacity-10">
+                <div class="d-flex align-items-center">
+                  <div class="rounded-circle bg-danger bg-opacity-25 p-2 me-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                  </div>
+                  <h5 class="modal-title fw-bold text-danger mb-0">
+                    Error de Validación
+                  </h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body py-4">
+                <p class="text-muted mb-3">Por favor corrige los siguientes errores:</p>
+                <div id="validationErrorList" class="validation-error-list"></div>
+              </div>
+              <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">
+                  <i class="bi bi-check-lg me-2"></i>Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modalContainer);
+      }
+
+      // Generar lista de errores con iconos
+      const errorListHtml = errors
+        .map(
+          (error) => `
+        <div class="d-flex align-items-start mb-2 p-2 bg-light rounded">
+          <i class="bi bi-x-circle-fill text-danger me-2 mt-1"></i>
+          <span class="text-dark">${error}</span>
+        </div>
+      `,
+        )
+        .join("");
+
+      const errorListEl = document.getElementById("validationErrorList");
+      if (errorListEl) {
+        errorListEl.innerHTML = errorListHtml;
+      }
+
+      // Mostrar el modal
+      const modal = new bootstrap.Modal(modalContainer);
+      modal.show();
+
+      // Log para debugging
+      console.warn("[VALIDACIÓN] Errores mostrados:", errors);
+    }
+
+    // ============================================
+    // FUNCIÓN: Mostrar toast de éxito/info/warning
+    // Toast estilizado con animaciones y diferentes tipos
+    // ============================================
+    function showToast(
+      message: string,
+      type: "success" | "info" | "warning" | "danger" = "info",
+    ) {
+      // Configuración de iconos y colores según tipo
+      const config = {
+        success: {
+          icon: "bi-check-circle-fill",
+          bg: "bg-success",
+          title: "Éxito",
+        },
+        info: {
+          icon: "bi-info-circle-fill",
+          bg: "bg-info",
+          title: "Información",
+        },
+        warning: {
+          icon: "bi-exclamation-triangle-fill",
+          bg: "bg-warning",
+          title: "Advertencia",
+        },
+        danger: { icon: "bi-x-circle-fill", bg: "bg-danger", title: "Error" },
+      };
+
+      const { icon, bg, title } = config[type];
+
+      // Crear contenedor de toasts si no existe
+      let toastContainer = document.getElementById("toast-container");
+      if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "toast-container";
+        toastContainer.className = "position-fixed top-0 end-0 p-3";
+        toastContainer.style.zIndex = "9999";
+        document.body.appendChild(toastContainer);
+      }
+
+      // Crear el toast
+      const toastId = `toast-${Date.now()}`;
+      const toastEl = document.createElement("div");
+      toastEl.id = toastId;
+      toastEl.className = "toast show border-0 shadow-lg";
+      toastEl.setAttribute("role", "alert");
+      toastEl.style.animation = "slideInRight 0.3s ease-out";
+      toastEl.innerHTML = `
+        <div class="toast-header ${bg} bg-opacity-10 border-0">
+          <i class="bi ${icon} ${bg.replace("bg-", "text-")} me-2"></i>
+          <strong class="me-auto ${bg.replace("bg-", "text-")}">${title}</strong>
+          <small class="text-muted">Ahora</small>
+          <button type="button" class="btn-close" onclick="this.closest('.toast').remove()"></button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      `;
+
+      toastContainer.appendChild(toastEl);
+
+      // Auto-remover después de 4 segundos con animación de salida
+      setTimeout(() => {
+        toastEl.style.animation = "slideOutRight 0.3s ease-in";
+        setTimeout(() => toastEl.remove(), 300);
+      }, 4000);
+    }
+
+    // ============================================
+    // FUNCIÓN: Mostrar alerta inline en el formulario
+    // Para feedback inmediato en campos específicos
+    // ============================================
+    function showFieldError(fieldId: string, message: string): void {
+      const field = document.getElementById(fieldId);
+      if (!field) return;
+
+      // Agregar clase de error al campo
+      field.classList.add("is-invalid");
+
+      // Crear mensaje de error si no existe
+      let errorDiv = field.parentElement?.querySelector(".invalid-feedback");
+      if (!errorDiv) {
+        errorDiv = document.createElement("div");
+        errorDiv.className = "invalid-feedback";
+        field.parentElement?.appendChild(errorDiv);
+      }
+      errorDiv.textContent = message;
+    }
+
+    // ============================================
+    // FUNCIÓN: Limpiar errores de campos
+    // ============================================
+    function clearFieldErrors(): void {
+      document.querySelectorAll(".is-invalid").forEach((el) => {
+        el.classList.remove("is-invalid");
+      });
+    }
 
     // Paginación
     const ITEMS_PER_PAGE = 10;
@@ -765,9 +1410,12 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       }
     };
 
-    // Guardar servicio
-    // Guardar servicio
+    // ============================================
+    // FUNCIÓN: Guardar servicio
+    // Valida todos los campos antes de guardar en Firestore
+    // ============================================
     window.saveServicio = async function () {
+      // Obtener valores del formulario
       const nombre = (document.getElementById("nombre") as HTMLInputElement)
         .value;
       const descripcion = (
@@ -781,63 +1429,95 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       const activo = (document.getElementById("activo") as HTMLInputElement)
         .checked;
 
-      let precio = "";
+      let precioRaw = "";
       let priceLabel = "";
 
       if (hasPrice) {
-        const precioRaw = (
-          document.getElementById("precio") as HTMLInputElement
-        ).value;
-        precio = "$" + parseInt(precioRaw).toLocaleString("es-CL");
+        precioRaw = (document.getElementById("precio") as HTMLInputElement)
+          .value;
         priceLabel = (document.getElementById("priceLabel") as HTMLInputElement)
           .value;
       }
 
-      if (!nombre || !descripcion || !imagen || !alt) {
-        alert("Por favor, completa todos los campos obligatorios");
-        return;
-      }
-
-      if (
-        hasPrice &&
-        !(document.getElementById("precio") as HTMLInputElement).value
-      ) {
-        alert("Por favor, ingresa el precio");
-        return;
-      }
-
-      const servicioData = {
-        name: nombre,
-        description: descripcion,
-        image: imagen,
-        alt: alt,
+      // ============================================
+      // VALIDACIÓN COMPLETA DEL SERVICIO
+      // Ejecutar todas las validaciones antes de guardar
+      // ============================================
+      const validationResult = validateServicio({
+        nombre,
+        descripcion,
+        imagen,
+        alt,
         hasPrice,
-        price: precio,
+        precioRaw,
         priceLabel,
-        activo,
+      });
+
+      // Si hay errores de validación, mostrarlos y no continuar
+      if (!validationResult.isValid) {
+        showValidationErrors(validationResult.errors);
+        console.warn(
+          "[VALIDACIÓN] Errores encontrados:",
+          validationResult.errors,
+        );
+        return;
+      }
+
+      // ============================================
+      // SANITIZACIÓN DE DATOS
+      // Limpiar y formatear los datos validados
+      // ============================================
+      let precio = "";
+      let priceLabelSanitized = "";
+
+      if (hasPrice) {
+        const precioValidado = validatePrice(precioRaw);
+        precio = "$" + precioValidado.value.toLocaleString("es-CL");
+        priceLabelSanitized = sanitizeText(priceLabel);
+      }
+
+      // Construir objeto de servicio con datos sanitizados
+      const servicioData = {
+        name: sanitizeText(nombre),
+        description: sanitizeText(descripcion),
+        image: imagen.trim(), // URL ya validada
+        alt: sanitizeText(alt),
+        hasPrice: Boolean(hasPrice),
+        price: precio,
+        priceLabel: priceLabelSanitized,
+        activo: Boolean(activo),
         updatedAt: new Date(),
         createdAt: null as Date | null,
       };
 
+      // ============================================
+      // GUARDAR EN FIRESTORE
+      // Crear o actualizar según el contexto
+      // ============================================
       try {
         if (editingId) {
+          // Modo edición: actualizar documento existente
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { createdAt: _, ...updateData } = servicioData;
           await updateDoc(doc(db, "services", editingId), updateData);
           showToast("Servicio actualizado exitosamente", "success");
+          console.log("[CRUD] Servicio actualizado:", editingId);
         } else {
+          // Modo creación: agregar nuevo documento
           servicioData.createdAt = new Date();
-          await addDoc(servicesCollection, servicioData);
+          const docRef = await addDoc(servicesCollection, servicioData);
           showToast("Servicio creado exitosamente", "success");
+          console.log("[CRUD] Servicio creado:", docRef.id);
         }
 
+        // Cerrar modal después de guardar exitosamente
         const modal = bootstrap.Modal.getInstance(
           document.getElementById("servicioModal"),
         );
         modal?.hide();
       } catch (e) {
-        console.error("Error saving service:", e);
-        alert("Error al guardar el servicio");
+        console.error("[ERROR] Error al guardar servicio:", e);
+        alert("Error al guardar el servicio. Por favor intente nuevamente.");
       }
     };
 
@@ -852,20 +1532,6 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       currentPage = 1; // Reset a página 1 al filtrar
       renderTable(filteredServices);
     });
-
-    function showToast(message: string, type = "info") {
-      const toast = document.createElement("div");
-      toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
-      toast.style.zIndex = "9999";
-      toast.innerHTML = `
-        <div class="d-flex align-items-center">
-          <i class="bi bi-check-circle me-2"></i>
-          <span>${message}</span>
-        </div>
-      `;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
   </script>
 
   <!-- Bootstrap JS Bundle -->

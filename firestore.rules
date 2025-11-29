@@ -25,23 +25,161 @@ service cloud.firestore {
     }
 
     // ============================================
+    // FUNCIONES DE VALIDACIÓN DE DATOS
+    // Prevenir inyección de datos maliciosos
+    // ============================================
+
+    // Valida que un string no exceda el límite de caracteres
+    // @param value - El valor a validar
+    // @param maxLength - Longitud máxima permitida
+    function isValidStringLength(value, maxLength) {
+      return value is string && value.size() <= maxLength;
+    }
+
+    // Valida que un string tenga una longitud mínima
+    // @param value - El valor a validar
+    // @param minLength - Longitud mínima requerida
+    function hasMinLength(value, minLength) {
+      return value is string && value.size() >= minLength;
+    }
+
+    // Valida que un número esté dentro de un rango
+    // @param value - El número a validar
+    // @param min - Valor mínimo permitido
+    // @param max - Valor máximo permitido
+    function isInRange(value, min, max) {
+      return value is number && value >= min && value <= max;
+    }
+
+    // Valida que un número no sea negativo
+    // @param value - El número a validar
+    function isNonNegative(value) {
+      return value is number && value >= 0;
+    }
+
+    // Valida que un número sea un entero positivo
+    // @param value - El número a validar
+    function isPositiveInteger(value) {
+      return value is int && value >= 0;
+    }
+
+    // Valida que una URL sea válida (http/https)
+    // Nota: Firestore rules no soporta regex completo, 
+    // validación básica por prefijo
+    // @param url - La URL a validar
+    function isValidUrl(url) {
+      return url is string && 
+             url.size() <= 2048 &&
+             (url.matches('^https://.*') || url.matches('^http://.*'));
+    }
+
+    // Valida que un string no contenga patrones peligrosos
+    // Detecta intentos de inyección de script
+    // @param value - El valor a validar
+    function isSafeString(value) {
+      return value is string &&
+             !value.lower().matches('.*<script.*') &&
+             !value.lower().matches('.*javascript:.*') &&
+             !value.lower().matches('.*onerror.*') &&
+             !value.lower().matches('.*onclick.*') &&
+             !value.lower().matches('.*onload.*');
+    }
+
+    // ============================================
     // COLECCIÓN: products
-    // Lectura pública, escritura solo admin
+    // Lectura pública, escritura solo admin con validación
     // ============================================
     match /products/{productId} {
       allow read: if true;
+      
       // Solo admin puede crear/modificar/eliminar productos
-      allow write: if isAdmin();
+      // Con validaciones de seguridad en los datos
+      allow create: if isAdmin() && isValidProduct(request.resource.data);
+      allow update: if isAdmin() && isValidProduct(request.resource.data);
+      allow delete: if isAdmin();
+      
+      // Función de validación para productos
+      // Valida todos los campos requeridos y sus restricciones
+      function isValidProduct(data) {
+        return data.keys().hasAll(['name', 'categoria', 'description', 'price', 'stock', 'image', 'alt', 'activo', 'destacado']) &&
+               // Validar nombre: string, 3-100 caracteres, seguro
+               data.name is string &&
+               hasMinLength(data.name, 3) &&
+               isValidStringLength(data.name, 100) &&
+               isSafeString(data.name) &&
+               // Validar categoría: debe ser una de las permitidas (whitelist)
+               data.categoria in ['Pizza', 'Ensalada', 'Bebidas', 'Desayuno', 'Carnes'] &&
+               // Validar descripción: string, 10-1000 caracteres, seguro
+               data.description is string &&
+               hasMinLength(data.description, 10) &&
+               isValidStringLength(data.description, 1000) &&
+               isSafeString(data.description) &&
+               // Validar precio: string formateado ($X.XXX)
+               data.price is string &&
+               isValidStringLength(data.price, 20) &&
+               // Validar stock: entero no negativo, máximo 999999
+               isPositiveInteger(data.stock) &&
+               isInRange(data.stock, 0, 999999) &&
+               // Validar URL de imagen
+               isValidUrl(data.image) &&
+               // Validar texto alternativo: string, 5-200 caracteres, seguro
+               data.alt is string &&
+               hasMinLength(data.alt, 5) &&
+               isValidStringLength(data.alt, 200) &&
+               isSafeString(data.alt) &&
+               // Validar campos booleanos
+               data.activo is bool &&
+               data.destacado is bool;
+      }
     }
 
     // ============================================
     // COLECCIÓN: services
-    // Lectura pública, escritura solo admin
+    // Lectura pública, escritura solo admin con validación
     // ============================================
     match /services/{serviceId} {
       allow read: if true;
+      
       // Solo admin puede crear/modificar/eliminar servicios
-      allow write: if isAdmin();
+      // Con validaciones de seguridad en los datos
+      allow create: if isAdmin() && isValidService(request.resource.data);
+      allow update: if isAdmin() && isValidService(request.resource.data);
+      allow delete: if isAdmin();
+      
+      // Función de validación para servicios
+      // Valida todos los campos requeridos y sus restricciones
+      function isValidService(data) {
+        return data.keys().hasAll(['name', 'description', 'image', 'alt', 'hasPrice', 'activo']) &&
+               // Validar nombre: string, 5-150 caracteres, seguro
+               data.name is string &&
+               hasMinLength(data.name, 5) &&
+               isValidStringLength(data.name, 150) &&
+               isSafeString(data.name) &&
+               // Validar descripción: string, 20-2000 caracteres, seguro
+               data.description is string &&
+               hasMinLength(data.description, 20) &&
+               isValidStringLength(data.description, 2000) &&
+               isSafeString(data.description) &&
+               // Validar URL de imagen
+               isValidUrl(data.image) &&
+               // Validar texto alternativo: string, 5-200 caracteres, seguro
+               data.alt is string &&
+               hasMinLength(data.alt, 5) &&
+               isValidStringLength(data.alt, 200) &&
+               isSafeString(data.alt) &&
+               // Validar campo hasPrice: booleano
+               data.hasPrice is bool &&
+               // Validar precio si hasPrice es true
+               (data.hasPrice == false || (
+                 data.price is string &&
+                 isValidStringLength(data.price, 20)
+               )) &&
+               // Validar priceLabel si existe
+               (!('priceLabel' in data.keys()) || 
+                (data.priceLabel is string && isValidStringLength(data.priceLabel, 50))) &&
+               // Validar campo activo: booleano
+               data.activo is bool;
+      }
     }
 
     // ============================================

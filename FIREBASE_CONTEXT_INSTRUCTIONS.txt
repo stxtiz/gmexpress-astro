@@ -386,6 +386,279 @@ CONTRASEÑA:
 - Validación delegada a Firebase Auth
 
 ================================================================================
+                  VALIDACIONES DE SEGURIDAD - CRUD ADMIN
+================================================================================
+
+ARCHIVOS AFECTADOS:
+- src/pages/admin/productos/index.astro
+- src/pages/admin/servicios/index.astro
+- firestore.rules
+
+--------------------------------------------------------------------------------
+                    VALIDACIONES EN CLIENTE (JavaScript)
+--------------------------------------------------------------------------------
+
+CONFIGURACIÓN CENTRALIZADA (VALIDATION_CONFIG):
+```javascript
+const VALIDATION_CONFIG = {
+  // PRODUCTOS
+  NAME_MAX_LENGTH: 100,           // Máximo caracteres para nombre
+  NAME_MIN_LENGTH: 3,             // Mínimo caracteres para nombre
+  DESCRIPTION_MAX_LENGTH: 1000,   // Máximo caracteres para descripción
+  DESCRIPTION_MIN_LENGTH: 10,     // Mínimo caracteres para descripción
+  ALT_MAX_LENGTH: 200,            // Máximo para texto alternativo
+  ALT_MIN_LENGTH: 5,              // Mínimo para texto alternativo
+  
+  // SERVICIOS
+  SERVICE_NAME_MAX: 150,          // Máximo nombre servicio
+  SERVICE_NAME_MIN: 5,            // Mínimo nombre servicio
+  SERVICE_DESC_MAX: 2000,         // Máximo descripción servicio
+  SERVICE_DESC_MIN: 20,           // Mínimo descripción servicio
+  PRICE_LABEL_MAX: 50,            // Máximo etiqueta precio
+  
+  // NUMÉRICOS
+  PRICE_MAX: 99999999,            // Precio máximo ($99.999.999)
+  PRICE_MIN: 1,                   // Precio mínimo ($1)
+  STOCK_MAX: 999999,              // Stock máximo
+  STOCK_MIN: 0,                   // Stock mínimo (no negativos)
+  
+  // CATEGORÍAS PERMITIDAS (whitelist)
+  ALLOWED_CATEGORIES: ["Pizza", "Ensalada", "Bebidas", "Desayuno", "Carnes"],
+  
+  // PATRONES DE DETECCIÓN DE ATAQUES
+  PATTERNS: {
+    URL: /^https?:\/\/[^\s<>"{}|\\^`[\]]+$/i,
+    SAFE_TEXT: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.,\-()¡!¿?&%$#@*+=:;'"]+$/,
+    SCRIPT_INJECTION: /<script[\s\S]*?>[\s\S]*?<\/script>|javascript:|on\w+\s*=/gi,
+    HTML_INJECTION: /<[^>]*(iframe|object|embed|form|input|button|meta|link|style)[^>]*>/gi,
+    NUMBERS_ONLY: /^\d+$/
+  }
+};
+```
+
+FUNCIONES DE VALIDACIÓN IMPLEMENTADAS:
+
+1. sanitizeText(input: string): string
+   - Elimina tags HTML
+   - Escapa caracteres especiales (&, <, >, ", ')
+   - Elimina caracteres de control
+   - Previene ataques XSS
+
+2. validateUrl(url: string): { isValid, error? }
+   - Verifica prefijo http:// o https://
+   - Bloquea javascript: y data:
+   - Máximo 2048 caracteres
+
+3. validatePrice(priceRaw: string): { isValid, value, error? }
+   - DETECTA NÚMEROS NEGATIVOS antes de limpiar el string
+   - Verifica rango $1 - $99.999.999
+   - Solo acepta números enteros positivos
+   - Error específico: "El precio no puede ser negativo"
+
+4. validateStock(stockRaw: string): { isValid, value, error? }
+   - Solo números enteros no negativos
+   - Rango: 0 - 999.999
+   - Previene números negativos
+
+5. validateText(text, fieldName, min, max, allowSpecial): { isValid, value, error? }
+   - Verifica longitud mínima y máxima
+   - Detecta inyección de scripts
+   - Detecta HTML peligroso
+
+6. validateCategory(category: string): { isValid, error? }
+   - Valida contra whitelist de categorías
+   - Previene categorías manipuladas
+
+7. validateProducto(data): ValidationResult
+   - Ejecuta todas las validaciones
+   - Retorna array de errores
+
+8. validateServicio(data): ValidationResult
+   - Ejecuta todas las validaciones para servicios
+   - Valida precio condicionalmente (si hasPrice=true)
+
+--------------------------------------------------------------------------------
+                    UI DE ALERTAS DE VALIDACIÓN
+--------------------------------------------------------------------------------
+
+MODAL DE ERRORES (showValidationErrors):
+- Modal centrado con Bootstrap 5
+- Header rojo con icono de advertencia
+- Lista de errores con iconos individuales
+- Botón "Entendido" para cerrar
+- Animación fade de entrada
+
+TOASTS DE NOTIFICACIÓN (showToast):
+- Tipos: success, info, warning, danger
+- Iconos y colores específicos por tipo
+- Animaciones slideInRight / slideOutRight
+- Auto-cierre después de 4 segundos
+
+ESTILOS CSS PERSONALIZADOS:
+```css
+@keyframes slideInRight { /* Entrada desde derecha */ }
+@keyframes slideOutRight { /* Salida hacia derecha */ }
+@keyframes shake { /* Vibración para campos con error */ }
+
+.is-invalid {
+  border-color: #dc3545 !important;
+  animation: shake 0.5s ease-in-out;
+}
+
+.validation-error-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+```
+
+--------------------------------------------------------------------------------
+                    VALIDACIONES HTML5 EN FORMULARIOS
+--------------------------------------------------------------------------------
+
+PRODUCTOS - Campos del formulario:
+┌──────────────┬────────────┬────────────┬─────────────────────────────────┐
+│ Campo        │ Min Length │ Max Length │ Otras restricciones             │
+├──────────────┼────────────┼────────────┼─────────────────────────────────┤
+│ nombre       │ 3          │ 100        │ pattern de caracteres seguros   │
+│ descripcion  │ 10         │ 1000       │ textarea                        │
+│ precio       │ -          │ -          │ type=number, min=1, max=99999999│
+│ stock        │ -          │ -          │ type=number, min=0, max=999999  │
+│ imagen       │ -          │ 2048       │ type=url, pattern ^https?://    │
+│ alt          │ 5          │ 200        │ texto alternativo accesibilidad │
+└──────────────┴────────────┴────────────┴─────────────────────────────────┘
+
+SERVICIOS - Campos del formulario:
+┌──────────────┬────────────┬────────────┬─────────────────────────────────┐
+│ Campo        │ Min Length │ Max Length │ Otras restricciones             │
+├──────────────┼────────────┼────────────┼─────────────────────────────────┤
+│ nombre       │ 5          │ 150        │ pattern de caracteres seguros   │
+│ descripcion  │ 20         │ 2000       │ textarea                        │
+│ precio       │ -          │ -          │ type=number, min=1, max=99999999│
+│ priceLabel   │ -          │ 50         │ etiqueta opcional               │
+│ imagen       │ -          │ 2048       │ type=url, pattern ^https?://    │
+│ alt          │ 5          │ 200        │ texto alternativo accesibilidad │
+└──────────────┴────────────┴────────────┴─────────────────────────────────┘
+
+--------------------------------------------------------------------------------
+                    VALIDACIONES EN SERVIDOR (Firestore Rules)
+--------------------------------------------------------------------------------
+
+FUNCIONES HELPER EN firestore.rules:
+
+1. isValidStringLength(value, maxLength)
+   - Valida que string no exceda límite
+
+2. hasMinLength(value, minLength)
+   - Valida longitud mínima
+
+3. isInRange(value, min, max)
+   - Valida rango numérico
+
+4. isNonNegative(value)
+   - Valida número >= 0
+
+5. isPositiveInteger(value)
+   - Valida entero positivo
+
+6. isValidUrl(url)
+   - Valida URL http/https
+
+7. isSafeString(value)
+   - Detecta patrones de inyección:
+     * <script
+     * javascript:
+     * onerror
+     * onclick
+     * onload
+
+REGLAS PARA PRODUCTS:
+```
+function isValidProduct(data) {
+  return data.keys().hasAll([...campos requeridos...]) &&
+         // Nombre: 3-100 caracteres, seguro
+         hasMinLength(data.name, 3) &&
+         isValidStringLength(data.name, 100) &&
+         isSafeString(data.name) &&
+         // Categoría: whitelist
+         data.categoria in ['Pizza', 'Ensalada', 'Bebidas', 'Desayuno', 'Carnes'] &&
+         // Descripción: 10-1000 caracteres, seguro
+         hasMinLength(data.description, 10) &&
+         isValidStringLength(data.description, 1000) &&
+         isSafeString(data.description) &&
+         // Stock: entero 0-999999
+         isPositiveInteger(data.stock) &&
+         isInRange(data.stock, 0, 999999) &&
+         // URL imagen válida
+         isValidUrl(data.image) &&
+         // Alt: 5-200 caracteres, seguro
+         hasMinLength(data.alt, 5) &&
+         isValidStringLength(data.alt, 200) &&
+         isSafeString(data.alt) &&
+         // Booleanos
+         data.activo is bool &&
+         data.destacado is bool;
+}
+```
+
+REGLAS PARA SERVICES:
+```
+function isValidService(data) {
+  return data.keys().hasAll([...campos requeridos...]) &&
+         // Nombre: 5-150 caracteres, seguro
+         hasMinLength(data.name, 5) &&
+         isValidStringLength(data.name, 150) &&
+         isSafeString(data.name) &&
+         // Descripción: 20-2000 caracteres, seguro
+         hasMinLength(data.description, 20) &&
+         isValidStringLength(data.description, 2000) &&
+         isSafeString(data.description) &&
+         // URL imagen válida
+         isValidUrl(data.image) &&
+         // Alt: 5-200 caracteres, seguro
+         hasMinLength(data.alt, 5) &&
+         isValidStringLength(data.alt, 200) &&
+         isSafeString(data.alt) &&
+         // Precio condicional
+         (data.hasPrice == false || data.price is string) &&
+         // PriceLabel opcional
+         (!('priceLabel' in data.keys()) || isValidStringLength(data.priceLabel, 50)) &&
+         data.activo is bool;
+}
+```
+
+--------------------------------------------------------------------------------
+                    PROTECCIONES IMPLEMENTADAS
+--------------------------------------------------------------------------------
+
+✅ XSS (Cross-Site Scripting)
+   - Sanitización de HTML y scripts en cliente
+   - Detección de patrones en Firestore Rules
+
+✅ Inyección de datos maliciosos
+   - Detección de <script>, javascript:, eventos on*
+   - Bloqueo en cliente y servidor
+
+✅ Números negativos
+   - Precio: detecta signo "-" ANTES de procesar
+   - Stock: validación min=0
+
+✅ Categorías manipuladas
+   - Whitelist en cliente (VALIDATION_CONFIG)
+   - Whitelist en servidor (Firestore Rules)
+
+✅ URLs maliciosas
+   - Bloqueo de javascript: y data:
+   - Solo http:// y https://
+
+✅ Overflow de datos
+   - Límites de longitud en todos los campos
+   - Validación en cliente Y servidor
+
+✅ Manipulación de IDs
+   - IDs generados por Firestore (no manipulables)
+   - Validación de userId en pedidos
+
+================================================================================
                         CONSIDERACIONES TÉCNICAS
 ================================================================================
 
