@@ -13,7 +13,11 @@ import { collection, getDocs, query, where, limit } from "firebase/firestore";
 
 // Fetch Featured Products
 const productsCollection = collection(db, "products");
-const qProducts = query(productsCollection, where("destacado", "==", true), limit(4));
+const qProducts = query(
+  productsCollection,
+  where("destacado", "==", true),
+  limit(4),
+);
 const productsSnapshot = await getDocs(qProducts);
 const products = productsSnapshot.docs.map((doc) => ({
   name: doc.data().name,
@@ -25,9 +29,14 @@ const products = productsSnapshot.docs.map((doc) => ({
 
 // Fetch Active Services
 const servicesCollection = collection(db, "services");
-const qServices = query(servicesCollection, where("activo", "==", true), limit(3));
+const qServices = query(
+  servicesCollection,
+  where("activo", "==", true),
+  limit(3),
+);
 const servicesSnapshot = await getDocs(qServices);
 const services = servicesSnapshot.docs.map((doc) => ({
+  id: doc.id,
   name: doc.data().name,
   description: doc.data().description,
   image: doc.data().image,
@@ -92,10 +101,14 @@ const features = [
           Nuestros Servicios
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
-            {services.map((service) => <ServiceCard {...service} />)}
+          {services.map((service) => <ServiceCard {...service} />)}
         </div>
         <div class="flex justify-center mt-8">
-            <a href="/servicios" class="inline-flex items-center justify-center bg-primary text-white hover:bg-primary/90 transition-colors rounded-full px-6 py-2 font-bold">Ver todos los servicios</a>
+          <a
+            href="/servicios"
+            class="inline-flex items-center justify-center bg-primary text-white hover:bg-primary/90 transition-colors rounded-full px-6 py-2 font-bold"
+            >Ver todos los servicios</a
+          >
         </div>
       </div>
     </section>
@@ -175,6 +188,160 @@ const features = [
       </div>
     </section>
   </main>
+
+  <!-- Modal de Detalle del Servicio -->
+  <div
+    id="service-detail-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm"
+  >
+    <div
+      class="relative w-full max-w-2xl mx-4 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+    >
+      <button
+        id="close-service-modal"
+        class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-primary/10 transition-colors"
+      >
+        <span
+          class="material-symbols-outlined text-slate-700 dark:text-slate-300"
+          >close</span
+        >
+      </button>
+
+      <div id="service-modal-content">
+        <!-- Contenido inyectado dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // MODAL DE DETALLE DE SERVICIO EN INDEX
+    // ============================================
+
+    function showServiceDetail(
+      id: string,
+      name: string,
+      price: string,
+      priceLabel: string,
+      image: string,
+      alt: string,
+      description: string,
+      hasPrice: boolean,
+    ): void {
+      const modal = document.getElementById("service-detail-modal");
+      const modalContent = document.getElementById("service-modal-content");
+
+      if (!modal || !modalContent) return;
+
+      const priceDisplay =
+        hasPrice && price
+          ? `<p class="text-4xl font-bold text-primary mb-2">${price}${priceLabel ? ` <span class="text-xl text-slate-500">${priceLabel}</span>` : ""}</p>`
+          : `<p class="text-xl text-slate-500 mb-2">Precio: Según cotización</p>`;
+
+      // Botón según si tiene precio o necesita cotización
+      const actionButton = hasPrice
+        ? `<a href="/servicios" class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-colors">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <span>Ver en Servicios</span>
+          </a>`
+        : `<a
+            href="/solicitud-cotizacion?servicio=${encodeURIComponent(name)}"
+            class="w-full flex items-center justify-center gap-2 rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-colors"
+          >
+            <span class="material-symbols-outlined">request_quote</span>
+            <span>Solicitar Cotización</span>
+          </a>`;
+
+      modalContent.innerHTML = `
+        <div class="relative">
+          <img
+            src="${image}"
+            alt="${alt}"
+            class="w-full h-64 md:h-96 object-cover rounded-t-2xl"
+          />
+        </div>
+        <div class="p-6 md:p-8">
+          <h2 class="text-3xl font-bold text-slate-800 dark:text-white mb-4">
+            ${name}
+          </h2>
+          ${priceDisplay}
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-2">
+              Descripción
+            </h3>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+              ${description}
+            </p>
+          </div>
+          ${actionButton}
+        </div>
+      `;
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeServiceModal(): void {
+      const modal = document.getElementById("service-detail-modal");
+      modal?.classList.add("hidden");
+      modal?.classList.remove("flex");
+    }
+
+    // Event Listeners
+    document
+      .getElementById("close-service-modal")
+      ?.addEventListener("click", closeServiceModal);
+
+    document
+      .getElementById("service-detail-modal")
+      ?.addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) closeServiceModal();
+      });
+
+    // Manejar clics en "Ver Detalles"
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+
+      if (target.closest("[data-view-detail]")) {
+        const card = target.closest("[data-service]");
+        if (!card) return;
+
+        const serviceId = card.getAttribute("data-service-id") || "";
+        const nameEl = card.querySelector("[data-service-name]");
+        const priceEl = card.querySelector("[data-service-price]");
+        const priceLabelEl = card.querySelector("[data-price-label]");
+        const imgDiv = card.querySelector("div[style*='background-image']");
+        const descEl = card.querySelector("p.text-sm");
+        const hasPriceAttr = card.getAttribute("data-has-price") === "true";
+
+        const name = nameEl?.textContent ?? "Servicio";
+        const price = priceEl?.textContent ?? "";
+        const priceLabel = priceLabelEl?.textContent ?? "";
+
+        let image = "";
+        if (imgDiv) {
+          const style = imgDiv.getAttribute("style");
+          const match = style?.match(/url\(['"]?(.*?)['"]?\)/);
+          if (match) image = match[1];
+        }
+
+        const alt = imgDiv?.getAttribute("data-alt") ?? "";
+        const description = descEl?.textContent ?? "";
+
+        showServiceDetail(
+          serviceId,
+          name,
+          price,
+          priceLabel,
+          image,
+          alt,
+          description,
+          hasPriceAttr,
+        );
+      }
+    });
+  </script>
 
   <Footer />
 </Layout>
