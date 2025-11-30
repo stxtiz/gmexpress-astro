@@ -1,0 +1,1864 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import "../../../styles/global.css";
+import AdminGuard from "../../../components/admin/AdminGuard.astro";
+import AdminHeader from "../../../components/admin/AdminHeader.astro";
+import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
+---
+
+<Layout title="GMExpress - Admin Dashboard - Usuarios">
+  <AdminGuard />
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+    crossorigin="anonymous"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+  />
+
+  <div class="admin-dashboard min-vh-100">
+    <!-- Sidebar -->
+    <AdminSidebar activePath="/admin/usuarios" />
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <AdminHeader title="Gestión de Usuarios" />
+
+      <!-- Content Area -->
+      <div class="p-4">
+        <!-- Actions Bar -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control border-start-0 ps-0"
+                    placeholder="Buscar usuarios..."
+                    id="searchInput"
+                  />
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select class="form-select" id="roleFilter">
+                  <option value="">Todos los roles</option>
+                  <option value="admin">Administrador</option>
+                  <option value="user">Cliente</option>
+                </select>
+              </div>
+              <div class="col-md-5 text-end">
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                  <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="px-4 py-3 border-0">Nombre Completo</th>
+                    <th class="px-4 py-3 border-0">Email</th>
+                    <th class="px-4 py-3 border-0">RUT</th>
+                    <th class="px-4 py-3 border-0">Teléfono</th>
+                    <th class="px-4 py-3 border-0">Rol</th>
+                    <th class="px-4 py-3 border-0 text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="usuariosTableBody">
+                  <!-- Se llenará dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer bg-white border-top-0">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small"
+                >Mostrando <span id="showing-count">0</span> de <span
+                  id="total-count">0</span
+                > usuarios</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Crear/Editar Usuario -->
+  <div
+    class="modal fade"
+    id="usuarioModal"
+    tabindex="-1"
+    aria-labelledby="usuarioModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="usuarioModalLabel">
+            Nuevo Usuario
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="usuarioForm">
+            <input type="hidden" id="userId" />
+
+            <!-- Información Personal -->
+            <h6 class="fw-bold mb-3 text-primary">Información Personal</h6>
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <label for="firstName" class="form-label fw-semibold"
+                  >Nombre <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  required
+                />
+              </div>
+              <div class="col-md-4">
+                <label for="lastNamePaterno" class="form-label fw-semibold"
+                  >Apellido Paterno <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastNamePaterno"
+                  required
+                />
+              </div>
+              <div class="col-md-4">
+                <label for="lastNameMaterno" class="form-label fw-semibold"
+                  >Apellido Materno <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastNameMaterno"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="rut" class="form-label fw-semibold"
+                  >RUT <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="rut"
+                  placeholder="12.345.678-9"
+                  maxlength="12"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="phone" class="form-label fw-semibold"
+                  >Teléfono <span class="text-danger">*</span></label
+                >
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="phone"
+                  placeholder="+56 9 1234 5678"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Cuenta y Rol -->
+            <h6 class="fw-bold mb-3 text-primary">Cuenta y Rol</h6>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="email" class="form-label fw-semibold"
+                  >Email <span class="text-danger">*</span></label
+                >
+                <input type="email" class="form-control" id="email" required />
+              </div>
+              <div class="col-md-6">
+                <label for="role" class="form-label fw-semibold"
+                  >Rol <span class="text-danger">*</span></label
+                >
+                <select class="form-select" id="role" required>
+                  <option value="user">Cliente (Usuario Normal)</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
+              <!-- Password fields only visible in create mode -->
+              <div class="col-md-6 password-field">
+                <label for="password" class="form-label fw-semibold"
+                  >Contraseña <span class="text-danger">*</span></label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  placeholder="Mínimo 8 caracteres"
+                />
+                <div class="form-text text-muted">
+                  Incluir mayúsculas, minúsculas, números y carácter especial
+                  (!@#$%^&*)
+                </div>
+              </div>
+              <div class="col-md-6 password-field">
+                <label for="confirmPassword" class="form-label fw-semibold"
+                  >Confirmar Contraseña <span class="text-danger">*</span
+                  ></label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="confirmPassword"
+                />
+              </div>
+            </div>
+
+            <!-- Dirección -->
+            <h6 class="fw-bold mb-3 text-primary">Dirección</h6>
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="address" class="form-label fw-semibold"
+                  >Calle y Número <span class="text-danger">*</span></label
+                >
+                <input type="text" class="form-control" id="address" required />
+              </div>
+              <div class="col-md-6">
+                <label for="region" class="form-label fw-semibold"
+                  >Región <span class="text-danger">*</span></label
+                >
+                <select class="form-select" id="region" required>
+                  <option value="">Selecciona una región</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="comuna" class="form-label fw-semibold"
+                  >Comuna <span class="text-danger">*</span></label
+                >
+                <select class="form-select" id="comuna" required>
+                  <option value="">Selecciona una comuna</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="apartment" class="form-label fw-semibold"
+                  >Depto/Oficina (Opcional)</label
+                >
+                <input type="text" class="form-control" id="apartment" />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cancelar</button
+          >
+          <button type="button" class="btn btn-primary" onclick="saveUsuario()">
+            <i class="bi bi-save me-2"></i>Guardar Usuario
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Eliminación -->
+  <div
+    class="modal fade"
+    id="deleteModal"
+    tabindex="-1"
+    aria-labelledby="deleteModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-danger" id="deleteModalLabel">
+            <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminación
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">
+            ¿Estás seguro de que deseas eliminar al usuario <strong
+              id="deleteUserName"></strong>?
+          </p>
+          <p class="text-muted small mb-0 mt-2">
+            Esta acción eliminará sus datos de la base de datos, pero la cuenta
+            de acceso podría permanecer activa hasta que un administrador la
+            elimine manualmente en la consola de Firebase.
+          </p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cancelar</button
+          >
+          <button
+            type="button"
+            class="btn btn-danger"
+            onclick="confirmDelete()"
+          >
+            <i class="bi bi-trash me-2"></i>Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .admin-dashboard {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .main-content {
+      margin-left: 260px;
+      min-height: 100vh;
+    }
+
+    .table tbody tr {
+      transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(121, 192, 67, 0.05);
+      transform: translateX(2px);
+    }
+
+    .btn-action {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 0;
+      }
+    }
+
+    /* ============================================
+       ESTILOS PARA VALIDACIONES Y TOASTS
+       Animaciones y estilos personalizados
+       ============================================ */
+
+    /* Animación de entrada desde la derecha */
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Animación de salida hacia la derecha */
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    /* Animación de shake para errores */
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      10%,
+      30%,
+      50%,
+      70%,
+      90% {
+        transform: translateX(-5px);
+      }
+      20%,
+      40%,
+      60%,
+      80% {
+        transform: translateX(5px);
+      }
+    }
+
+    /* Estilos para campos con error */
+    .is-invalid {
+      border-color: #dc3545 !important;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    .is-invalid:focus {
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+
+    /* Lista de errores de validación */
+    .validation-error-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    /* Toasts personalizados */
+    #toast-container .toast {
+      min-width: 300px;
+      border-radius: 8px;
+    }
+
+    #toast-container .toast-header {
+      border-radius: 8px 8px 0 0;
+    }
+
+    /* Modal de errores de validación */
+    #validationErrorModal .modal-content {
+      border-radius: 12px;
+    }
+
+    #validationErrorModal .modal-header {
+      border-radius: 12px 12px 0 0;
+    }
+  </style>
+
+  <script>
+    import { db, auth as mainAuth } from "../../../firebase/client";
+    import { initializeApp } from "firebase/app";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      updateProfile,
+    } from "firebase/auth";
+    import {
+      collection,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp,
+      where,
+      getDocs,
+    } from "firebase/firestore";
+
+    // Inicializar App Secundaria para crear usuarios sin cerrar sesión
+    const config = mainAuth.app.options;
+    const secondaryApp = initializeApp(config, "SecondaryApp");
+    const secondaryAuth = getAuth(secondaryApp);
+
+    const usersCollection = collection(db, "users");
+    // Ordenar por fecha de creación descendente si es posible, o por nombre
+    // Nota: Para ordenar por createdAt se requiere índice compuesto si filtramos.
+    // Usaremos ordenamiento en cliente si es necesario o simple por ahora.
+    const q = query(usersCollection);
+
+    // ============================================
+    // INTERFAZ: Resultado de validación
+    // ============================================
+    interface ValidationResult {
+      isValid: boolean;
+      errors: string[];
+    }
+
+    // ============================================
+    // CONSTANTES DE VALIDACIÓN
+    // Configuración centralizada para límites y patrones
+    // ============================================
+    const VALIDATION_CONFIG = {
+      // Límites de longitud de texto
+      NAME_MAX_LENGTH: 50,
+      NAME_MIN_LENGTH: 2,
+      ADDRESS_MAX_LENGTH: 200,
+      ADDRESS_MIN_LENGTH: 5,
+      PASSWORD_MIN_LENGTH: 8,
+
+      // Patrones regex para validación
+      PATTERNS: {
+        // Solo caracteres seguros para nombres (letras, espacios, acentos, ñ)
+        SAFE_NAME: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-']+$/,
+        // Email válido
+        EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        // Patrón para detectar posibles scripts maliciosos
+        SCRIPT_INJECTION:
+          /<script[\s\S]*?>[\s\S]*?<\/script>|javascript:|on\w+\s*=/gi,
+        // Patrón para detectar HTML peligroso
+        HTML_INJECTION:
+          /<[^>]*(iframe|object|embed|form|input|button|meta|link|style)[^>]*>/gi,
+      },
+    } as const;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    declare var bootstrap: any;
+
+    // ============================================
+    // FUNCIÓN: Sanitizar texto
+    // Elimina caracteres peligrosos y previene XSS
+    // ============================================
+    function sanitizeText(input: string): string {
+      if (!input || typeof input !== "string") return "";
+
+      return input
+        .replace(/<[^>]*>/g, "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#x27;")
+        .replace(/[\x00-\x1F\x7F]/g, "")
+        .trim();
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar texto general
+    // Verifica longitud y caracteres seguros
+    // ============================================
+    function validateText(
+      text: string,
+      fieldName: string,
+      minLength: number,
+      maxLength: number,
+      pattern?: RegExp,
+    ): { isValid: boolean; value: string; error?: string } {
+      if (!text || typeof text !== "string") {
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} es requerido`,
+        };
+      }
+
+      const trimmedText = text.trim();
+
+      if (trimmedText.length < minLength) {
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} debe tener al menos ${minLength} caracteres`,
+        };
+      }
+
+      if (trimmedText.length > maxLength) {
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} no puede exceder ${maxLength} caracteres`,
+        };
+      }
+
+      if (VALIDATION_CONFIG.PATTERNS.SCRIPT_INJECTION.test(trimmedText)) {
+        console.warn(
+          `[SEGURIDAD] Intento de inyección de script detectado en ${fieldName}`,
+        );
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} contiene contenido no permitido`,
+        };
+      }
+
+      if (VALIDATION_CONFIG.PATTERNS.HTML_INJECTION.test(trimmedText)) {
+        console.warn(
+          `[SEGURIDAD] Intento de inyección HTML detectado en ${fieldName}`,
+        );
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} contiene HTML no permitido`,
+        };
+      }
+
+      if (pattern && !pattern.test(trimmedText)) {
+        return {
+          isValid: false,
+          value: "",
+          error: `${fieldName} contiene caracteres no permitidos`,
+        };
+      }
+
+      return { isValid: true, value: sanitizeText(trimmedText) };
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar Email
+    // ============================================
+    function validateEmail(email: string): {
+      isValid: boolean;
+      error?: string;
+    } {
+      if (!email || typeof email !== "string") {
+        return { isValid: false, error: "Email es requerido" };
+      }
+
+      const trimmedEmail = email.trim().toLowerCase();
+
+      if (!VALIDATION_CONFIG.PATTERNS.EMAIL.test(trimmedEmail)) {
+        return { isValid: false, error: "Email no tiene un formato válido" };
+      }
+
+      if (trimmedEmail.length > 100) {
+        return {
+          isValid: false,
+          error: "Email demasiado largo (máximo 100 caracteres)",
+        };
+      }
+
+      return { isValid: true };
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar contraseña
+    // Requisitos: 8+ caracteres, 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial
+    // ============================================
+    function validatePassword(
+      password: string,
+      confirmPassword: string,
+    ): { isValid: boolean; error?: string } {
+      if (!password) {
+        return { isValid: false, error: "Contraseña es requerida" };
+      }
+
+      if (password.length < VALIDATION_CONFIG.PASSWORD_MIN_LENGTH) {
+        return {
+          isValid: false,
+          error: `La contraseña debe tener al menos ${VALIDATION_CONFIG.PASSWORD_MIN_LENGTH} caracteres`,
+        };
+      }
+
+      // Verificar que tenga al menos una mayúscula
+      if (!/[A-Z]/.test(password)) {
+        return {
+          isValid: false,
+          error: "La contraseña debe contener al menos una letra mayúscula",
+        };
+      }
+
+      // Verificar que tenga al menos una minúscula
+      if (!/[a-z]/.test(password)) {
+        return {
+          isValid: false,
+          error: "La contraseña debe contener al menos una letra minúscula",
+        };
+      }
+
+      // Verificar que tenga al menos un número
+      if (!/[0-9]/.test(password)) {
+        return {
+          isValid: false,
+          error: "La contraseña debe contener al menos un número",
+        };
+      }
+
+      // Verificar que tenga al menos un carácter especial
+      if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password)) {
+        return {
+          isValid: false,
+          error:
+            "La contraseña debe contener al menos un carácter especial (!@#$%^&*()_+-=[]{}|;':,.<>?`~)",
+        };
+      }
+
+      if (password !== confirmPassword) {
+        return { isValid: false, error: "Las contraseñas no coinciden" };
+      }
+
+      return { isValid: true };
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar usuario completo
+    // ============================================
+    function validateUsuario(data: {
+      firstName: string;
+      lastNamePaterno: string;
+      lastNameMaterno: string;
+      rut: string;
+      phone: string;
+      email: string;
+      address: string;
+      region: string;
+      comuna: string;
+      isEditing: boolean;
+      password?: string;
+      confirmPassword?: string;
+    }): ValidationResult {
+      const errors: string[] = [];
+
+      // Validar nombre
+      const nombreValidation = validateText(
+        data.firstName,
+        "Nombre",
+        VALIDATION_CONFIG.NAME_MIN_LENGTH,
+        VALIDATION_CONFIG.NAME_MAX_LENGTH,
+        VALIDATION_CONFIG.PATTERNS.SAFE_NAME,
+      );
+      if (!nombreValidation.isValid) errors.push(nombreValidation.error!);
+
+      // Validar apellido paterno
+      const apellidoPaternoValidation = validateText(
+        data.lastNamePaterno,
+        "Apellido Paterno",
+        VALIDATION_CONFIG.NAME_MIN_LENGTH,
+        VALIDATION_CONFIG.NAME_MAX_LENGTH,
+        VALIDATION_CONFIG.PATTERNS.SAFE_NAME,
+      );
+      if (!apellidoPaternoValidation.isValid)
+        errors.push(apellidoPaternoValidation.error!);
+
+      // Validar apellido materno
+      const apellidoMaternoValidation = validateText(
+        data.lastNameMaterno,
+        "Apellido Materno",
+        VALIDATION_CONFIG.NAME_MIN_LENGTH,
+        VALIDATION_CONFIG.NAME_MAX_LENGTH,
+        VALIDATION_CONFIG.PATTERNS.SAFE_NAME,
+      );
+      if (!apellidoMaternoValidation.isValid)
+        errors.push(apellidoMaternoValidation.error!);
+
+      // Validar RUT
+      const cleanRut = data.rut.replace(/\./g, "");
+      if (!validateRUT(cleanRut)) {
+        errors.push("RUT inválido. Verifique el formato y dígito verificador");
+      }
+
+      // Validar teléfono
+      if (!validatePhone(data.phone)) {
+        errors.push(
+          "Teléfono inválido. Use formato chileno (ej: +56 9 1234 5678)",
+        );
+      }
+
+      // Validar email
+      const emailValidation = validateEmail(data.email);
+      if (!emailValidation.isValid) errors.push(emailValidation.error!);
+
+      // Validar dirección
+      const addressValidation = validateText(
+        data.address,
+        "Dirección",
+        VALIDATION_CONFIG.ADDRESS_MIN_LENGTH,
+        VALIDATION_CONFIG.ADDRESS_MAX_LENGTH,
+      );
+      if (!addressValidation.isValid) errors.push(addressValidation.error!);
+
+      // Validar región
+      if (!data.region || data.region.trim() === "") {
+        errors.push("Debe seleccionar una región");
+      }
+
+      // Validar comuna
+      if (!data.comuna || data.comuna.trim() === "") {
+        errors.push("Debe seleccionar una comuna");
+      }
+
+      // Validar contraseña solo en modo creación
+      if (!data.isEditing && data.password !== undefined) {
+        const passwordValidation = validatePassword(
+          data.password,
+          data.confirmPassword || "",
+        );
+        if (!passwordValidation.isValid) errors.push(passwordValidation.error!);
+      }
+
+      return {
+        isValid: errors.length === 0,
+        errors,
+      };
+    }
+
+    // ============================================
+    // FUNCIÓN: Mostrar errores de validación
+    // ============================================
+    function showValidationErrors(errors: string[]): void {
+      let modalContainer = document.getElementById("validationErrorModal");
+      if (!modalContainer) {
+        modalContainer = document.createElement("div");
+        modalContainer.id = "validationErrorModal";
+        modalContainer.className = "modal fade";
+        modalContainer.setAttribute("tabindex", "-1");
+        modalContainer.setAttribute("aria-hidden", "true");
+        modalContainer.innerHTML = `
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+              <div class="modal-header border-0 bg-danger bg-opacity-10">
+                <div class="d-flex align-items-center">
+                  <div class="rounded-circle bg-danger bg-opacity-25 p-2 me-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                  </div>
+                  <h5 class="modal-title fw-bold text-danger mb-0">
+                    Error de Validación
+                  </h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body py-4">
+                <p class="text-muted mb-3">Por favor corrige los siguientes errores:</p>
+                <div id="validationErrorList" class="validation-error-list"></div>
+              </div>
+              <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">
+                  <i class="bi bi-check-lg me-2"></i>Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modalContainer);
+      }
+
+      const errorListHtml = errors
+        .map(
+          (error) => `
+        <div class="d-flex align-items-start mb-2 p-2 bg-light rounded">
+          <i class="bi bi-x-circle-fill text-danger me-2 mt-1"></i>
+          <span class="text-dark">${error}</span>
+        </div>
+      `,
+        )
+        .join("");
+
+      const errorListEl = document.getElementById("validationErrorList");
+      if (errorListEl) {
+        errorListEl.innerHTML = errorListHtml;
+      }
+
+      const modal = new bootstrap.Modal(modalContainer);
+      modal.show();
+
+      console.warn("[VALIDACIÓN] Errores mostrados:", errors);
+    }
+
+    // ============================================
+    // FUNCIÓN: Mostrar toast de éxito/info/warning/danger
+    // ============================================
+    function showToast(
+      message: string,
+      type: "success" | "info" | "warning" | "danger" = "info",
+    ) {
+      const config = {
+        success: {
+          icon: "bi-check-circle-fill",
+          bg: "bg-success",
+          title: "Éxito",
+        },
+        info: {
+          icon: "bi-info-circle-fill",
+          bg: "bg-info",
+          title: "Información",
+        },
+        warning: {
+          icon: "bi-exclamation-triangle-fill",
+          bg: "bg-warning",
+          title: "Advertencia",
+        },
+        danger: { icon: "bi-x-circle-fill", bg: "bg-danger", title: "Error" },
+      };
+
+      const { icon, bg, title } = config[type];
+
+      let toastContainer = document.getElementById("toast-container");
+      if (!toastContainer) {
+        toastContainer = document.createElement("div");
+        toastContainer.id = "toast-container";
+        toastContainer.className = "position-fixed top-0 end-0 p-3";
+        toastContainer.style.zIndex = "9999";
+        document.body.appendChild(toastContainer);
+      }
+
+      const toastId = `toast-${Date.now()}`;
+      const toastEl = document.createElement("div");
+      toastEl.id = toastId;
+      toastEl.className = "toast show border-0 shadow-lg";
+      toastEl.setAttribute("role", "alert");
+      toastEl.style.animation = "slideInRight 0.3s ease-out";
+      toastEl.innerHTML = `
+        <div class="toast-header ${bg} bg-opacity-10 border-0">
+          <i class="bi ${icon} ${bg.replace("bg-", "text-")} me-2"></i>
+          <strong class="me-auto ${bg.replace("bg-", "text-")}">${title}</strong>
+          <small class="text-muted">Ahora</small>
+          <button type="button" class="btn-close" onclick="this.closest('.toast').remove()"></button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      `;
+
+      toastContainer.appendChild(toastEl);
+
+      setTimeout(() => {
+        toastEl.style.animation = "slideOutRight 0.3s ease-in";
+        setTimeout(() => toastEl.remove(), 300);
+      }, 4000);
+    }
+
+    // ============================================
+    // FUNCIÓN: Limpiar errores de campos
+    // ============================================
+    function clearFieldErrors(): void {
+      document.querySelectorAll(".is-invalid").forEach((el) => {
+        el.classList.remove("is-invalid");
+      });
+    }
+
+    // Datos de Regiones y Comunas (Copiado de registro.astro)
+    const chileData = {
+      regiones: [
+        {
+          region: "Arica y Parinacota",
+          comunas: ["Arica", "Camarones", "Putre", "General Lagos"],
+        },
+        {
+          region: "Tarapacá",
+          comunas: [
+            "Iquique",
+            "Alto Hospicio",
+            "Pozo Almonte",
+            "Camiña",
+            "Colchane",
+            "Huara",
+            "Pica",
+          ],
+        },
+        {
+          region: "Antofagasta",
+          comunas: [
+            "Antofagasta",
+            "Mejillones",
+            "Sierra Gorda",
+            "Taltal",
+            "Calama",
+            "Ollagüe",
+            "San Pedro de Atacama",
+            "Tocopilla",
+            "María Elena",
+          ],
+        },
+        {
+          region: "Atacama",
+          comunas: [
+            "Copiapó",
+            "Caldera",
+            "Tierra Amarilla",
+            "Chañaral",
+            "Diego de Almagro",
+            "Vallenar",
+            "Alto del Carmen",
+            "Freirina",
+            "Huasco",
+          ],
+        },
+        {
+          region: "Coquimbo",
+          comunas: [
+            "La Serena",
+            "Coquimbo",
+            "Andacollo",
+            "La Higuera",
+            "Paiguano",
+            "Vicuña",
+            "Illapel",
+            "Canela",
+            "Los Vilos",
+            "Salamanca",
+            "Ovalle",
+            "Combarbalá",
+            "Monte Patria",
+            "Punitaqui",
+            "Río Hurtado",
+          ],
+        },
+        {
+          region: "Valparaíso",
+          comunas: [
+            "Valparaíso",
+            "Casablanca",
+            "Concón",
+            "Juan Fernández",
+            "Puchuncaví",
+            "Quintero",
+            "Viña del Mar",
+            "Isla de Pascua",
+            "Los Andes",
+            "Calle Larga",
+            "Rinconada",
+            "San Esteban",
+            "La Ligua",
+            "Cabildo",
+            "Papudo",
+            "Petorca",
+            "Zapallar",
+            "Quillota",
+            "Calera",
+            "Hijuelas",
+            "La Cruz",
+            "Nogales",
+            "San Antonio",
+            "Algarrobo",
+            "Cartagena",
+            "El Quisco",
+            "El Tabo",
+            "Santo Domingo",
+            "San Felipe",
+            "Catemu",
+            "Llaillay",
+            "Panquehue",
+            "Putaendo",
+            "Santa María",
+            "Quilpué",
+            "Limache",
+            "Olmué",
+            "Villa Alemana",
+          ],
+        },
+        {
+          region: "Región del Libertador Gral. Bernardo O’Higgins",
+          comunas: [
+            "Rancagua",
+            "Codegua",
+            "Coinco",
+            "Coltauco",
+            "Doñihue",
+            "Graneros",
+            "Las Cabras",
+            "Machalí",
+            "Malloa",
+            "Mostazal",
+            "Olivar",
+            "Peumo",
+            "Pichidegua",
+            "Quinta de Tilcoco",
+            "Rengo",
+            "Requínoa",
+            "San Vicente",
+            "Pichilemu",
+            "La Estrella",
+            "Litueche",
+            "Marchihue",
+            "Navidad",
+            "Paredones",
+            "San Fernando",
+            "Chépica",
+            "Chimbarongo",
+            "Lolol",
+            "Nancagua",
+            "Palmilla",
+            "Peralillo",
+            "Placilla",
+            "Pumanque",
+            "Santa Cruz",
+          ],
+        },
+        {
+          region: "Región del Maule",
+          comunas: [
+            "Talca",
+            "Constitución",
+            "Curepto",
+            "Empedrado",
+            "Maule",
+            "Pelarco",
+            "Pencahue",
+            "Río Claro",
+            "San Clemente",
+            "San Rafael",
+            "Cauquenes",
+            "Chanco",
+            "Pelluhue",
+            "Curicó",
+            "Hualañé",
+            "Licantén",
+            "Molina",
+            "Rauco",
+            "Romeral",
+            "Sagrada Familia",
+            "Teno",
+            "Vichuquén",
+            "Linares",
+            "Colbún",
+            "Longaví",
+            "Parral",
+            "Retiro",
+            "San Javier",
+            "Villa Alegre",
+            "Yerbas Buenas",
+          ],
+        },
+        {
+          region: "Región de Ñuble",
+          comunas: [
+            "Cobquecura",
+            "Coelemu",
+            "Ninhue",
+            "Portezuelo",
+            "Quirihue",
+            "Ránquil",
+            "Treguaco",
+            "Bulnes",
+            "Chillán Viejo",
+            "Chillán",
+            "El Carmen",
+            "Pemuco",
+            "Pinto",
+            "Quillón",
+            "San Ignacio",
+            "Yungay",
+            "Coihueco",
+            "Ñiquén",
+            "San Carlos",
+            "San Fabián",
+            "San Nicolás",
+          ],
+        },
+        {
+          region: "Región del Biobío",
+          comunas: [
+            "Concepción",
+            "Coronel",
+            "Chiguayante",
+            "Florida",
+            "Hualqui",
+            "Lota",
+            "Penco",
+            "San Pedro de la Paz",
+            "Santa Juana",
+            "Talcahuano",
+            "Tomé",
+            "Hualpén",
+            "Lebu",
+            "Arauco",
+            "Cañete",
+            "Contulmo",
+            "Curanilahue",
+            "Los Álamos",
+            "Tirúa",
+            "Los Ángeles",
+            "Antuco",
+            "Cabrero",
+            "Laja",
+            "Mulchén",
+            "Nacimiento",
+            "Negrete",
+            "Quilaco",
+            "Quilleco",
+            "San Rosendo",
+            "Santa Bárbara",
+            "Tucapel",
+            "Yumbel",
+            "Alto Biobío",
+          ],
+        },
+        {
+          region: "Región de la Araucanía",
+          comunas: [
+            "Temuco",
+            "Carahue",
+            "Cunco",
+            "Curarrehue",
+            "Freire",
+            "Galvarino",
+            "Gorbea",
+            "Lautaro",
+            "Loncoche",
+            "Melipeuco",
+            "Nueva Imperial",
+            "Padre las Casas",
+            "Perquenco",
+            "Pitrufquén",
+            "Pucón",
+            "Saavedra",
+            "Teodoro Schmidt",
+            "Toltén",
+            "Vilcún",
+            "Villarrica",
+            "Cholchol",
+            "Angol",
+            "Collipulli",
+            "Curacautín",
+            "Ercilla",
+            "Lonquimay",
+            "Los Sauces",
+            "Lumaco",
+            "Purén",
+            "Renaico",
+            "Traiguén",
+            "Victoria",
+          ],
+        },
+        {
+          region: "Región de Los Ríos",
+          comunas: [
+            "Valdivia",
+            "Corral",
+            "Lanco",
+            "Los Lagos",
+            "Máfil",
+            "Mariquina",
+            "Paillaco",
+            "Panguipulli",
+            "La Unión",
+            "Futrono",
+            "Lago Ranco",
+            "Río Bueno",
+          ],
+        },
+        {
+          region: "Región de Los Lagos",
+          comunas: [
+            "Puerto Montt",
+            "Calbuco",
+            "Cochamó",
+            "Fresia",
+            "Frutillar",
+            "Los Muermos",
+            "Llanquihue",
+            "Maullín",
+            "Puerto Varas",
+            "Castro",
+            "Ancud",
+            "Chonchi",
+            "Curaco de Vélez",
+            "Dalcahue",
+            "Puqueldón",
+            "Queilén",
+            "Quellón",
+            "Quemchi",
+            "Quinchao",
+            "Osorno",
+            "Puerto Octay",
+            "Purranque",
+            "Puyehue",
+            "Río Negro",
+            "San Juan de la Costa",
+            "San Pablo",
+            "Chaitén",
+            "Futaleufú",
+            "Hualaihué",
+            "Palena",
+          ],
+        },
+        {
+          region: "Región Aisén del Gral. Carlos Ibáñez del Campo",
+          comunas: [
+            "Coihaique",
+            "Lago Verde",
+            "Aisén",
+            "Cisnes",
+            "Guaitecas",
+            "Cochrane",
+            "O’Higgins",
+            "Tortel",
+            "Chile Chico",
+            "Río Ibáñez",
+          ],
+        },
+        {
+          region: "Región de Magallanes y de la Antártica Chilena",
+          comunas: [
+            "Punta Arenas",
+            "Laguna Blanca",
+            "Río Verde",
+            "San Gregorio",
+            "Cabo de Hornos (Ex Navarino)",
+            "Antártica",
+            "Porvenir",
+            "Primavera",
+            "Timaukel",
+            "Natales",
+            "Torres del Paine",
+          ],
+        },
+        {
+          region: "Región Metropolitana de Santiago",
+          comunas: [
+            "Cerrillos",
+            "Cerro Navia",
+            "Conchalí",
+            "El Bosque",
+            "Estación Central",
+            "Huechuraba",
+            "Independencia",
+            "La Cisterna",
+            "La Florida",
+            "La Granja",
+            "La Pintana",
+            "La Reina",
+            "Las Condes",
+            "Lo Barnechea",
+            "Lo Espejo",
+            "Lo Prado",
+            "Macul",
+            "Maipú",
+            "Ñuñoa",
+            "Pedro Aguirre Cerda",
+            "Peñalolén",
+            "Providencia",
+            "Pudahuel",
+            "Quilicura",
+            "Quinta Normal",
+            "Recoleta",
+            "Renca",
+            "Santiago",
+            "San Joaquín",
+            "San Miguel",
+            "San Ramón",
+            "Vitacura",
+            "Puente Alto",
+            "Pirque",
+            "San José de Maipo",
+            "Colina",
+            "Lampa",
+            "Tiltil",
+            "San Bernardo",
+            "Buin",
+            "Calera de Tango",
+            "Paine",
+            "Melipilla",
+            "Alhué",
+            "Curacaví",
+            "María Pinto",
+            "San Pedro",
+            "Talagante",
+            "El Monte",
+            "Isla de Maipo",
+            "Padre Hurtado",
+            "Peñaflor",
+          ],
+        },
+      ],
+    };
+
+    // ============================================
+    // TIPOS E INTERFACES
+    // ============================================
+    interface User {
+      id: string;
+      firstName?: string;
+      lastNamePaterno?: string;
+      lastNameMaterno?: string;
+      email?: string;
+      rut?: string;
+      phone?: string;
+      role?: string;
+      address?: string;
+      apartment?: string;
+      region?: string;
+      comuna?: string;
+    }
+
+    // Extender Window para funciones globales
+    declare global {
+      interface Window {
+        openCreateModal: () => void;
+        editUsuario: (id: string) => void;
+        deleteUsuario: (id: string, name: string) => void;
+        confirmDelete: () => Promise<void>;
+        saveUsuario: () => Promise<void>;
+      }
+    }
+
+    let users: User[] = [];
+    let editingId: string | null = null;
+    let deleteId: string | null = null;
+
+    // Elementos del DOM
+    const modalElement = document.getElementById("usuarioModal");
+    const modal = new bootstrap.Modal(modalElement);
+    const deleteModalElement = document.getElementById("deleteModal");
+    const deleteModal = new bootstrap.Modal(deleteModalElement);
+    const form = document.getElementById(
+      "usuarioForm",
+    ) as HTMLFormElement | null;
+    const tableBody = document.getElementById("usuariosTableBody");
+    const regionSelect = document.getElementById(
+      "region",
+    ) as HTMLSelectElement | null;
+    const comunaSelect = document.getElementById(
+      "comuna",
+    ) as HTMLSelectElement | null;
+    const searchInput = document.getElementById(
+      "searchInput",
+    ) as HTMLInputElement | null;
+    const roleFilter = document.getElementById(
+      "roleFilter",
+    ) as HTMLSelectElement | null;
+
+    // Llenar select de regiones
+    function populateRegiones(): void {
+      if (!regionSelect) return;
+      regionSelect.innerHTML =
+        '<option value="">Selecciona una región</option>';
+      chileData.regiones.forEach((region) => {
+        const option = document.createElement("option");
+        option.value = region.region;
+        option.textContent = region.region;
+        regionSelect.appendChild(option);
+      });
+    }
+
+    // Evento cambio de región
+    regionSelect?.addEventListener("change", (e: Event) => {
+      const target = e.target as HTMLSelectElement;
+      const selectedRegionName = target.value;
+      populateComunas(selectedRegionName);
+    });
+
+    function populateComunas(
+      regionName: string,
+      selectedComuna: string | null = null,
+    ): void {
+      if (!comunaSelect) return;
+      comunaSelect.innerHTML =
+        '<option value="">Selecciona una comuna</option>';
+      const region = chileData.regiones.find((r) => r.region === regionName);
+      if (region) {
+        region.comunas.forEach((comuna) => {
+          const option = document.createElement("option");
+          option.value = comuna;
+          option.textContent = comuna;
+          if (selectedComuna && comuna === selectedComuna) {
+            option.selected = true;
+          }
+          comunaSelect.appendChild(option);
+        });
+      }
+    }
+
+    // Validación RUT
+    function validateRUT(rut: string): boolean {
+      if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) return false;
+      const tmp = rut.split("-");
+      let digito: string = tmp[1];
+      const rutBody = tmp[0];
+      if (digito == "K") digito = "k";
+      return rutBody == "0" ? false : checkDigito(parseInt(rutBody)) == digito;
+    }
+
+    function checkDigito(T: number): string | number {
+      let M = 0,
+        S = 1;
+      for (; T; T = Math.floor(T / 10))
+        S = (S + (T % 10) * (9 - (M++ % 6))) % 11;
+      return S ? S - 1 : "k";
+    }
+
+    // Formateo RUT
+    document
+      .getElementById("rut")
+      ?.addEventListener("input", function (e: Event) {
+        const target = e.target as HTMLInputElement;
+        let value = target.value.replace(/\./g, "").replace(/-/g, "");
+        if (value.match(/^(\d{2})(\d{3}){2}(\w{1})$/)) {
+          value = value.replace(
+            /^(\d{2})(\d{3})(\d{3})(\w{1})$/,
+            "$1.$2.$3-$4",
+          );
+        } else if (value.match(/^(\d)(\d{3}){2}(\w{0,1})$/)) {
+          value = value.replace(/^(\d)(\d{3})(\d{3})(\w{0,1})$/, "$1.$2.$3-$4");
+        } else if (value.match(/^(\d)(\d{3})(\d{0,2})$/)) {
+          value = value.replace(/^(\d)(\d{3})(\d{0,2})$/, "$1.$2.$3");
+        } else if (value.match(/^(\d)(\d{0,2})$/)) {
+          value = value.replace(/^(\d)(\d{0,2})$/, "$1.$2");
+        }
+        target.value = value;
+      });
+
+    // Validación Teléfono
+    function validatePhone(phone: string): boolean {
+      const phoneRegex = /^(\+?56)?(\s?)(0?9)(\s?)[98765432]\d{7}$/;
+      return phoneRegex.test(phone);
+    }
+
+    // ============================================
+    // FUNCIÓN: Verificar si RUT ya existe en la base de datos
+    // @param rut - RUT a verificar
+    // @param excludeUserId - ID de usuario a excluir (para edición)
+    // ============================================
+    async function checkRutExists(
+      rut: string,
+      excludeUserId?: string,
+    ): Promise<boolean> {
+      try {
+        const rutQuery = query(usersCollection, where("rut", "==", rut));
+        const querySnapshot = await getDocs(rutQuery);
+
+        // Si no hay resultados, el RUT no existe
+        if (querySnapshot.empty) return false;
+
+        // Si estamos editando, verificar que no sea el mismo usuario
+        if (excludeUserId) {
+          return querySnapshot.docs.some((doc) => doc.id !== excludeUserId);
+        }
+
+        // En creación, cualquier resultado significa duplicado
+        return true;
+      } catch (error) {
+        console.error("[ERROR] Error verificando RUT:", error);
+        throw error;
+      }
+    }
+
+    // Cargar usuarios
+    onSnapshot(q, (snapshot) => {
+      users = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as User[];
+      renderTable();
+    });
+
+    function renderTable(): void {
+      const searchTerm = searchInput?.value.toLowerCase() || "";
+      const roleTerm = roleFilter?.value || "";
+
+      const filtered = users.filter((user) => {
+        const matchesSearch =
+          (user.firstName || "").toLowerCase().includes(searchTerm) ||
+          (user.lastNamePaterno || "").toLowerCase().includes(searchTerm) ||
+          (user.email || "").toLowerCase().includes(searchTerm) ||
+          (user.rut || "").toLowerCase().includes(searchTerm);
+        const matchesRole = roleTerm ? user.role === roleTerm : true;
+        return matchesSearch && matchesRole;
+      });
+
+      if (!tableBody) return;
+      tableBody.innerHTML = filtered
+        .map(
+          (user) => `
+            <tr>
+                <td class="px-4 py-3">
+                    <div class="fw-bold text-dark">${user.firstName || ""} ${user.lastNamePaterno || ""}</div>
+                </td>
+                <td class="px-4 py-3 text-muted">${user.email || ""}</td>
+                <td class="px-4 py-3 text-muted">${user.rut || ""}</td>
+                <td class="px-4 py-3 text-muted">${user.phone || ""}</td>
+                <td class="px-4 py-3">
+                    <span class="badge ${user.role === "admin" ? "bg-danger" : "bg-primary"} bg-opacity-10 text-${user.role === "admin" ? "danger" : "primary"}">
+                        ${user.role === "admin" ? "Administrador" : "Cliente"}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-end">
+                    <button class="btn btn-action btn-light text-primary me-1" onclick="editUsuario('${user.id}')" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-action btn-light text-danger" onclick="deleteUsuario('${user.id}', '${user.firstName} ${user.lastNamePaterno}')" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `,
+        )
+        .join("");
+
+      document.getElementById("showing-count")!.textContent =
+        filtered.length.toString();
+      document.getElementById("total-count")!.textContent =
+        users.length.toString();
+    }
+
+    // Exponer funciones globales
+    window.openCreateModal = (): void => {
+      editingId = null;
+      form?.reset();
+      (document.getElementById("userId") as HTMLInputElement).value = "";
+      document.getElementById("usuarioModalLabel")!.textContent =
+        "Nuevo Usuario";
+
+      // Mostrar campos de contraseña
+      document
+        .querySelectorAll(".password-field")
+        .forEach((el) => ((el as HTMLElement).style.display = "block"));
+      (document.getElementById("password") as HTMLInputElement).required = true;
+      (
+        document.getElementById("confirmPassword") as HTMLInputElement
+      ).required = true;
+      (document.getElementById("email") as HTMLInputElement).disabled = false; // Permitir editar email al crear
+
+      populateRegiones();
+      modal.show();
+    };
+
+    window.editUsuario = (id: string): void => {
+      const user = users.find((u) => u.id === id);
+      if (!user) return;
+
+      editingId = id;
+      (document.getElementById("userId") as HTMLInputElement).value = id;
+      document.getElementById("usuarioModalLabel")!.textContent =
+        "Editar Usuario";
+
+      // Llenar campos
+      (document.getElementById("firstName") as HTMLInputElement).value =
+        user.firstName || "";
+      (document.getElementById("lastNamePaterno") as HTMLInputElement).value =
+        user.lastNamePaterno || "";
+      (document.getElementById("lastNameMaterno") as HTMLInputElement).value =
+        user.lastNameMaterno || "";
+      (document.getElementById("rut") as HTMLInputElement).value =
+        user.rut || "";
+      (document.getElementById("phone") as HTMLInputElement).value =
+        user.phone || "";
+      (document.getElementById("email") as HTMLInputElement).value =
+        user.email || "";
+      (document.getElementById("role") as HTMLSelectElement).value =
+        user.role || "user";
+      (document.getElementById("address") as HTMLInputElement).value =
+        user.address || "";
+      (document.getElementById("apartment") as HTMLInputElement).value =
+        user.apartment || "";
+
+      // Manejar región y comuna
+      populateRegiones();
+      if (regionSelect) regionSelect.value = user.region || "";
+      if (user.region) {
+        populateComunas(user.region, user.comuna || null);
+      }
+
+      // Ocultar campos de contraseña y deshabilitar email (no editable fácilmente)
+      document
+        .querySelectorAll(".password-field")
+        .forEach((el) => ((el as HTMLElement).style.display = "none"));
+      (document.getElementById("password") as HTMLInputElement).required =
+        false;
+      (
+        document.getElementById("confirmPassword") as HTMLInputElement
+      ).required = false;
+      (document.getElementById("email") as HTMLInputElement).disabled = true;
+
+      modal.show();
+    };
+
+    window.deleteUsuario = (id: string, name: string): void => {
+      deleteId = id;
+      document.getElementById("deleteUserName")!.textContent = name;
+      deleteModal.show();
+    };
+
+    window.confirmDelete = async (): Promise<void> => {
+      if (!deleteId) return;
+      try {
+        await deleteDoc(doc(db, "users", deleteId));
+        deleteModal.hide();
+        showToast(
+          "Usuario eliminado exitosamente de la base de datos",
+          "success",
+        );
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        const err = error as Error & { code?: string };
+        showToast("Error al eliminar usuario: " + err.message, "danger");
+      }
+    };
+
+    window.saveUsuario = async (): Promise<void> => {
+      // Limpiar errores previos
+      clearFieldErrors();
+
+      // Obtener valores del formulario
+      const firstName = (
+        document.getElementById("firstName") as HTMLInputElement
+      ).value;
+      const lastNamePaterno = (
+        document.getElementById("lastNamePaterno") as HTMLInputElement
+      ).value;
+      const lastNameMaterno = (
+        document.getElementById("lastNameMaterno") as HTMLInputElement
+      ).value;
+      const rut = (document.getElementById("rut") as HTMLInputElement).value;
+      const phone = (document.getElementById("phone") as HTMLInputElement)
+        .value;
+      const email = (document.getElementById("email") as HTMLInputElement)
+        .value;
+      const address = (document.getElementById("address") as HTMLInputElement)
+        .value;
+      const region = (document.getElementById("region") as HTMLSelectElement)
+        .value;
+      const comuna = (document.getElementById("comuna") as HTMLSelectElement)
+        .value;
+      const apartment = (
+        document.getElementById("apartment") as HTMLInputElement
+      ).value;
+      const role = (document.getElementById("role") as HTMLSelectElement).value;
+
+      let password = "";
+      let confirmPassword = "";
+
+      if (!editingId) {
+        password = (document.getElementById("password") as HTMLInputElement)
+          .value;
+        confirmPassword = (
+          document.getElementById("confirmPassword") as HTMLInputElement
+        ).value;
+      }
+
+      // ============================================
+      // VALIDACIÓN COMPLETA DEL USUARIO
+      // ============================================
+      const validationResult = validateUsuario({
+        firstName,
+        lastNamePaterno,
+        lastNameMaterno,
+        rut,
+        phone,
+        email,
+        address,
+        region,
+        comuna,
+        isEditing: !!editingId,
+        password,
+        confirmPassword,
+      });
+
+      // Si hay errores de validación, mostrarlos y no continuar
+      if (!validationResult.isValid) {
+        showValidationErrors(validationResult.errors);
+        console.warn(
+          "[VALIDACIÓN] Errores encontrados:",
+          validationResult.errors,
+        );
+        return;
+      }
+
+      // ============================================
+      // VERIFICAR RUT DUPLICADO EN BASE DE DATOS
+      // ============================================
+      try {
+        const rutExists = await checkRutExists(rut, editingId || undefined);
+        if (rutExists) {
+          showValidationErrors([
+            "El RUT ingresado ya está registrado en el sistema por otro usuario.",
+          ]);
+          console.warn("[VALIDACIÓN] RUT duplicado:", rut);
+          return;
+        }
+      } catch (error) {
+        console.error("[ERROR] Error verificando RUT:", error);
+        showToast(
+          "Error al verificar disponibilidad del RUT. Intente nuevamente.",
+          "danger",
+        );
+        return;
+      }
+
+      // ============================================
+      // SANITIZACIÓN DE DATOS
+      // ============================================
+      const userData = {
+        firstName: sanitizeText(firstName),
+        lastNamePaterno: sanitizeText(lastNamePaterno),
+        lastNameMaterno: sanitizeText(lastNameMaterno),
+        rut: rut,
+        phone: phone,
+        address: sanitizeText(address),
+        region: region,
+        comuna: comuna,
+        apartment: sanitizeText(apartment),
+        role: role,
+        email: email.trim().toLowerCase(),
+      };
+
+      // ============================================
+      // GUARDAR EN FIRESTORE
+      // ============================================
+      try {
+        if (editingId) {
+          // Modo edición: actualizar documento existente
+          await updateDoc(doc(db, "users", editingId), {
+            ...userData,
+            updatedAt: serverTimestamp(),
+          });
+          showToast("Usuario actualizado exitosamente", "success");
+          console.log("[CRUD] Usuario actualizado:", editingId);
+        } else {
+          // Modo creación: crear usuario en Auth y Firestore
+          const userCredential = await createUserWithEmailAndPassword(
+            secondaryAuth,
+            userData.email,
+            password,
+          );
+          const user = userCredential.user;
+
+          // Actualizar perfil en Auth
+          await updateProfile(user, {
+            displayName: `${userData.firstName} ${userData.lastNamePaterno}`,
+          });
+
+          // Guardar en Firestore
+          await setDoc(doc(db, "users", user.uid), {
+            ...userData,
+            createdAt: serverTimestamp(),
+          });
+          showToast("Usuario creado exitosamente", "success");
+          console.log("[CRUD] Usuario creado:", user.uid);
+        }
+
+        // Cerrar modal después de guardar exitosamente
+        modal.hide();
+        (form as HTMLFormElement)?.reset();
+      } catch (error) {
+        console.error("[ERROR] Error al guardar usuario:", error);
+        const err = error as Error & { code?: string };
+        let msg = err.message;
+
+        // Mensajes de error específicos de Firebase Auth
+        if (err.code === "auth/email-already-in-use") {
+          msg = "El correo electrónico ya está registrado en el sistema";
+        } else if (err.code === "auth/weak-password") {
+          msg = "La contraseña es demasiado débil";
+        } else if (err.code === "auth/invalid-email") {
+          msg = "El formato del correo electrónico no es válido";
+        }
+
+        showToast(msg, "danger");
+      }
+    };
+
+    // Listeners para filtros
+    searchInput?.addEventListener("input", renderTable);
+    roleFilter?.addEventListener("change", renderTable);
+
+    // Inicializar
+    populateRegiones();
+  </script>
+
+  <!-- Bootstrap JS Bundle -->
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</Layout>

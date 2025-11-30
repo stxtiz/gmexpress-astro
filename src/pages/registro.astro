@@ -54,7 +54,6 @@ import "../styles/global.css";
                     type="text"
                     id="firstName"
                     name="firstName"
-                    required
                     placeholder="Juan"
                     class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   />
@@ -72,7 +71,6 @@ import "../styles/global.css";
                     type="text"
                     id="lastNamePaterno"
                     name="lastNamePaterno"
-                    required
                     placeholder="Pérez"
                     class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   />
@@ -90,7 +88,6 @@ import "../styles/global.css";
                     type="text"
                     id="lastNameMaterno"
                     name="lastNameMaterno"
-                    required
                     placeholder="González"
                     class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   />
@@ -109,7 +106,6 @@ import "../styles/global.css";
                   type="text"
                   id="rut"
                   name="rut"
-                  required
                   maxlength="12"
                   placeholder="12.345.678-9"
                   class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
@@ -128,7 +124,6 @@ import "../styles/global.css";
                   type="email"
                   id="email"
                   name="email"
-                  required
                   placeholder="correo@ejemplo.com"
                   class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
@@ -146,7 +141,6 @@ import "../styles/global.css";
                   type="tel"
                   id="phone"
                   name="phone"
-                  required
                   placeholder="+56 9 1234 5678"
                   class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
@@ -171,7 +165,6 @@ import "../styles/global.css";
                   type="text"
                   id="address"
                   name="address"
-                  required
                   placeholder="Av. Libertador Bernardo O'Higgins 1234"
                   class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
@@ -189,7 +182,6 @@ import "../styles/global.css";
                   <select
                     id="comuna"
                     name="comuna"
-                    required
                     class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Selecciona una comuna</option>
@@ -208,7 +200,6 @@ import "../styles/global.css";
                   <select
                     id="region"
                     name="region"
-                    required
                     class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Selecciona una región</option>
@@ -253,13 +244,13 @@ import "../styles/global.css";
                   type="password"
                   id="password"
                   name="password"
-                  required
                   placeholder="Mínimo 8 caracteres"
                   class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
                 <p class="text-xs text-slate-500 dark:text-slate-400">
                   La contraseña debe tener al menos 8 caracteres, incluir
-                  mayúsculas, minúsculas y números
+                  mayúsculas, minúsculas, números y un carácter especial
+                  (!@#$%^&*)
                 </p>
               </div>
 
@@ -275,7 +266,6 @@ import "../styles/global.css";
                   type="password"
                   id="confirmPassword"
                   name="confirmPassword"
-                  required
                   placeholder="Repite tu contraseña"
                   class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
@@ -288,7 +278,6 @@ import "../styles/global.css";
                 type="checkbox"
                 id="terms"
                 name="terms"
-                required
                 class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary focus:ring-2 cursor-pointer"
               />
               <label
@@ -395,92 +384,778 @@ import "../styles/global.css";
   <Footer />
 </Layout>
 
+<style>
+  /* ============================================
+     ESTILOS PARA VALIDACIONES Y TOASTS
+     ============================================ */
+
+  /* Animación de entrada desde la derecha */
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Animación de salida hacia la derecha */
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  /* Animación de shake para errores */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-5px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(5px);
+    }
+  }
+
+  /* Estilos para campos con error */
+  :global(.field-error) {
+    border-color: #dc2626 !important;
+    animation: shake 0.5s ease-in-out;
+  }
+
+  :global(.field-error:focus) {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25) !important;
+    ring-color: #dc2626 !important;
+  }
+
+  /* Toast container */
+  :global(#toast-container) {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  :global(.toast) {
+    min-width: 320px;
+    max-width: 420px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+
+  :global(.toast-success) {
+    border-left: 4px solid #22c55e;
+  }
+
+  :global(.toast-danger) {
+    border-left: 4px solid #ef4444;
+  }
+
+  :global(.toast-warning) {
+    border-left: 4px solid #f59e0b;
+  }
+
+  :global(.toast-info) {
+    border-left: 4px solid #3b82f6;
+  }
+
+  /* Modal de validación */
+  :global(.validation-modal-overlay) {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  :global(.validation-modal) {
+    background: white;
+    border-radius: 16px;
+    max-width: 420px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
 <script>
   import { auth, db } from "../firebase/client";
   import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-  import { doc, setDoc } from "firebase/firestore";
+  import {
+    doc,
+    setDoc,
+    collection,
+    query,
+    where,
+    getDocs,
+  } from "firebase/firestore";
 
-  const form = document.querySelector("form");
-  const password = document.getElementById("password");
-  const confirmPassword = document.getElementById("confirmPassword");
-  const regionSelect = document.getElementById("region");
-  const comunaSelect = document.getElementById("comuna");
-  const rutInput = document.getElementById("rut");
-  const phoneInput = document.getElementById("phone");
+  const form = document.querySelector("form") as HTMLFormElement | null;
+  const password = document.getElementById(
+    "password",
+  ) as HTMLInputElement | null;
+  const confirmPassword = document.getElementById(
+    "confirmPassword",
+  ) as HTMLInputElement | null;
+  const regionSelect = document.getElementById(
+    "region",
+  ) as HTMLSelectElement | null;
+  const comunaSelect = document.getElementById(
+    "comuna",
+  ) as HTMLSelectElement | null;
+  const rutInput = document.getElementById("rut") as HTMLInputElement | null;
+  const phoneInput = document.getElementById(
+    "phone",
+  ) as HTMLInputElement | null;
+
+  // ============================================
+  // FUNCIÓN: Verificar si RUT ya existe en la base de datos
+  // ============================================
+  async function checkRutExists(rut: string): Promise<boolean> {
+    try {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("rut", "==", rut));
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error("Error verificando RUT:", error);
+      return false; // En caso de error, permitir continuar
+    }
+  }
+
+  // ============================================
+  // FUNCIÓN: Mostrar toast de éxito/info/warning/danger
+  // ============================================
+  function showToast(
+    message: string,
+    type: "success" | "info" | "warning" | "danger" = "info",
+  ): void {
+    const config = {
+      success: {
+        icon: `<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+        title: "Éxito",
+        bgColor: "bg-green-50",
+        textColor: "text-green-800",
+        borderClass: "toast-success",
+      },
+      info: {
+        icon: `<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+        title: "Información",
+        bgColor: "bg-blue-50",
+        textColor: "text-blue-800",
+        borderClass: "toast-info",
+      },
+      warning: {
+        icon: `<svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`,
+        title: "Advertencia",
+        bgColor: "bg-amber-50",
+        textColor: "text-amber-800",
+        borderClass: "toast-warning",
+      },
+      danger: {
+        icon: `<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+        title: "Error",
+        bgColor: "bg-red-50",
+        textColor: "text-red-800",
+        borderClass: "toast-danger",
+      },
+    };
+
+    const { icon, title, bgColor, textColor, borderClass } = config[type];
+
+    // Crear contenedor de toasts si no existe
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+      toastContainer = document.createElement("div");
+      toastContainer.id = "toast-container";
+      document.body.appendChild(toastContainer);
+    }
+
+    // Crear el toast
+    const toastId = `toast-${Date.now()}`;
+    const toastEl = document.createElement("div");
+    toastEl.id = toastId;
+    toastEl.className = `toast ${borderClass}`;
+    toastEl.style.animation = "slideInRight 0.3s ease-out";
+    toastEl.innerHTML = `
+      <div class="p-4 ${bgColor}">
+        <div class="flex items-start gap-3">
+          <div class="flex-shrink-0">${icon}</div>
+          <div class="flex-1">
+            <p class="font-semibold ${textColor}">${title}</p>
+            <p class="text-sm text-gray-600 mt-1">${message}</p>
+          </div>
+          <button onclick="this.closest('.toast').remove()" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+      </div>
+    `;
+
+    toastContainer.appendChild(toastEl);
+
+    // Auto-remover después de 5 segundos
+    setTimeout(() => {
+      toastEl.style.animation = "slideOutRight 0.3s ease-in";
+      setTimeout(() => toastEl.remove(), 300);
+    }, 5000);
+  }
+
+  // ============================================
+  // FUNCIÓN: Mostrar errores de validación en modal
+  // ============================================
+  function showValidationErrors(errors: string[]): void {
+    // Remover modal existente si hay
+    const existingModal = document.getElementById("validation-modal-overlay");
+    if (existingModal) existingModal.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "validation-modal-overlay";
+    overlay.className = "validation-modal-overlay";
+    overlay.innerHTML = `
+      <div class="validation-modal">
+        <div class="bg-red-50 px-6 py-4 border-b border-red-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-red-800">Error de Validación</h3>
+          </div>
+        </div>
+        <div class="px-6 py-4 max-h-60 overflow-y-auto">
+          <p class="text-gray-600 text-sm mb-3">Por favor corrige los siguientes errores:</p>
+          <ul class="space-y-2">
+            ${errors
+              .map(
+                (error) => `
+              <li class="flex items-start gap-2 p-2 bg-red-50 rounded-lg">
+                <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span class="text-sm text-gray-700">${error}</span>
+              </li>
+            `,
+              )
+              .join("")}
+          </ul>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <button id="close-validation-modal" class="w-full py-2.5 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors">
+            Entendido
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Event listeners para cerrar
+    document
+      .getElementById("close-validation-modal")
+      ?.addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+
+    // Cerrar con Escape
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        overlay.remove();
+        document.removeEventListener("keydown", handleEscape);
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+  }
+
+  // ============================================
+  // FUNCIÓN: Limpiar errores de campos
+  // ============================================
+  function clearFieldErrors(): void {
+    document.querySelectorAll(".field-error").forEach((el) => {
+      el.classList.remove("field-error");
+    });
+  }
 
   // Data provided by user
   const chileData = {
-    "regiones": [
-        {
-            "region": "Arica y Parinacota",
-            "comunas": ["Arica", "Camarones", "Putre", "General Lagos"]
-        },
-        {
-            "region": "Tarapacá",
-            "comunas": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"]
-        },
-        {
-            "region": "Antofagasta",
-            "comunas": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"]
-        },
-        {
-            "region": "Atacama",
-            "comunas": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"]
-        },
-        {
-            "region": "Coquimbo",
-            "comunas": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"]
-        },
-        {
-            "region": "Valparaíso",
-            "comunas": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"]
-        },
-        {
-            "region": "Región del Libertador Gral. Bernardo O’Higgins",
-            "comunas": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"]
-        },
-        {
-            "region": "Región del Maule",
-            "comunas": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"]
-        },
-        {
-            "region": "Región de Ñuble",
-            "comunas": ["Cobquecura", "Coelemu", "Ninhue", "Portezuelo", "Quirihue", "Ránquil", "Treguaco", "Bulnes", "Chillán Viejo", "Chillán", "El Carmen", "Pemuco", "Pinto", "Quillón", "San Ignacio", "Yungay", "Coihueco", "Ñiquén", "San Carlos", "San Fabián", "San Nicolás"]
-        },
-        {
-            "region": "Región del Biobío",
-            "comunas": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Hualpén", "Lebu", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Los Álamos", "Tirúa", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"]
-        },
-        {
-            "region": "Región de la Araucanía",
-            "comunas": ["Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"]
-        },
-        {
-            "region": "Región de Los Ríos",
-            "comunas": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Futrono", "Lago Ranco", "Río Bueno"]
-        },
-        {
-            "region": "Región de Los Lagos",
-            "comunas": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"]
-        },
-        {
-            "region": "Región Aisén del Gral. Carlos Ibáñez del Campo",
-            "comunas": ["Coihaique", "Lago Verde", "Aisén", "Cisnes", "Guaitecas", "Cochrane", "O’Higgins", "Tortel", "Chile Chico", "Río Ibáñez"]
-        },
-        {
-            "region": "Región de Magallanes y de la Antártica Chilena",
-            "comunas": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos (Ex Navarino)", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"]
-        },
-        {
-            "region": "Región Metropolitana de Santiago",
-            "comunas": ["Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "Santiago", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"]
-         }
-    ]
+    regiones: [
+      {
+        region: "Arica y Parinacota",
+        comunas: ["Arica", "Camarones", "Putre", "General Lagos"],
+      },
+      {
+        region: "Tarapacá",
+        comunas: [
+          "Iquique",
+          "Alto Hospicio",
+          "Pozo Almonte",
+          "Camiña",
+          "Colchane",
+          "Huara",
+          "Pica",
+        ],
+      },
+      {
+        region: "Antofagasta",
+        comunas: [
+          "Antofagasta",
+          "Mejillones",
+          "Sierra Gorda",
+          "Taltal",
+          "Calama",
+          "Ollagüe",
+          "San Pedro de Atacama",
+          "Tocopilla",
+          "María Elena",
+        ],
+      },
+      {
+        region: "Atacama",
+        comunas: [
+          "Copiapó",
+          "Caldera",
+          "Tierra Amarilla",
+          "Chañaral",
+          "Diego de Almagro",
+          "Vallenar",
+          "Alto del Carmen",
+          "Freirina",
+          "Huasco",
+        ],
+      },
+      {
+        region: "Coquimbo",
+        comunas: [
+          "La Serena",
+          "Coquimbo",
+          "Andacollo",
+          "La Higuera",
+          "Paiguano",
+          "Vicuña",
+          "Illapel",
+          "Canela",
+          "Los Vilos",
+          "Salamanca",
+          "Ovalle",
+          "Combarbalá",
+          "Monte Patria",
+          "Punitaqui",
+          "Río Hurtado",
+        ],
+      },
+      {
+        region: "Valparaíso",
+        comunas: [
+          "Valparaíso",
+          "Casablanca",
+          "Concón",
+          "Juan Fernández",
+          "Puchuncaví",
+          "Quintero",
+          "Viña del Mar",
+          "Isla de Pascua",
+          "Los Andes",
+          "Calle Larga",
+          "Rinconada",
+          "San Esteban",
+          "La Ligua",
+          "Cabildo",
+          "Papudo",
+          "Petorca",
+          "Zapallar",
+          "Quillota",
+          "Calera",
+          "Hijuelas",
+          "La Cruz",
+          "Nogales",
+          "San Antonio",
+          "Algarrobo",
+          "Cartagena",
+          "El Quisco",
+          "El Tabo",
+          "Santo Domingo",
+          "San Felipe",
+          "Catemu",
+          "Llaillay",
+          "Panquehue",
+          "Putaendo",
+          "Santa María",
+          "Quilpué",
+          "Limache",
+          "Olmué",
+          "Villa Alemana",
+        ],
+      },
+      {
+        region: "Región del Libertador Gral. Bernardo O’Higgins",
+        comunas: [
+          "Rancagua",
+          "Codegua",
+          "Coinco",
+          "Coltauco",
+          "Doñihue",
+          "Graneros",
+          "Las Cabras",
+          "Machalí",
+          "Malloa",
+          "Mostazal",
+          "Olivar",
+          "Peumo",
+          "Pichidegua",
+          "Quinta de Tilcoco",
+          "Rengo",
+          "Requínoa",
+          "San Vicente",
+          "Pichilemu",
+          "La Estrella",
+          "Litueche",
+          "Marchihue",
+          "Navidad",
+          "Paredones",
+          "San Fernando",
+          "Chépica",
+          "Chimbarongo",
+          "Lolol",
+          "Nancagua",
+          "Palmilla",
+          "Peralillo",
+          "Placilla",
+          "Pumanque",
+          "Santa Cruz",
+        ],
+      },
+      {
+        region: "Región del Maule",
+        comunas: [
+          "Talca",
+          "Constitución",
+          "Curepto",
+          "Empedrado",
+          "Maule",
+          "Pelarco",
+          "Pencahue",
+          "Río Claro",
+          "San Clemente",
+          "San Rafael",
+          "Cauquenes",
+          "Chanco",
+          "Pelluhue",
+          "Curicó",
+          "Hualañé",
+          "Licantén",
+          "Molina",
+          "Rauco",
+          "Romeral",
+          "Sagrada Familia",
+          "Teno",
+          "Vichuquén",
+          "Linares",
+          "Colbún",
+          "Longaví",
+          "Parral",
+          "Retiro",
+          "San Javier",
+          "Villa Alegre",
+          "Yerbas Buenas",
+        ],
+      },
+      {
+        region: "Región de Ñuble",
+        comunas: [
+          "Cobquecura",
+          "Coelemu",
+          "Ninhue",
+          "Portezuelo",
+          "Quirihue",
+          "Ránquil",
+          "Treguaco",
+          "Bulnes",
+          "Chillán Viejo",
+          "Chillán",
+          "El Carmen",
+          "Pemuco",
+          "Pinto",
+          "Quillón",
+          "San Ignacio",
+          "Yungay",
+          "Coihueco",
+          "Ñiquén",
+          "San Carlos",
+          "San Fabián",
+          "San Nicolás",
+        ],
+      },
+      {
+        region: "Región del Biobío",
+        comunas: [
+          "Concepción",
+          "Coronel",
+          "Chiguayante",
+          "Florida",
+          "Hualqui",
+          "Lota",
+          "Penco",
+          "San Pedro de la Paz",
+          "Santa Juana",
+          "Talcahuano",
+          "Tomé",
+          "Hualpén",
+          "Lebu",
+          "Arauco",
+          "Cañete",
+          "Contulmo",
+          "Curanilahue",
+          "Los Álamos",
+          "Tirúa",
+          "Los Ángeles",
+          "Antuco",
+          "Cabrero",
+          "Laja",
+          "Mulchén",
+          "Nacimiento",
+          "Negrete",
+          "Quilaco",
+          "Quilleco",
+          "San Rosendo",
+          "Santa Bárbara",
+          "Tucapel",
+          "Yumbel",
+          "Alto Biobío",
+        ],
+      },
+      {
+        region: "Región de la Araucanía",
+        comunas: [
+          "Temuco",
+          "Carahue",
+          "Cunco",
+          "Curarrehue",
+          "Freire",
+          "Galvarino",
+          "Gorbea",
+          "Lautaro",
+          "Loncoche",
+          "Melipeuco",
+          "Nueva Imperial",
+          "Padre las Casas",
+          "Perquenco",
+          "Pitrufquén",
+          "Pucón",
+          "Saavedra",
+          "Teodoro Schmidt",
+          "Toltén",
+          "Vilcún",
+          "Villarrica",
+          "Cholchol",
+          "Angol",
+          "Collipulli",
+          "Curacautín",
+          "Ercilla",
+          "Lonquimay",
+          "Los Sauces",
+          "Lumaco",
+          "Purén",
+          "Renaico",
+          "Traiguén",
+          "Victoria",
+        ],
+      },
+      {
+        region: "Región de Los Ríos",
+        comunas: [
+          "Valdivia",
+          "Corral",
+          "Lanco",
+          "Los Lagos",
+          "Máfil",
+          "Mariquina",
+          "Paillaco",
+          "Panguipulli",
+          "La Unión",
+          "Futrono",
+          "Lago Ranco",
+          "Río Bueno",
+        ],
+      },
+      {
+        region: "Región de Los Lagos",
+        comunas: [
+          "Puerto Montt",
+          "Calbuco",
+          "Cochamó",
+          "Fresia",
+          "Frutillar",
+          "Los Muermos",
+          "Llanquihue",
+          "Maullín",
+          "Puerto Varas",
+          "Castro",
+          "Ancud",
+          "Chonchi",
+          "Curaco de Vélez",
+          "Dalcahue",
+          "Puqueldón",
+          "Queilén",
+          "Quellón",
+          "Quemchi",
+          "Quinchao",
+          "Osorno",
+          "Puerto Octay",
+          "Purranque",
+          "Puyehue",
+          "Río Negro",
+          "San Juan de la Costa",
+          "San Pablo",
+          "Chaitén",
+          "Futaleufú",
+          "Hualaihué",
+          "Palena",
+        ],
+      },
+      {
+        region: "Región Aisén del Gral. Carlos Ibáñez del Campo",
+        comunas: [
+          "Coihaique",
+          "Lago Verde",
+          "Aisén",
+          "Cisnes",
+          "Guaitecas",
+          "Cochrane",
+          "O’Higgins",
+          "Tortel",
+          "Chile Chico",
+          "Río Ibáñez",
+        ],
+      },
+      {
+        region: "Región de Magallanes y de la Antártica Chilena",
+        comunas: [
+          "Punta Arenas",
+          "Laguna Blanca",
+          "Río Verde",
+          "San Gregorio",
+          "Cabo de Hornos (Ex Navarino)",
+          "Antártica",
+          "Porvenir",
+          "Primavera",
+          "Timaukel",
+          "Natales",
+          "Torres del Paine",
+        ],
+      },
+      {
+        region: "Región Metropolitana de Santiago",
+        comunas: [
+          "Cerrillos",
+          "Cerro Navia",
+          "Conchalí",
+          "El Bosque",
+          "Estación Central",
+          "Huechuraba",
+          "Independencia",
+          "La Cisterna",
+          "La Florida",
+          "La Granja",
+          "La Pintana",
+          "La Reina",
+          "Las Condes",
+          "Lo Barnechea",
+          "Lo Espejo",
+          "Lo Prado",
+          "Macul",
+          "Maipú",
+          "Ñuñoa",
+          "Pedro Aguirre Cerda",
+          "Peñalolén",
+          "Providencia",
+          "Pudahuel",
+          "Quilicura",
+          "Quinta Normal",
+          "Recoleta",
+          "Renca",
+          "Santiago",
+          "San Joaquín",
+          "San Miguel",
+          "San Ramón",
+          "Vitacura",
+          "Puente Alto",
+          "Pirque",
+          "San José de Maipo",
+          "Colina",
+          "Lampa",
+          "Tiltil",
+          "San Bernardo",
+          "Buin",
+          "Calera de Tango",
+          "Paine",
+          "Melipilla",
+          "Alhué",
+          "Curacaví",
+          "María Pinto",
+          "San Pedro",
+          "Talagante",
+          "El Monte",
+          "Isla de Maipo",
+          "Padre Hurtado",
+          "Peñaflor",
+        ],
+      },
+    ],
   };
 
   const regionesData = chileData.regiones;
 
-  function populateRegiones() {
+  function populateRegiones(): void {
+    if (!regionSelect) return;
     regionSelect.innerHTML = '<option value="">Selecciona una región</option>';
     regionesData.forEach((region) => {
       const option = document.createElement("option");
@@ -493,14 +1168,15 @@ import "../styles/global.css";
   // Initialize immediately
   populateRegiones();
 
-
-  regionSelect.addEventListener("change", (e) => {
-    const selectedRegionName = e.target.value;
+  regionSelect?.addEventListener("change", (e) => {
+    const target = e.target as HTMLSelectElement;
+    const selectedRegionName = target.value;
+    if (!comunaSelect) return;
     comunaSelect.innerHTML = '<option value="">Selecciona una comuna</option>';
-    
-    const region = regionesData.find(r => r.region === selectedRegionName);
+
+    const region = regionesData.find((r) => r.region === selectedRegionName);
     if (region) {
-      region.comunas.forEach(comuna => {
+      region.comunas.forEach((comuna) => {
         const option = document.createElement("option");
         option.value = comuna;
         option.textContent = comuna;
@@ -510,108 +1186,266 @@ import "../styles/global.css";
   });
 
   // RUT Validation
-  function validateRUT(rut) {
+  function validateRUT(rut: string): boolean {
     if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) return false;
-    const tmp = rut.split('-');
-    let digito = tmp[1];
+    const tmp = rut.split("-");
+    let digito: string = tmp[1];
     const rutBody = tmp[0];
-    if (digito == 'K') digito = 'k';
-    
-    return (rutBody == 0) ? false : checkDigito(rutBody) == digito;
+    if (digito == "K") digito = "k";
+
+    return rutBody == "0" ? false : checkDigito(parseInt(rutBody)) == digito;
   }
 
-  function checkDigito(T) {
-    let M = 0, S = 1;
-    for (; T; T = Math.floor(T / 10))
-      S = (S + T % 10 * (9 - M++ % 6)) % 11;
-    return S ? S - 1 : 'k';
+  function checkDigito(T: number): string | number {
+    let M = 0,
+      S = 1;
+    for (; T; T = Math.floor(T / 10)) S = (S + (T % 10) * (9 - (M++ % 6))) % 11;
+    return S ? S - 1 : "k";
   }
 
   // Format RUT on input
-  rutInput.addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\./g, '').replace(/-/g, '');
+  rutInput?.addEventListener("input", function (e: Event) {
+    const target = e.target as HTMLInputElement;
+    let value = target.value.replace(/\./g, "").replace(/-/g, "");
     if (value.match(/^(\d{2})(\d{3}){2}(\w{1})$/)) {
-      value = value.replace(/^(\d{2})(\d{3})(\d{3})(\w{1})$/, '$1.$2.$3-$4');
+      value = value.replace(/^(\d{2})(\d{3})(\d{3})(\w{1})$/, "$1.$2.$3-$4");
     } else if (value.match(/^(\d)(\d{3}){2}(\w{0,1})$/)) {
-      value = value.replace(/^(\d)(\d{3})(\d{3})(\w{0,1})$/, '$1.$2.$3-$4');
+      value = value.replace(/^(\d)(\d{3})(\d{3})(\w{0,1})$/, "$1.$2.$3-$4");
     } else if (value.match(/^(\d)(\d{3})(\d{0,2})$/)) {
-      value = value.replace(/^(\d)(\d{3})(\d{0,2})$/, '$1.$2.$3');
+      value = value.replace(/^(\d)(\d{3})(\d{0,2})$/, "$1.$2.$3");
     } else if (value.match(/^(\d)(\d{0,2})$/)) {
-      value = value.replace(/^(\d)(\d{0,2})$/, '$1.$2');
+      value = value.replace(/^(\d)(\d{0,2})$/, "$1.$2");
     }
-    e.target.value = value;
+    target.value = value;
   });
 
   // Phone Validation
-  function validatePhone(phone) {
+  function validatePhone(phone: string): boolean {
     // Acepta +56912345678 o 912345678
     const phoneRegex = /^(\+?56)?(\s?)(0?9)(\s?)[98765432]\d{7}$/;
     return phoneRegex.test(phone);
   }
 
-  // Form Submit
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  // Password Validation
+  // Requisitos: 8+ caracteres, 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial
+  function validatePassword(
+    pwd: string,
+    confirmPwd: string,
+  ): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
 
-    // Validations
-    if (password.value !== confirmPassword.value) {
-      alert("Las contraseñas no coinciden.");
+    if (!pwd) {
+      return { isValid: false, errors: ["Contraseña es requerida"] };
+    }
+
+    if (pwd.length < 8) {
+      errors.push("La contraseña debe tener al menos 8 caracteres");
+    }
+
+    if (!/[A-Z]/.test(pwd)) {
+      errors.push("La contraseña debe contener al menos una letra mayúscula");
+    }
+
+    if (!/[a-z]/.test(pwd)) {
+      errors.push("La contraseña debe contener al menos una letra minúscula");
+    }
+
+    if (!/[0-9]/.test(pwd)) {
+      errors.push("La contraseña debe contener al menos un número");
+    }
+
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pwd)) {
+      errors.push(
+        "La contraseña debe contener al menos un carácter especial (!@#$%^&*()_+-=[]{}|;':,.<>?`~)",
+      );
+    }
+
+    if (pwd !== confirmPwd) {
+      errors.push("Las contraseñas no coinciden");
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+    };
+  }
+
+  // Form Submit
+  form?.addEventListener("submit", async (e: Event) => {
+    e.preventDefault();
+    clearFieldErrors();
+
+    // Null checks for required elements
+    if (
+      !password ||
+      !confirmPassword ||
+      !rutInput ||
+      !phoneInput ||
+      !regionSelect ||
+      !comunaSelect
+    ) {
+      showToast(
+        "Error: No se pudieron encontrar todos los campos del formulario.",
+        "danger",
+      );
       return;
+    }
+
+    // Get form values with proper typing
+    const emailInput = document.getElementById("email") as HTMLInputElement;
+    const firstNameInput = document.getElementById(
+      "firstName",
+    ) as HTMLInputElement;
+    const lastNamePaternoInput = document.getElementById(
+      "lastNamePaterno",
+    ) as HTMLInputElement;
+    const lastNameMaternoInput = document.getElementById(
+      "lastNameMaterno",
+    ) as HTMLInputElement;
+    const addressInput = document.getElementById("address") as HTMLInputElement;
+    const apartmentInput = document.getElementById(
+      "apartment",
+    ) as HTMLInputElement;
+
+    // Collect all validation errors
+    const allErrors: string[] = [];
+
+    // Required fields validation
+    const requiredFields = [
+      { element: firstNameInput, name: "Nombre" },
+      { element: lastNamePaternoInput, name: "Apellido Paterno" },
+      { element: lastNameMaternoInput, name: "Apellido Materno" },
+      { element: rutInput, name: "RUT" },
+      { element: emailInput, name: "Correo Electrónico" },
+      { element: phoneInput, name: "Teléfono" },
+      { element: addressInput, name: "Calle y Número" },
+      { element: regionSelect, name: "Región" },
+      { element: comunaSelect, name: "Comuna" },
+      { element: password, name: "Contraseña" },
+      { element: confirmPassword, name: "Confirmar Contraseña" },
+    ];
+
+    requiredFields.forEach((field) => {
+      if (!field.element?.value?.trim()) {
+        allErrors.push(`El campo "${field.name}" es obligatorio.`);
+      }
+    });
+
+    // Validate terms checkbox
+    const termsCheckbox = document.getElementById("terms") as HTMLInputElement;
+    if (!termsCheckbox?.checked) {
+      allErrors.push(
+        "Debes aceptar los Términos y Condiciones para registrarte.",
+      );
+    }
+
+    // If there are empty required fields, show errors and stop
+    if (allErrors.length > 0) {
+      showValidationErrors(allErrors);
+      return;
+    }
+
+    // Password Validation
+    const passwordValidation = validatePassword(
+      password.value,
+      confirmPassword.value,
+    );
+    if (!passwordValidation.isValid) {
+      allErrors.push(...passwordValidation.errors);
     }
 
     // Clean RUT for validation (remove dots)
-    const cleanRut = rutInput.value.replace(/\./g, '');
+    const cleanRut = rutInput.value.replace(/\./g, "");
     if (!validateRUT(cleanRut)) {
-      alert("RUT inválido. Por favor verifique.");
-      return;
+      allErrors.push(
+        "RUT inválido. Por favor verifique el formato (ej: 12.345.678-9).",
+      );
     }
 
     if (!validatePhone(phoneInput.value)) {
-      alert("Teléfono inválido. Use formato chileno (ej: +56912345678).");
+      allErrors.push(
+        "Teléfono inválido. Use formato chileno (ej: +56912345678).",
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailInput.value)) {
+      allErrors.push("Correo electrónico inválido. Verifique el formato.");
+    }
+
+    // If there are validation errors, show them all at once
+    if (allErrors.length > 0) {
+      showValidationErrors(allErrors);
+      return;
+    }
+
+    // ============================================
+    // VERIFICAR RUT DUPLICADO EN BASE DE DATOS
+    // ============================================
+    try {
+      const rutExists = await checkRutExists(rutInput.value);
+      if (rutExists) {
+        showValidationErrors([
+          "El RUT ingresado ya está registrado en el sistema. Si ya tienes una cuenta, inicia sesión.",
+        ]);
+        return;
+      }
+    } catch (error) {
+      console.error("Error verificando RUT:", error);
+      showToast(
+        "Error al verificar disponibilidad del RUT. Intente nuevamente.",
+        "danger",
+      );
       return;
     }
 
     try {
       // Create User in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(
-        auth, 
-        document.getElementById("email").value, 
-        password.value
+        auth,
+        emailInput.value,
+        password.value,
       );
       const user = userCredential.user;
 
       // Update Profile
       await updateProfile(user, {
-        displayName: `${document.getElementById("firstName").value} ${document.getElementById("lastNamePaterno").value}`
+        displayName: `${firstNameInput.value} ${lastNamePaternoInput.value}`,
       });
 
       // Save additional data to Firestore
       await setDoc(doc(db, "users", user.uid), {
-        firstName: document.getElementById("firstName").value,
-        lastNamePaterno: document.getElementById("lastNamePaterno").value,
-        lastNameMaterno: document.getElementById("lastNameMaterno").value,
+        firstName: firstNameInput.value,
+        lastNamePaterno: lastNamePaternoInput.value,
+        lastNameMaterno: lastNameMaternoInput.value,
         rut: rutInput.value,
-        email: document.getElementById("email").value,
+        email: emailInput.value,
         phone: phoneInput.value,
-        address: document.getElementById("address").value,
+        address: addressInput.value,
         region: regionSelect.value,
         comuna: comunaSelect.value,
-        apartment: document.getElementById("apartment").value,
+        apartment: apartmentInput.value,
         createdAt: new Date(),
-        role: "user" // Default role
+        role: "user", // Default role
       });
 
-      alert("¡Registro exitoso! Bienvenido a GMEXPRESS.");
-      window.location.href = "/";
-
+      showToast(
+        "¡Registro exitoso! Bienvenido a GMEXPRESS. Redirigiendo...",
+        "success",
+      );
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
     } catch (error) {
       console.error("Error registering:", error);
+      const err = error as Error & { code?: string };
       let msg = "Error al registrar usuario.";
-      if (error.code === 'auth/email-already-in-use') msg = "El correo ya está registrado.";
-      if (error.code === 'auth/weak-password') msg = "La contraseña es muy débil.";
-      alert(msg);
+      if (err.code === "auth/email-already-in-use")
+        msg = "El correo ya está registrado.";
+      if (err.code === "auth/weak-password")
+        msg = "La contraseña es muy débil.";
+      showToast(msg, "danger");
     }
   });
-
-
 </script>

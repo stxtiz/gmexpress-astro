@@ -184,11 +184,98 @@ service cloud.firestore {
 
     // ============================================
     // COLECCIÓN: users
-    // Lectura/escritura: propietario o admin
+    // - Lectura: propietario o admin
+    // - Creación: cualquier autenticado (registro) o admin
+    // - Actualización: propietario (datos propios) o admin (cualquier usuario)
+    // - Eliminación: solo admin
     // ============================================
     match /users/{userId} {
+      // Lectura: el usuario puede ver su propio perfil, admin puede ver todos
       allow read: if isOwner(userId) || isAdmin();
-      allow write: if isOwner(userId) || isAdmin();
+      
+      // Creación: usuario autenticado puede crear su propio documento
+      // Admin puede crear cualquier usuario
+      allow create: if (isAuthenticated() && request.auth.uid == userId && isValidUserData(request.resource.data, false))
+                    || (isAdmin() && isValidUserData(request.resource.data, true));
+      
+      // Actualización: usuario puede actualizar su perfil (excepto rol)
+      // Admin puede actualizar cualquier usuario incluyendo rol
+      allow update: if (isOwner(userId) && isValidUserUpdate(request.resource.data, resource.data, false))
+                    || (isAdmin() && isValidUserUpdate(request.resource.data, resource.data, true));
+      
+      // Eliminación: solo admin puede eliminar usuarios
+      allow delete: if isAdmin();
+      
+      // ============================================
+      // Función de validación para creación de usuarios
+      // @param data - Datos del nuevo usuario
+      // @param isAdminCreating - Si es admin quien crea (puede asignar cualquier rol)
+      // ============================================
+      function isValidUserData(data, isAdminCreating) {
+        return data.keys().hasAll(['firstName', 'lastNamePaterno', 'lastNameMaterno', 'rut', 'email', 'phone', 'address', 'region', 'comuna', 'role']) &&
+               // Validar nombre: string, 2-50 caracteres, seguro
+               data.firstName is string &&
+               hasMinLength(data.firstName, 2) &&
+               isValidStringLength(data.firstName, 50) &&
+               isSafeString(data.firstName) &&
+               // Validar apellido paterno: string, 2-50 caracteres, seguro
+               data.lastNamePaterno is string &&
+               hasMinLength(data.lastNamePaterno, 2) &&
+               isValidStringLength(data.lastNamePaterno, 50) &&
+               isSafeString(data.lastNamePaterno) &&
+               // Validar apellido materno: string, 2-50 caracteres, seguro
+               data.lastNameMaterno is string &&
+               hasMinLength(data.lastNameMaterno, 2) &&
+               isValidStringLength(data.lastNameMaterno, 50) &&
+               isSafeString(data.lastNameMaterno) &&
+               // Validar RUT: string, formato chileno (10-12 caracteres con puntos y guión)
+               data.rut is string &&
+               hasMinLength(data.rut, 9) &&
+               isValidStringLength(data.rut, 12) &&
+               // Validar email: string, máximo 100 caracteres
+               data.email is string &&
+               hasMinLength(data.email, 5) &&
+               isValidStringLength(data.email, 100) &&
+               // Validar teléfono: string, formato chileno
+               data.phone is string &&
+               hasMinLength(data.phone, 9) &&
+               isValidStringLength(data.phone, 20) &&
+               // Validar dirección: string, 5-200 caracteres, seguro
+               data.address is string &&
+               hasMinLength(data.address, 5) &&
+               isValidStringLength(data.address, 200) &&
+               isSafeString(data.address) &&
+               // Validar región: string, 3-100 caracteres
+               data.region is string &&
+               hasMinLength(data.region, 3) &&
+               isValidStringLength(data.region, 100) &&
+               // Validar comuna: string, 3-100 caracteres
+               data.comuna is string &&
+               hasMinLength(data.comuna, 3) &&
+               isValidStringLength(data.comuna, 100) &&
+               // Validar apartment si existe (opcional)
+               (!('apartment' in data.keys()) || 
+                (data.apartment is string && isValidStringLength(data.apartment, 50))) &&
+               // Validar rol: solo 'user' o 'admin'
+               // Usuarios normales solo pueden tener rol 'user'
+               // Admin puede asignar cualquier rol válido
+               data.role in ['user', 'admin'] &&
+               (isAdminCreating || data.role == 'user');
+      }
+      
+      // ============================================
+      // Función de validación para actualización de usuarios
+      // @param newData - Nuevos datos del usuario
+      // @param oldData - Datos actuales del usuario
+      // @param isAdminUpdating - Si es admin quien actualiza
+      // ============================================
+      function isValidUserUpdate(newData, oldData, isAdminUpdating) {
+        return isValidUserData(newData, isAdminUpdating) &&
+               // El email no puede cambiar (está vinculado a Auth)
+               newData.email == oldData.email &&
+               // Solo admin puede cambiar el rol
+               (isAdminUpdating || newData.role == oldData.role);
+      }
     }
 
     // ============================================

@@ -45,37 +45,65 @@ RUTA: /users/{userId}
 
 ESTRUCTURA DEL DOCUMENTO:
 {
-  firstName: string,           // Nombre del usuario (ej: "Juan")
-  lastNamePaterno: string,     // Apellido paterno (ej: "Pérez")
-  lastNameMaterno: string,     // Apellido materno (ej: "González")
-  rut: string,                 // RUT chileno formateado (ej: "12.345.678-9")
-  email: string,               // Correo electrónico del usuario
-  phone: string,               // Teléfono con formato chileno (ej: "+56 9 1234 5678")
-  address: string,             // Dirección de calle y número
-  region: string,              // Región de Chile
-  comuna: string,              // Comuna de Chile
-  apartment: string,           // Departamento/oficina (opcional)
+  firstName: string,           // Nombre del usuario (ej: "Juan") - 2-50 caracteres
+  lastNamePaterno: string,     // Apellido paterno (ej: "Pérez") - 2-50 caracteres
+  lastNameMaterno: string,     // Apellido materno (ej: "González") - 2-50 caracteres
+  rut: string,                 // RUT chileno formateado (ej: "12.345.678-9") - ÚNICO, 9-12 caracteres
+  email: string,               // Correo electrónico del usuario - 5-100 caracteres, NO puede cambiar
+  phone: string,               // Teléfono con formato chileno (ej: "+56 9 1234 5678") - 9-20 caracteres
+  address: string,             // Dirección de calle y número - 5-200 caracteres
+  region: string,              // Región de Chile - 3-100 caracteres
+  comuna: string,              // Comuna de Chile - 3-100 caracteres
+  apartment: string,           // Departamento/oficina (opcional) - máx 50 caracteres
   role: string,                // Rol del usuario: "user" | "admin"
-  createdAt: Timestamp         // Fecha de creación del usuario
+  createdAt: Timestamp,        // Fecha de creación del usuario
+  updatedAt: Timestamp         // Fecha de última actualización (solo en edición)
 }
 
-CÓMO SE CREA:
+CÓMO SE CREA (REGISTRO PÚBLICO):
 - Archivo: src/pages/registro.astro
 - Proceso: 
-  1. Se crea usuario en Firebase Auth con createUserWithEmailAndPassword()
-  2. Se actualiza el perfil con updateProfile() (displayName)
-  3. Se guarda documento en Firestore con setDoc(doc(db, "users", user.uid), {...})
-  4. El ID del documento es el UID del usuario de Firebase Auth
+  1. Validación de campos obligatorios con modal de errores UI
+  2. Verificación de RUT duplicado en Firestore (query where rut == valor)
+  3. Se crea usuario en Firebase Auth con createUserWithEmailAndPassword()
+  4. Se actualiza el perfil con updateProfile() (displayName)
+  5. Se guarda documento en Firestore con setDoc(doc(db, "users", user.uid), {...})
+  6. El ID del documento es el UID del usuario de Firebase Auth
+  7. Toast de éxito y redirección automática
 
-REGLAS DE SEGURIDAD:
-- READ: Solo el propietario (owner) o admin pueden leer
-- WRITE: Solo el propietario (owner) o admin pueden escribir
+CÓMO SE GESTIONA (PANEL ADMIN):
+- Archivo: src/pages/admin/usuarios/index.astro
+- Operaciones CRUD completas:
+  - CREATE: createUserWithEmailAndPassword() + setDoc() con validación de RUT único
+  - READ: onSnapshot con query a colección users
+  - UPDATE: updateDoc() con validación de RUT único (excluyendo usuario actual)
+  - DELETE: deleteDoc() (solo admin puede eliminar)
+
+VALIDACIONES IMPLEMENTADAS:
+- Campos obligatorios: firstName, lastNamePaterno, lastNameMaterno, rut, email, phone, address, region, comuna
+- RUT: Algoritmo de verificación chileno + verificación de unicidad en BD
+- Teléfono: Regex para formato chileno (+56 9 XXXX XXXX)
+- Email: Formato válido, no puede cambiar después de creación
+- Contraseña: Mínimo 8 caracteres, mayúscula, minúscula, número, carácter especial (!@#$%^&*)
+- Términos y condiciones: Checkbox obligatorio en registro público
+
+REGLAS DE SEGURIDAD FIRESTORE:
+- READ: Propietario del documento o admin
+- CREATE: 
+  - Usuario autenticado puede crear su propio documento (role='user' obligatorio)
+  - Admin puede crear cualquier usuario con cualquier rol
+- UPDATE:
+  - Propietario puede actualizar su perfil (NO puede cambiar email ni rol)
+  - Admin puede actualizar cualquier usuario (puede cambiar rol, NO puede cambiar email)
+- DELETE: Solo admin
 
 NOTAS IMPORTANTES:
 - El campo "role" por defecto es "user"
 - Los administradores tienen role: "admin"
-- El RUT se valida con algoritmo de verificación chileno
-- El teléfono se valida con regex para formato chileno
+- El RUT debe ser ÚNICO en toda la colección
+- El email NO puede cambiar (está vinculado a Firebase Auth)
+- Solo admin puede cambiar el rol de un usuario
+- Se aplican validaciones de seguridad contra XSS en todos los campos de texto
 
 ================================================================================
                         2. COLECCIÓN: products
@@ -938,6 +966,126 @@ const role = data.role;
 // Desde Firebase Auth metadata
 const lastLogin = user.metadata.lastSignInTime;
 ```
+
+================================================================================
+                  SISTEMA DE VALIDACIÓN Y ALERTAS UI
+================================================================================
+
+DESCRIPCIÓN:
+Sistema unificado de validación de formularios con feedback visual mediante
+toasts (notificaciones) y modales de errores de validación.
+
+ARCHIVOS QUE IMPLEMENTAN EL SISTEMA:
+- src/pages/registro.astro (registro público)
+- src/pages/admin/usuarios/index.astro (CRUD admin)
+- src/pages/admin/servicios/index.astro (referencia original)
+
+--------------------------------------------------------------------------------
+                           FUNCIONES DE UI
+--------------------------------------------------------------------------------
+
+1. showToast(message, type)
+   - Muestra notificación temporal en esquina superior derecha
+   - Tipos: "success" (verde), "info" (azul), "warning" (amarillo), "danger" (rojo)
+   - Auto-cierre después de 5 segundos
+   - Animación de entrada/salida con CSS
+
+2. showValidationErrors(errors[])
+   - Muestra modal con lista de errores de validación
+   - Animación de shake para llamar atención
+   - Botón para cerrar
+   - Lista ordenada de errores
+
+3. clearFieldErrors()
+   - Limpia errores previos antes de nueva validación
+
+--------------------------------------------------------------------------------
+                     VALIDACIONES DE CONTRASEÑA
+--------------------------------------------------------------------------------
+
+Requisitos de contraseña (registro público y admin):
+- Mínimo 8 caracteres
+- Al menos una letra mayúscula (A-Z)
+- Al menos una letra minúscula (a-z)
+- Al menos un número (0-9)
+- Al menos un carácter especial (!@#$%^&*)
+- Confirmación de contraseña debe coincidir
+
+Función: validatePassword(password, confirmPassword)
+Retorna: { isValid: boolean, errors: string[] }
+
+--------------------------------------------------------------------------------
+                     VALIDACIÓN DE RUT DUPLICADO
+--------------------------------------------------------------------------------
+
+PROPÓSITO: Evitar que se registren usuarios con RUT ya existente en la BD.
+
+IMPLEMENTACIÓN:
+```javascript
+async function checkRutExists(rut, excludeUserId?) {
+  const rutQuery = query(usersCollection, where("rut", "==", rut));
+  const querySnapshot = await getDocs(rutQuery);
+  
+  if (querySnapshot.empty) return false;
+  
+  // En edición, excluir el usuario actual
+  if (excludeUserId) {
+    return querySnapshot.docs.some(doc => doc.id !== excludeUserId);
+  }
+  
+  return true;
+}
+```
+
+USO:
+- Registro público: Verifica antes de crear usuario en Auth
+- Admin crear: Verifica antes de crear usuario
+- Admin editar: Verifica excluyendo el ID del usuario que se edita
+
+MENSAJE DE ERROR:
+- Registro: "El RUT ingresado ya está registrado en el sistema. Si ya tienes una cuenta, inicia sesión."
+- Admin: "El RUT ingresado ya está registrado en el sistema por otro usuario."
+
+--------------------------------------------------------------------------------
+                     VALIDACIÓN DE CAMPOS VACÍOS
+--------------------------------------------------------------------------------
+
+ARCHIVO: src/pages/registro.astro
+
+La validación nativa HTML5 (atributo required) fue REMOVIDA para usar
+validación personalizada con mensajes en modal UI.
+
+Campos obligatorios validados:
+- firstName (Nombre)
+- lastNamePaterno (Apellido Paterno)
+- lastNameMaterno (Apellido Materno)
+- rut (RUT)
+- email (Correo Electrónico)
+- phone (Teléfono)
+- address (Calle y Número)
+- region (Región)
+- comuna (Comuna)
+- password (Contraseña)
+- confirmPassword (Confirmar Contraseña)
+- terms (Checkbox de Términos y Condiciones)
+
+--------------------------------------------------------------------------------
+                     ESTILOS CSS PARA ALERTAS
+--------------------------------------------------------------------------------
+
+Animaciones definidas en <style> de cada página:
+
+@keyframes slideInRight - Entrada del toast desde derecha
+@keyframes slideOutRight - Salida del toast hacia derecha
+@keyframes shake - Vibración del modal de errores
+@keyframes fadeIn - Aparición gradual del overlay
+@keyframes slideUp - Entrada del modal desde abajo
+
+Clases CSS:
+- .toast-container - Contenedor fijo en esquina superior derecha
+- .toast-success/info/warning/danger - Bordes de color por tipo
+- .validation-modal-overlay - Fondo oscuro del modal
+- .validation-modal - Caja blanca centrada con errores
 
 ================================================================================
                               FIN DEL DOCUMENTO
