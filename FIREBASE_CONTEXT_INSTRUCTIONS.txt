@@ -6,21 +6,86 @@
 PROYECTO: GMEXPRESS-ASTRO
 DESCRIPCIÓN: Plataforma web de servicio de alimentación/catering desarrollada con Astro.js
 FIREBASE PROJECT ID: gmexpress-estesi
-TECNOLOGÍAS: Astro.js, Firebase (Firestore + Auth), TypeScript, Tailwind CSS
+TECNOLOGÍAS: Astro.js (SSR con Vercel), Firebase (Firestore + Auth + Admin SDK), TypeScript, Tailwind CSS
 
 ================================================================================
                             CONFIGURACIÓN FIREBASE
 ================================================================================
 
-Archivo de configuración: src/firebase/client.ts
+CLIENTE (Frontend):
+- Archivo de configuración: src/firebase/client.ts
+- Servicios utilizados:
+  - Firebase Authentication (getAuth)
+  - Cloud Firestore (getFirestore)
+- Instancias exportadas:
+  - db: Instancia de Firestore
+  - auth: Instancia de Authentication
 
-Servicios utilizados:
-- Firebase Authentication (getAuth)
-- Cloud Firestore (getFirestore)
+ADMIN SDK (Backend/Server):
+- Archivo de configuración: src/firebase/admin.ts
+- Servicios utilizados:
+  - Firebase Admin Auth (getAuth) - Para eliminar usuarios de Authentication
+  - Firebase Admin Firestore (getFirestore) - Acceso privilegiado a la BD
+- Instancias exportadas:
+  - adminAuth: Instancia de Auth con privilegios de admin
+  - adminDb: Instancia de Firestore con privilegios de admin
+- Variables de entorno requeridas (.env):
+  - FIREBASE_PROJECT_ID: ID del proyecto Firebase
+  - FIREBASE_CLIENT_EMAIL: Email de la cuenta de servicio
+  - FIREBASE_PRIVATE_KEY: Clave privada de la cuenta de servicio
 
-Las instancias exportadas son:
-- db: Instancia de Firestore
-- auth: Instancia de Authentication
+NOTA: El Admin SDK ignora las reglas de seguridad de Firestore y tiene acceso completo.
+
+================================================================================
+                          CONFIGURACIÓN ASTRO (SSR)
+================================================================================
+
+MODO DE RENDERIZADO: Server-Side Rendering (SSR)
+- Archivo: astro.config.mjs
+- Output: 'server' (todas las páginas se renderizan en el servidor por defecto)
+- Adapter: @astrojs/vercel (para despliegue en Vercel)
+
+PÁGINAS CON DATOS DINÁMICOS DE FIREBASE:
+Las siguientes páginas usan `export const prerender = false` para obtener
+datos frescos de Firebase en cada solicitud (no se pre-renderizan):
+
+- src/pages/index.astro - Productos destacados y servicios activos
+- src/pages/productos.astro - Lista de productos activos
+- src/pages/servicios.astro - Lista de servicios activos
+
+MOTIVO: Sin SSR, los datos se obtenían solo durante el build y los nuevos
+productos/servicios no aparecían hasta hacer un nuevo deploy.
+
+================================================================================
+                          API ENDPOINTS (Server-Side)
+================================================================================
+
+1. DELETE USER ENDPOINT
+- Archivo: src/pages/api/admin/delete-user.ts
+- Método: POST
+- Propósito: Eliminar usuarios completamente de Firebase Auth Y Firestore
+- Body esperado:
+  {
+    userId: string,      // ID del usuario a eliminar
+    adminToken: string   // Token JWT del admin que hace la petición
+  }
+- Proceso:
+  1. Valida que se envíen userId y adminToken
+  2. Verifica el token con adminAuth.verifyIdToken()
+  3. Confirma que el usuario que hace la petición es admin (role='admin')
+  4. Previene auto-eliminación (admin no puede eliminarse a sí mismo)
+  5. Elimina usuario de Firebase Authentication con adminAuth.deleteUser()
+  6. Elimina documento de Firestore con adminDb.collection('users').doc().delete()
+- Respuestas:
+  - 200: { success: true, message: "Usuario eliminado completamente..." }
+  - 400: Error de validación o intento de auto-eliminación
+  - 401: Token inválido o no proporcionado
+  - 403: Usuario no es administrador
+  - 500: Error interno del servidor
+
+NOTA IMPORTANTE: Sin este endpoint, eliminar usuarios solo desde el cliente
+(deleteDoc) dejaba el usuario en Firebase Auth, permitiendo que siguiera
+iniciando sesión y bloqueando la creación de nuevos usuarios con el mismo email.
 
 ================================================================================
                           COLECCIONES EN FIRESTORE
@@ -77,7 +142,19 @@ CÓMO SE GESTIONA (PANEL ADMIN):
   - CREATE: createUserWithEmailAndPassword() + setDoc() con validación de RUT único
   - READ: onSnapshot con query a colección users
   - UPDATE: updateDoc() con validación de RUT único (excluyendo usuario actual)
-  - DELETE: deleteDoc() (solo admin puede eliminar)
+  - DELETE: Llamada a API endpoint /api/admin/delete-user (elimina de Auth Y Firestore)
+
+PROCESO DE ELIMINACIÓN DE USUARIOS:
+1. Admin hace clic en "Eliminar" en el panel de usuarios
+2. Se muestra modal de confirmación
+3. Al confirmar, se obtiene el token JWT del admin actual
+4. Se hace POST a /api/admin/delete-user con { userId, adminToken }
+5. El servidor valida permisos y elimina de Firebase Auth + Firestore
+6. Se muestra toast de éxito/error
+
+NOTA: La eliminación DEBE hacerse vía API endpoint para eliminar de ambos
+sistemas (Auth y Firestore). Usar solo deleteDoc() del cliente deja el
+usuario en Auth, permitiendo login y bloqueando re-registro con mismo email.
 
 VALIDACIONES IMPLEMENTADAS:
 - Campos obligatorios: firstName, lastNamePaterno, lastNameMaterno, rut, email, phone, address, region, comuna
@@ -1086,6 +1163,48 @@ Clases CSS:
 - .toast-success/info/warning/danger - Bordes de color por tipo
 - .validation-modal-overlay - Fondo oscuro del modal
 - .validation-modal - Caja blanca centrada con errores
+
+================================================================================
+                     VARIABLES DE ENTORNO Y DESPLIEGUE
+================================================================================
+
+ARCHIVO: .env (NO subir a Git - está en .gitignore)
+
+Variables requeridas para Firebase Admin SDK:
+- FIREBASE_PROJECT_ID=gmexpress-estesi
+- FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@gmexpress-estesi.iam.gserviceaccount.com
+- FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+
+OBTENER CREDENCIALES:
+1. Firebase Console → Project Settings (⚙️) → Service Accounts
+2. Click en "Generate new private key"
+3. Copiar valores del JSON descargado al .env
+
+DESPLIEGUE EN VERCEL:
+1. Las variables de entorno se configuran en Vercel Dashboard:
+   - Settings → Environment Variables
+   - Agregar las 3 variables (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY)
+   - Seleccionar: Production, Preview, Development
+2. El código se sube a GitHub normalmente (el .env no se sube)
+3. Vercel despliega automáticamente al hacer push
+
+NOTA: La FIREBASE_PRIVATE_KEY debe incluir los \n literales en Vercel.
+
+================================================================================
+                     ESTRUCTURA DE ARCHIVOS FIREBASE
+================================================================================
+
+src/
+├── firebase/
+│   ├── client.ts          # Configuración Firebase Client SDK (frontend)
+│   └── admin.ts           # Configuración Firebase Admin SDK (backend/server)
+├── pages/
+│   ├── api/
+│   │   └── admin/
+│   │       └── delete-user.ts  # Endpoint para eliminar usuarios completo
+│   ├── index.astro        # SSR - Datos dinámicos de Firebase
+│   ├── productos.astro    # SSR - Datos dinámicos de Firebase
+│   └── servicios.astro    # SSR - Datos dinámicos de Firebase
 
 ================================================================================
                               FIN DEL DOCUMENTO

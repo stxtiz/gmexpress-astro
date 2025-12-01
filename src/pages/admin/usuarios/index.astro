@@ -1671,12 +1671,38 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     window.confirmDelete = async (): Promise<void> => {
       if (!deleteId) return;
       try {
-        await deleteDoc(doc(db, "users", deleteId));
-        deleteModal.hide();
-        showToast(
-          "Usuario eliminado exitosamente de la base de datos",
-          "success",
-        );
+        // Obtener el token del usuario actual (admin)
+        const currentUser = mainAuth.currentUser;
+        if (!currentUser) {
+          showToast("Error: No hay sesión activa", "danger");
+          return;
+        }
+        
+        const adminToken = await currentUser.getIdToken();
+        
+        // Llamar al endpoint API para eliminar usuario de Auth y Firestore
+        const response = await fetch('/api/admin/delete-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: deleteId,
+            adminToken: adminToken
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          deleteModal.hide();
+          showToast(
+            "Usuario eliminado completamente (Authentication y Base de datos)",
+            "success",
+          );
+        } else {
+          throw new Error(result.error || 'Error desconocido al eliminar');
+        }
       } catch (error) {
         console.error("Error al eliminar:", error);
         const err = error as Error & { code?: string };
