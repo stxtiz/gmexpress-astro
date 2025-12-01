@@ -1677,23 +1677,23 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           showToast("Error: No hay sesión activa", "danger");
           return;
         }
-        
+
         const adminToken = await currentUser.getIdToken();
-        
+
         // Llamar al endpoint API para eliminar usuario de Auth y Firestore
-        const response = await fetch('/api/admin/delete-user', {
-          method: 'POST',
+        const response = await fetch("/api/admin/delete-user", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             userId: deleteId,
-            adminToken: adminToken
-          })
+            adminToken: adminToken,
+          }),
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
           deleteModal.hide();
           showToast(
@@ -1701,7 +1701,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
             "success",
           );
         } else {
-          throw new Error(result.error || 'Error desconocido al eliminar');
+          throw new Error(result.error || "Error desconocido al eliminar");
         }
       } catch (error) {
         console.error("Error al eliminar:", error);
