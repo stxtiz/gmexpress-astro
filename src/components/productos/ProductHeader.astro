@@ -209,6 +209,18 @@ const { searchPlaceholder = "Buscar productos..." } = Astro.props;
           />
         </div>
         <div id="header-login-error" class="hidden text-red-500 text-sm"></div>
+        
+        <!-- Forgot Password -->
+        <div class="flex justify-end">
+          <button
+            type="button"
+            id="product-forgot-password-btn"
+            class="text-sm text-primary hover:underline font-medium bg-transparent border-none cursor-pointer"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
+        
         <button
           type="submit"
           class="w-full h-10 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors"
@@ -229,12 +241,73 @@ const { searchPlaceholder = "Buscar productos..." } = Astro.props;
   </div>
 </div>
 
+<!-- Modal de Recuperar Contraseña -->
+<div
+  id="product-reset-password-modal"
+  class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 backdrop-blur-sm"
+>
+  <div
+    class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+  >
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-text-light dark:text-text-dark">
+          Recuperar Contraseña
+        </h2>
+        <button
+          id="close-product-reset-modal"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
+      </p>
+
+      <form id="product-reset-password-form" class="space-y-4">
+        <div>
+          <label
+            class="block text-sm font-medium text-text-light dark:text-text-dark mb-1"
+          >
+            Correo Electrónico
+          </label>
+          <input
+            type="email"
+            id="product-reset-email"
+            required
+            class="w-full h-10 px-3 rounded-lg border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+            placeholder="correo@ejemplo.com"
+          />
+        </div>
+        <div id="product-reset-message" class="hidden text-sm"></div>
+        <button
+          type="submit"
+          id="product-reset-submit-btn"
+          class="w-full h-10 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors"
+        >
+          Enviar Enlace
+        </button>
+        <button
+          type="button"
+          id="back-to-product-login-btn"
+          class="w-full text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+        >
+          ← Volver al inicio de sesión
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
   import { auth, db } from "../../firebase/client";
   import {
     onAuthStateChanged,
     signOut,
     signInWithEmailAndPassword,
+    sendPasswordResetEmail,
   } from "firebase/auth";
   import { doc, getDoc } from "firebase/firestore";
 
@@ -449,6 +522,115 @@ const { searchPlaceholder = "Buscar productos..." } = Astro.props;
           }
         } else if (noResultsMsg) {
           noResultsMsg.remove();
+        }
+      });
+    }
+
+    // ============================================
+    // FUNCIONALIDAD DE RECUPERAR CONTRASEÑA
+    // ============================================
+    const forgotPasswordBtn = document.getElementById("product-forgot-password-btn");
+    const resetPasswordModal = document.getElementById("product-reset-password-modal");
+    const closeResetModal = document.getElementById("close-product-reset-modal");
+    const resetPasswordForm = document.getElementById("product-reset-password-form");
+    const backToLoginBtn = document.getElementById("back-to-product-login-btn");
+    const resetMessage = document.getElementById("product-reset-message");
+    const resetSubmitBtn = document.getElementById("product-reset-submit-btn") as HTMLButtonElement | null;
+
+    // Abrir modal de recuperar contraseña
+    if (forgotPasswordBtn && resetPasswordModal && loginModal) {
+      forgotPasswordBtn.addEventListener("click", () => {
+        loginModal.classList.add("hidden");
+        loginModal.classList.remove("flex");
+        resetPasswordModal.classList.remove("hidden");
+        resetPasswordModal.classList.add("flex");
+      });
+    }
+
+    // Cerrar modal de reset
+    if (closeResetModal && resetPasswordModal) {
+      closeResetModal.addEventListener("click", () => {
+        resetPasswordModal.classList.add("hidden");
+        resetPasswordModal.classList.remove("flex");
+      });
+    }
+
+    // Volver al login
+    if (backToLoginBtn && resetPasswordModal && loginModal) {
+      backToLoginBtn.addEventListener("click", () => {
+        resetPasswordModal.classList.add("hidden");
+        resetPasswordModal.classList.remove("flex");
+        loginModal.classList.remove("hidden");
+        loginModal.classList.add("flex");
+      });
+    }
+
+    // Cerrar al hacer click fuera
+    if (resetPasswordModal) {
+      resetPasswordModal.addEventListener("click", (e) => {
+        if (e.target === resetPasswordModal) {
+          resetPasswordModal.classList.add("hidden");
+          resetPasswordModal.classList.remove("flex");
+        }
+      });
+    }
+
+    // Enviar email de recuperación
+    if (resetPasswordForm) {
+      resetPasswordForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const emailInput = document.getElementById("product-reset-email") as HTMLInputElement;
+        const email = emailInput?.value?.trim();
+        
+        if (!email) return;
+
+        // Loading state
+        if (resetSubmitBtn) {
+          resetSubmitBtn.disabled = true;
+          resetSubmitBtn.textContent = "Enviando...";
+        }
+
+        try {
+          await sendPasswordResetEmail(auth, email);
+          
+          if (resetMessage) {
+            resetMessage.textContent = `¡Listo! Hemos enviado un enlace a ${email}`;
+            resetMessage.className = "text-sm text-green-600";
+            resetMessage.classList.remove("hidden");
+          }
+          
+          emailInput.value = "";
+          
+          setTimeout(() => {
+            if (resetPasswordModal) {
+              resetPasswordModal.classList.add("hidden");
+              resetPasswordModal.classList.remove("flex");
+            }
+            if (resetMessage) resetMessage.classList.add("hidden");
+          }, 3000);
+          
+        } catch (error) {
+          console.error("Error sending password reset email:", error);
+          const err = error as Error & { code?: string };
+          
+          let errorMsg = "No pudimos enviar el correo. Intenta nuevamente.";
+          if (err.code === "auth/user-not-found") {
+            errorMsg = "No existe una cuenta con este correo.";
+          } else if (err.code === "auth/too-many-requests") {
+            errorMsg = "Demasiados intentos. Espera unos minutos.";
+          }
+          
+          if (resetMessage) {
+            resetMessage.textContent = errorMsg;
+            resetMessage.className = "text-sm text-red-600";
+            resetMessage.classList.remove("hidden");
+          }
+        } finally {
+          if (resetSubmitBtn) {
+            resetSubmitBtn.disabled = false;
+            resetSubmitBtn.textContent = "Enviar Enlace";
+          }
         }
       });
     }

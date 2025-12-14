@@ -159,9 +159,13 @@
               Recordarme
             </span>
           </label>
-          <a href="#" class="text-sm text-primary hover:underline font-medium">
+          <button
+            type="button"
+            id="forgotPasswordBtn"
+            class="text-sm text-primary hover:underline font-medium bg-transparent border-none cursor-pointer"
+          >
             ¿Olvidaste tu contraseña?
-          </a>
+          </button>
         </div>
 
         <!-- Botón de Login -->
@@ -205,6 +209,73 @@
   </div>
 </div>
 
+<!-- Modal de Recuperar Contraseña -->
+<div
+  id="resetPasswordModal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[101] hidden items-center justify-center p-4"
+>
+  <div
+    class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-8 relative animate-fade-in"
+  >
+    <button
+      id="closeResetModal"
+      class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+    >
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-2 text-center">
+        <div class="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+          <span class="material-symbols-outlined text-3xl text-primary">lock_reset</span>
+        </div>
+        <h2 class="text-2xl font-bold text-secondary dark:text-text-dark">
+          Recuperar Contraseña
+        </h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400">
+          Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
+        </p>
+      </div>
+
+      <form id="resetPasswordForm" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <label
+            for="resetEmail"
+            class="text-sm font-medium text-secondary dark:text-text-dark"
+          >
+            Correo Electrónico
+          </label>
+          <input
+            type="email"
+            id="resetEmail"
+            name="resetEmail"
+            required
+            placeholder="correo@ejemplo.com"
+            class="h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-secondary dark:text-text-dark placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </div>
+
+        <button
+          type="submit"
+          id="resetPasswordSubmitBtn"
+          class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-primary text-white text-base font-bold tracking-wide hover:bg-primary/90 transition-all hover:shadow-lg mt-2"
+        >
+          <span class="material-symbols-outlined mr-2">send</span>
+          <span>Enviar Enlace</span>
+        </button>
+
+        <button
+          type="button"
+          id="backToLoginBtn"
+          class="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
+        >
+          ← Volver al inicio de sesión
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <style>
   @keyframes fade-in {
     from {
@@ -228,6 +299,7 @@
     signInWithEmailAndPassword,
     onAuthStateChanged,
     signOut,
+    sendPasswordResetEmail,
   } from "firebase/auth";
   import { doc, getDoc } from "firebase/firestore";
 
@@ -430,4 +502,126 @@
     `;
     document.head.appendChild(style);
   }
+
+  // ============================================
+  // FUNCIONALIDAD DE RECUPERAR CONTRASEÑA
+  // ============================================
+  const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  const closeResetModal = document.getElementById("closeResetModal");
+  const resetPasswordForm = document.getElementById("resetPasswordForm");
+  const backToLoginBtn = document.getElementById("backToLoginBtn");
+  const resetPasswordSubmitBtn = document.getElementById("resetPasswordSubmitBtn") as HTMLButtonElement | null;
+
+  // Abrir modal de recuperar contraseña
+  forgotPasswordBtn?.addEventListener("click", () => {
+    // Cerrar modal de login
+    loginModal?.classList.add("hidden");
+    loginModal?.classList.remove("flex");
+    // Abrir modal de reset
+    resetPasswordModal?.classList.remove("hidden");
+    resetPasswordModal?.classList.add("flex");
+  });
+
+  // Cerrar modal de reset
+  const closeResetPasswordModal = () => {
+    resetPasswordModal?.classList.add("hidden");
+    resetPasswordModal?.classList.remove("flex");
+    document.body.style.overflow = "auto";
+  };
+
+  closeResetModal?.addEventListener("click", closeResetPasswordModal);
+
+  // Volver al login
+  backToLoginBtn?.addEventListener("click", () => {
+    closeResetPasswordModal();
+    loginModal?.classList.remove("hidden");
+    loginModal?.classList.add("flex");
+  });
+
+  // Cerrar al hacer click fuera del modal
+  resetPasswordModal?.addEventListener("click", (e) => {
+    if (e.target === resetPasswordModal) {
+      closeResetPasswordModal();
+    }
+  });
+
+  // Cerrar con ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !resetPasswordModal?.classList.contains("hidden")) {
+      closeResetPasswordModal();
+    }
+  });
+
+  // Enviar email de recuperación
+  resetPasswordForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const emailInput = document.getElementById("resetEmail") as HTMLInputElement;
+    const email = emailInput?.value?.trim();
+    
+    if (!email) {
+      showLoginToast("Por favor ingresa tu correo electrónico.", "warning");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showLoginToast("Por favor ingresa un correo electrónico válido.", "warning");
+      return;
+    }
+
+    // Loading state
+    if (resetPasswordSubmitBtn) {
+      resetPasswordSubmitBtn.disabled = true;
+      resetPasswordSubmitBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Enviando...</span>
+      `;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      
+      showLoginToast(
+        `¡Listo! Hemos enviado un enlace de recuperación a ${email}. Revisa tu bandeja de entrada.`,
+        "success"
+      );
+      
+      // Limpiar y cerrar
+      emailInput.value = "";
+      setTimeout(() => {
+        closeResetPasswordModal();
+      }, 2000);
+      
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+      const err = error as Error & { code?: string };
+      
+      let errorMsg = "No pudimos enviar el correo de recuperación. Intenta nuevamente.";
+      
+      if (err.code === "auth/user-not-found") {
+        errorMsg = "No existe una cuenta con este correo electrónico.";
+      } else if (err.code === "auth/invalid-email") {
+        errorMsg = "El formato del correo electrónico no es válido.";
+      } else if (err.code === "auth/too-many-requests") {
+        errorMsg = "Demasiados intentos. Por favor espera unos minutos.";
+      }
+      
+      showLoginToast(errorMsg, "danger");
+    } finally {
+      // Reset button
+      if (resetPasswordSubmitBtn) {
+        resetPasswordSubmitBtn.disabled = false;
+        resetPasswordSubmitBtn.innerHTML = `
+          <span class="material-symbols-outlined mr-2">send</span>
+          <span>Enviar Enlace</span>
+        `;
+      }
+    }
+  });
 </script>
