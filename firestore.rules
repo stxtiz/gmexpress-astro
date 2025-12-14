@@ -88,15 +88,28 @@ service cloud.firestore {
     // ============================================
     // COLECCIÓN: products
     // Lectura pública, escritura solo admin con validación
+    // Excepción: usuarios autenticados pueden decrementar stock al comprar
     // ============================================
     match /products/{productId} {
       allow read: if true;
       
-      // Solo admin puede crear/modificar/eliminar productos
-      // Con validaciones de seguridad en los datos
+      // Solo admin puede crear/eliminar productos
       allow create: if isAdmin() && isValidProduct(request.resource.data);
-      allow update: if isAdmin() && isValidProduct(request.resource.data);
       allow delete: if isAdmin();
+      
+      // Admin puede actualizar todo, usuarios autenticados solo pueden decrementar stock
+      allow update: if isAdmin() && isValidProduct(request.resource.data)
+                    || (isAuthenticated() && isStockDecrement());
+      
+      // Función para validar que solo se está decrementando el stock
+      function isStockDecrement() {
+        // Solo se puede modificar el campo stock
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
+          // El nuevo stock debe ser menor que el actual (decrementar)
+          && request.resource.data.stock < resource.data.stock
+          // El stock no puede ser negativo
+          && request.resource.data.stock >= 0;
+      }
       
       // Función de validación para productos
       // Valida todos los campos requeridos y sus restricciones
@@ -289,41 +302,22 @@ service cloud.firestore {
 
     // ============================================
     // COLECCIÓN: pedidos (órdenes de compra)
-    // - Creación: solo usuarios autenticados con validaciones
+    // - Creación: cualquier usuario autenticado (su propio pedido)
     // - Lectura: propietario del pedido o admin
     // - Actualización/Eliminación: solo admin
     // ============================================
     match /pedidos/{pedidoId} {
-      // Validar estructura del pedido
-      function isValidPedido() {
-        let data = request.resource.data;
-        return data.keys().hasAll(['userId', 'cliente', 'email', 'productos', 'subtotal', 'iva', 'total', 'estado', 'createdAt'])
-          && data.userId is string
-          && data.userId.size() > 0
-          && data.email is string
-          && data.productos is list
-          && data.productos.size() > 0
-          && data.estado == 'En Proceso';  // Solo puede crear con estado inicial
-      }
-
-      // Solo usuarios autenticados pueden crear pedidos
-      // con su propio userId y estructura válida
+      // Cualquier usuario autenticado puede crear un pedido
+      // Solo validamos que el userId coincida con el usuario autenticado
       allow create: if isAuthenticated() 
-        && request.resource.data.userId == request.auth.uid
-        && isValidPedido();
+        && request.resource.data.userId == request.auth.uid;
       
       // El usuario puede leer sus propios pedidos, admin puede leer todos
       allow read: if isAuthenticated() 
         && (resource.data.userId == request.auth.uid || isAdmin());
       
       // Solo admin puede actualizar estado de pedidos
-      // Y solo puede modificar campos específicos (no userId, no productos, no totales)
-      // Requiere campos de auditoría: updatedBy y updatedAt
-      allow update: if isAdmin()
-        && request.resource.data.userId == resource.data.userId  // No puede cambiar userId
-        && request.resource.data.productos == resource.data.productos  // No puede cambiar productos
-        && request.resource.data.updatedBy == request.auth.uid  // Debe registrar quién actualiza
-        && request.resource.data.updatedAt == request.time;  // Debe registrar cuándo
+      allow update: if isAdmin();
       
       // Solo admin puede eliminar pedidos
       allow delete: if isAdmin();

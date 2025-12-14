@@ -66,7 +66,6 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                   >
                     <i class="bi bi-box-seam text-primary fs-3"></i>
                   </div>
-                  <span class="badge bg-success">+8%</span>
                 </div>
                 <h2 class="fw-bold mb-1" id="total-products-count">...</h2>
                 <p class="text-muted mb-0 small">Total Productos</p>
@@ -87,7 +86,6 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                   >
                     <i class="bi bi-gear text-success fs-3"></i>
                   </div>
-                  <span class="badge bg-primary">+12%</span>
                 </div>
                 <h2 class="fw-bold mb-1" id="total-services-count">...</h2>
                 <p class="text-muted mb-0 small">Total Servicios</p>
@@ -108,7 +106,6 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                   >
                     <i class="bi bi-people text-warning fs-3"></i>
                   </div>
-                  <span class="badge bg-info" id="users-badge">...</span>
                 </div>
                 <h2 class="fw-bold mb-1" id="total-users-count">...</h2>
                 <p class="text-muted mb-0 small">Usuarios Registrados</p>
@@ -126,10 +123,6 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                   >
                     <i class="bi bi-cart-check text-info fs-3"></i>
                   </div>
-                  <span
-                    class="badge bg-warning text-dark"
-                    id="pedidos-pendientes-badge">...</span
-                  >
                 </div>
                 <h2 class="fw-bold mb-1" id="total-pedidos-mes">...</h2>
                 <p class="text-muted mb-0 small">Pedidos del Mes</p>
@@ -144,24 +137,101 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
           <div class="col-lg-8">
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body">
+                <!-- Header con título y controles -->
                 <div
-                  class="d-flex justify-content-between align-items-center mb-4"
+                  class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"
                 >
-                  <h5 class="fw-bold mb-0">Ventas del Mes</h5>
-                  <div class="btn-group btn-group-sm" role="group">
+                  <h5 class="fw-bold mb-0">Ventas</h5>
+
+                  <!-- Controles de tipo de gráfico -->
+                  <div
+                    class="btn-group btn-group-sm me-2"
+                    role="group"
+                    id="chartTypeGroup"
+                  >
                     <button
                       type="button"
-                      class="btn btn-outline-secondary active">Semana</button
+                      class="btn btn-outline-secondary active"
+                      data-chart-type="pie"
+                      title="Gráfico Pastel"
                     >
-                    <button type="button" class="btn btn-outline-secondary"
-                      >Mes</button
+                      <i class="bi bi-pie-chart-fill"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      data-chart-type="bar"
+                      title="Gráfico Barras"
                     >
-                    <button type="button" class="btn btn-outline-secondary"
-                      >Año</button
+                      <i class="bi bi-bar-chart-fill"></i>
+                    </button>
+                  </div>
+
+                  <!-- Filtros de tiempo -->
+                  <div class="btn-group btn-group-sm" role="group" id="timeFilterGroup">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      data-filter="day">Hoy</button
+                    >
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      data-filter="week">Semana</button
+                    >
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary active"
+                      data-filter="month">Mes</button
+                    >
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      data-filter="year">Año</button
                     >
                   </div>
                 </div>
-                <canvas id="salesChart" height="100"></canvas>
+
+                <!-- Estado de carga -->
+                <div id="chartLoading" class="text-center py-5">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="text-muted mt-2 mb-0">Cargando datos...</p>
+                </div>
+
+                <!-- Estado de error -->
+                <div id="chartError" class="text-center py-5 d-none">
+                  <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
+                  <p class="text-danger mt-2 mb-0">Error al cargar datos</p>
+                  <button
+                    class="btn btn-sm btn-outline-primary mt-2"
+                    id="retryChartBtn">Reintentar</button
+                  >
+                </div>
+
+                <!-- Estado sin datos -->
+                <div id="chartEmpty" class="text-center py-5 d-none">
+                  <i class="bi bi-inbox text-muted fs-1"></i>
+                  <p class="text-muted mt-2 mb-0">No hay ventas en este período</p>
+                </div>
+
+                <!-- Canvas del gráfico -->
+                <div id="chartContainer" class="d-none">
+                  <canvas id="salesChart"></canvas>
+                </div>
+
+                <!-- Resumen de ventas -->
+                <div id="salesSummary" class="mt-3 d-none">
+                  <div class="row text-center">
+                    <div class="col">
+                      <h4 class="fw-bold text-success mb-0" id="totalVentas">$0</h4>
+                      <small class="text-muted">Total Ventas</small>
+                    </div>
+                    <div class="col">
+                      <h4 class="fw-bold text-primary mb-0" id="cantidadPedidos">0</h4>
+                      <small class="text-muted">Pedidos Totales</small>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -310,6 +380,29 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
       .main-content {
         margin-left: 0;
       }
+    }
+
+    /* Estilos para el gráfico de ventas */
+    #chartContainer {
+      max-height: 280px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #chartContainer canvas {
+      max-height: 280px !important;
+      max-width: 100% !important;
+    }
+
+    #chartLoading,
+    #chartError,
+    #chartEmpty {
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
   </style>
 
@@ -567,32 +660,277 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
       return date.toLocaleDateString("es-CL");
     }
 
-    // Mock chart data (kept for visual consistency)
-    document.addEventListener("DOMContentLoaded", function () {
-      const ctx = document.getElementById("salesChart") as HTMLCanvasElement;
-      if (ctx) {
-        const data = [12, 19, 15, 22, 18, 25, 20];
-        const labels = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-        const canvas = ctx.getContext("2d");
-        if (canvas) {
-          canvas.fillStyle = "#79c043";
-          const barWidth = ctx.width / data.length;
-          const maxValue = Math.max(...data);
+    // ============================================
+    // GRÁFICO DE VENTAS CON FILTROS DE TIEMPO
+    // Usa Chart.js para mostrar gráfico de pastel/barras
+    // con datos reales filtrados por tiempo
+    // ============================================
 
-          data.forEach((value, index) => {
-            const barHeight = (value / maxValue) * (ctx.height - 40);
-            const x = index * barWidth + 10;
-            const y = ctx.height - barHeight - 20;
-            canvas.fillRect(x, y, barWidth - 20, barHeight);
-            canvas.fillStyle = "#666";
-            canvas.font = "12px Arial";
-            canvas.fillText(labels[index], x + 5, ctx.height - 5);
-            canvas.fillStyle = "#79c043";
-          });
-        }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let salesChart: any = null;
+    let currentFilter = "month";
+    let currentChartType = "pie";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let salesUnsubscribe: any = null;
+
+    // Obtener rango de fechas según filtro seleccionado
+    function getDateRange(filter: string): { start: Date; end: Date } {
+      const now = new Date();
+      const end = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        23,
+        59,
+        59,
+      );
+      let start: Date;
+
+      switch (filter) {
+        case "day":
+          start = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            0,
+            0,
+            0,
+          );
+          break;
+        case "week":
+          start = new Date(now);
+          start.setDate(now.getDate() - now.getDay());
+          start.setHours(0, 0, 0, 0);
+          break;
+        case "month":
+          start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+          break;
+        case "year":
+          start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
+          break;
+        default:
+          start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
       }
+      return { start, end };
+    }
+
+    // Formatear moneda chilena
+    function formatCurrency(value: number): string {
+      return new Intl.NumberFormat("es-CL", {
+        style: "currency",
+        currency: "CLP",
+        maximumFractionDigits: 0,
+      }).format(value);
+    }
+
+    // Renderizar el gráfico con Chart.js
+    function renderSalesChart(data: Record<string, number>) {
+      const ctx = document.getElementById("salesChart") as HTMLCanvasElement;
+      if (!ctx) return;
+
+      // Destruir gráfico anterior si existe
+      if (salesChart) {
+        salesChart.destroy();
+      }
+
+      const labels = Object.keys(data);
+      const values = Object.values(data);
+      const colors = ["#ffc107", "#17a2b8", "#6c757d", "#28a745"];
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const chartConfig: any = {
+        type: currentChartType,
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Ventas por Estado ($)",
+              data: values,
+              backgroundColor: colors,
+              borderColor: currentChartType === "bar" ? colors : "#fff",
+              borderWidth: currentChartType === "bar" ? 0 : 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: currentChartType === "pie" ? "bottom" : "top",
+            },
+            tooltip: {
+              callbacks: {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                label: function (context: any) {
+                  return `${context.label}: ${formatCurrency(context.raw)}`;
+                },
+              },
+            },
+          },
+        },
+      };
+
+      // @ts-ignore - Chart.js cargado via CDN
+      salesChart = new Chart(ctx, chartConfig);
+    }
+
+    // Cargar y mostrar datos de ventas
+    function loadSalesData() {
+      const loadingEl = document.getElementById("chartLoading");
+      const errorEl = document.getElementById("chartError");
+      const emptyEl = document.getElementById("chartEmpty");
+      const containerEl = document.getElementById("chartContainer");
+      const summaryEl = document.getElementById("salesSummary");
+
+      // Mostrar loading
+      loadingEl?.classList.remove("d-none");
+      errorEl?.classList.add("d-none");
+      emptyEl?.classList.add("d-none");
+      containerEl?.classList.add("d-none");
+      summaryEl?.classList.add("d-none");
+
+      const { start, end } = getDateRange(currentFilter);
+
+      // Cancelar listener anterior si existe
+      if (salesUnsubscribe) {
+        salesUnsubscribe();
+      }
+
+      // Escuchar cambios en pedidos
+      salesUnsubscribe = onSnapshot(
+        pedidosCol,
+        (snap) => {
+          try {
+            // Filtrar pedidos por rango de fecha
+            const pedidosFiltrados = snap.docs.filter((doc) => {
+              const data = doc.data();
+              const fecha =
+                data.createdAt?.toDate?.() ||
+                new Date(data.fecha || data.createdAt);
+              return fecha >= start && fecha <= end;
+            });
+
+            // Agrupar ventas por estado
+            const ventasPorEstado: Record<string, number> = {
+              Pendiente: 0,
+              "En Proceso": 0,
+              Enviado: 0,
+              Completado: 0,
+            };
+
+            let totalVentas = 0;
+            pedidosFiltrados.forEach((doc) => {
+              const data = doc.data();
+              // Parsear el total correctamente
+              // Si es número, usarlo directamente
+              // Si es string con formato chileno ("$951.405"), quitar $ y puntos
+              let total = 0;
+              if (typeof data.total === "number") {
+                total = data.total;
+              } else if (typeof data.total === "string") {
+                // Quitar $ y puntos (separadores de miles en formato chileno)
+                const cleanTotal = data.total.replace(/[$\.]/g, "").replace(",", ".");
+                total = parseFloat(cleanTotal) || 0;
+              }
+              
+              // Mapear estado "Recibido" a "Completado" si existe
+              let estado = data.estado || "Pendiente";
+              if (estado === "Recibido") estado = "Completado";
+              
+              totalVentas += total;
+              if (ventasPorEstado[estado] !== undefined) {
+                ventasPorEstado[estado] += total;
+              }
+            });
+
+            // Ocultar loading
+            loadingEl?.classList.add("d-none");
+
+            // Verificar si hay datos
+            if (pedidosFiltrados.length === 0) {
+              emptyEl?.classList.remove("d-none");
+              return;
+            }
+
+            // Mostrar gráfico y resumen
+            containerEl?.classList.remove("d-none");
+            summaryEl?.classList.remove("d-none");
+
+            // Actualizar resumen - Solo mostrar ventas y pedidos COMPLETADOS
+            const totalEl = document.getElementById("totalVentas");
+            const cantidadEl = document.getElementById("cantidadPedidos");
+            const ventasCompletadas = ventasPorEstado["Completado"] || 0;
+            const pedidosCompletados = pedidosFiltrados.filter(
+              (doc) => {
+                let estado = doc.data().estado || "Pendiente";
+                if (estado === "Recibido") estado = "Completado";
+                return estado === "Completado";
+              }
+            ).length;
+            
+            if (totalEl) totalEl.textContent = formatCurrency(ventasCompletadas);
+            if (cantidadEl) cantidadEl.textContent = pedidosCompletados.toString();
+
+            // Renderizar gráfico
+            renderSalesChart(ventasPorEstado);
+          } catch (error) {
+            console.error("Error procesando datos de ventas:", error);
+            loadingEl?.classList.add("d-none");
+            errorEl?.classList.remove("d-none");
+          }
+        },
+        (error) => {
+          console.error("Error cargando ventas:", error);
+          loadingEl?.classList.add("d-none");
+          errorEl?.classList.remove("d-none");
+        },
+      );
+    }
+
+    // Inicializar gráfico y event listeners
+    document.addEventListener("DOMContentLoaded", () => {
+      // Filtros de tiempo
+      document.querySelectorAll("#timeFilterGroup button").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const target = e.currentTarget as HTMLButtonElement;
+          document
+            .querySelectorAll("#timeFilterGroup button")
+            .forEach((b) => b.classList.remove("active"));
+          target.classList.add("active");
+          currentFilter = target.dataset.filter || "month";
+          loadSalesData();
+        });
+      });
+
+      // Tipo de gráfico
+      document.querySelectorAll("#chartTypeGroup button").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const target = e.currentTarget as HTMLButtonElement;
+          document
+            .querySelectorAll("#chartTypeGroup button")
+            .forEach((b) => b.classList.remove("active"));
+          target.classList.add("active");
+          currentChartType = target.dataset.chartType || "pie";
+          loadSalesData();
+        });
+      });
+
+      // Botón reintentar
+      document.getElementById("retryChartBtn")?.addEventListener("click", () => {
+        loadSalesData();
+      });
+
+      // Cargar datos iniciales
+      loadSalesData();
     });
   </script>
+
+  <!-- Chart.js CDN -->
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+  ></script>
 
   <!-- Bootstrap JS Bundle -->
   <script

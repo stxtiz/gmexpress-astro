@@ -1016,6 +1016,75 @@ onSnapshot(notifQuery, (snapshot) => {
 });
 ```
 
+5. GRÁFICO DE VENTAS:
+   - Librería: Chart.js 4.4.1 (CDN)
+   - Tipo: Por defecto Pastel (Pie), toggleable a Barras (Bar)
+   - Filtros de tiempo: Hoy, Semana, Mes, Año
+   - Datos: Agrupados por estado del pedido (Pendiente, En Proceso, Enviado, Completado)
+   - Estados UI: Loading, Error, Empty, Data
+   - Total Ventas: Solo muestra suma de pedidos COMPLETADOS
+   - Pedidos Totales: Solo cuenta pedidos COMPLETADOS
+
+MAPEO DE ESTADO EN UI:
+- En la base de datos, el estado final se guarda como "Recibido"
+- En la interfaz de usuario, se muestra como "Completado"
+- Esto aplica a: Dashboard, Gráfico de Ventas, Tabla de Pedidos, Modal de Detalle
+
+CÓDIGO DE REFERENCIA (Gráfico de Ventas):
+```javascript
+// Variables de estado
+let currentFilter = "month";
+let currentChartType = "pie";
+
+// Parseo de precios en formato chileno ($951.405 = 951405)
+function parseChileanPrice(total) {
+  if (typeof total === "number") return total;
+  // Quitar $ y puntos (separadores de miles)
+  return parseFloat(total.replace(/[$\.]/g, "").replace(",", ".")) || 0;
+}
+
+// Mapeo de estado para UI
+function mapEstado(estado) {
+  return estado === "Recibido" ? "Completado" : estado;
+}
+
+// Cargar datos filtrados
+onSnapshot(pedidosCol, (snap) => {
+  const { start, end } = getDateRange(currentFilter);
+  
+  const pedidosFiltrados = snap.docs.filter((doc) => {
+    const data = doc.data();
+    const fecha = data.createdAt?.toDate?.() || new Date(data.createdAt);
+    return fecha >= start && fecha <= end;
+  });
+  
+  // Agrupar ventas por estado
+  const ventasPorEstado = {
+    "Pendiente": 0,
+    "En Proceso": 0,
+    "Enviado": 0,
+    "Completado": 0  // Antes: "Recibido"
+  };
+  
+  pedidosFiltrados.forEach((doc) => {
+    const data = doc.data();
+    const total = parseChileanPrice(data.total);
+    let estado = data.estado || "Pendiente";
+    if (estado === "Recibido") estado = "Completado";
+    ventasPorEstado[estado] += total;
+  });
+  
+  // Total Ventas = Solo pedidos Completados
+  const totalVentas = ventasPorEstado["Completado"];
+  
+  // Renderizar gráfico con Chart.js
+  new Chart(ctx, {
+    type: currentChartType, // 'pie' o 'bar'
+    data: { labels, datasets: [{ data: values, backgroundColor: colors }] }
+  });
+});
+```
+
 ================================================================================
                      HEADER ADMIN - PERFIL DE USUARIO
 ================================================================================

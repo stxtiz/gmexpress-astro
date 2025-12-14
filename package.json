@@ -13,25 +13,25 @@
   "dependencies": {
     "@astrojs/check": "^0.9.6",
     "@astrojs/vercel": "^9.0.2",
-    "@tailwindcss/vite": "^4.1.17",
-    "astro": "^5.16.3",
+    "@tailwindcss/vite": "^4.1.18",
+    "astro": "^5.16.5",
     "firebase": "^12.6.0",
     "firebase-admin": "^13.6.0",
-    "tailwindcss": "^4.1.17",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
-    "@typescript-eslint/eslint-plugin": "^8.48.0",
-    "@typescript-eslint/parser": "^8.48.0",
+    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/parser": "^8.49.0",
     "astro-eslint-parser": "^1.2.2",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "eslint-plugin-astro": "^1.5.0",
     "globals": "^16.5.0",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.4",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript-eslint": "^8.48.0",
-    "vitest": "^4.0.14"
+    "typescript-eslint": "^8.49.0",
+    "vitest": "^4.0.15"
   },
   "engines": {
     "node": ">=18",
