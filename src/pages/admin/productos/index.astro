@@ -45,7 +45,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                     <i class="bi bi-box-seam text-primary fs-4"></i>
                   </div>
                 </div>
-                <h3 class="fw-bold mb-0" id="total-productos">8</h3>
+                <h3 class="fw-bold mb-0" id="total-productos">...</h3>
                 <p class="text-muted mb-0 small">Total Productos</p>
               </div>
             </div>
@@ -62,7 +62,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                     <i class="bi bi-check-circle text-success fs-4"></i>
                   </div>
                 </div>
-                <h3 class="fw-bold mb-0" id="productos-activos">8</h3>
+                <h3 class="fw-bold mb-0" id="productos-activos">...</h3>
                 <p class="text-muted mb-0 small">Activos</p>
               </div>
             </div>
@@ -79,7 +79,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                     <i class="bi bi-tags text-warning fs-4"></i>
                   </div>
                 </div>
-                <h3 class="fw-bold mb-0" id="categorias">5</h3>
+                <h3 class="fw-bold mb-0" id="categorias">...</h3>
                 <p class="text-muted mb-0 small">Categorías</p>
               </div>
             </div>
@@ -91,13 +91,13 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                   class="d-flex align-items-center justify-content-between mb-2"
                 >
                   <div
-                    class="rounded-circle bg-info bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
+                    class="rounded-circle bg-danger bg-opacity-10 p-3 d-flex align-items-center justify-content-center"
                   >
-                    <i class="bi bi-currency-dollar text-info fs-4"></i>
+                    <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
                   </div>
                 </div>
-                <h3 class="fw-bold mb-0" id="precio-promedio">$9.240</h3>
-                <p class="text-muted mb-0 small">Precio Promedio</p>
+                <h3 class="fw-bold mb-0" id="productos-sin-stock">...</h3>
+                <p class="text-muted mb-0 small">Sin Stock</p>
               </div>
             </div>
           </div>
@@ -121,13 +121,9 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                 </div>
               </div>
               <div class="col-md-3">
+                <!-- Las opciones se cargan dinámicamente desde Firebase -->
                 <select class="form-select" id="categoryFilter">
                   <option value="">Todas las categorías</option>
-                  <option value="Pizza">Pizza</option>
-                  <option value="Ensalada">Ensalada</option>
-                  <option value="Bebidas">Bebidas</option>
-                  <option value="Desayuno">Desayuno</option>
-                  <option value="Carnes">Carnes</option>
                 </select>
               </div>
               <div class="col-md-2">
@@ -138,6 +134,14 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                 </select>
               </div>
               <div class="col-md-3 text-end">
+                <button
+                  class="btn btn-outline-primary me-2"
+                  data-bs-toggle="modal"
+                  data-bs-target="#categoriaModal"
+                  onclick="openCategoriaModal()"
+                >
+                  <i class="bi bi-tags me-2"></i>Nueva Categoría
+                </button>
                 <button
                   class="btn btn-primary"
                   data-bs-toggle="modal"
@@ -250,13 +254,9 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
                 <label for="categoria" class="form-label fw-semibold"
                   >Categoría <span class="text-danger">*</span></label
                 >
+                <!-- Las opciones se cargan dinámicamente desde Firebase -->
                 <select class="form-select" id="categoria" required>
                   <option value="">Seleccionar...</option>
-                  <option value="Pizza">Pizza</option>
-                  <option value="Ensalada">Ensalada</option>
-                  <option value="Bebidas">Bebidas</option>
-                  <option value="Desayuno">Desayuno</option>
-                  <option value="Carnes">Carnes</option>
                 </select>
               </div>
               <div class="col-12">
@@ -476,6 +476,66 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     </div>
   </div>
 
+  <!-- Modal para Nueva Categoría -->
+  <div
+    class="modal fade"
+    id="categoriaModal"
+    tabindex="-1"
+    aria-labelledby="categoriaModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="categoriaModalLabel">
+            <i class="bi bi-tags me-2 text-primary"></i>Nueva Categoría
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="categoriaForm">
+            <div class="mb-3">
+              <label for="categoriaNombre" class="form-label fw-semibold"
+                >Nombre de la Categoría <span class="text-danger">*</span></label
+              >
+              <!-- Validación: mínimo 2, máximo 50 caracteres. Pattern previene caracteres peligrosos -->
+              <input
+                type="text"
+                class="form-control"
+                id="categoriaNombre"
+                placeholder="Ej: Postres, Bebidas Calientes, etc."
+                required
+                minlength="2"
+                maxlength="50"
+                pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.,\-()]+$"
+                title="Solo letras, números y caracteres básicos permitidos"
+              />
+              <div class="form-text text-muted">
+                <i class="bi bi-info-circle me-1"></i>Mínimo 2, máximo 50 caracteres. Sin caracteres especiales.
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cancelar</button
+          >
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="saveCategoria()"
+          >
+            <i class="bi bi-save me-2"></i>Guardar Categoría
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <style>
     .admin-dashboard {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -648,7 +708,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
   </style>
 
   <script>
-    import { db } from "../../../firebase/client";
+    import { db, auth } from "../../../firebase/client";
     import {
       collection,
       addDoc,
@@ -658,6 +718,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       onSnapshot,
       query,
       orderBy,
+      serverTimestamp,
     } from "firebase/firestore";
 
     const productsCollection = collection(db, "products");
@@ -694,6 +755,17 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     }
 
     // ============================================
+    // INTERFAZ: Definición de tipos para Categoría
+    // ============================================
+    interface Category {
+      id: string;
+      name: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      createdAt?: any;
+      createdBy?: string;
+    }
+
+    // ============================================
     // CONSTANTES DE VALIDACIÓN
     // Configuración centralizada para límites y patrones
     // ============================================
@@ -712,14 +784,9 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       STOCK_MAX: 999999, // Stock máximo
       STOCK_MIN: 0, // Stock mínimo (no negativos)
 
-      // Categorías permitidas (whitelist)
-      ALLOWED_CATEGORIES: [
-        "Pizza",
-        "Ensalada",
-        "Bebidas",
-        "Desayuno",
-        "Carnes",
-      ] as readonly string[],
+      // Límites para categorías
+      CATEGORY_NAME_MAX_LENGTH: 50, // Máximo caracteres para nombre de categoría
+      CATEGORY_NAME_MIN_LENGTH: 2,  // Mínimo caracteres para nombre de categoría
 
       // Patrones regex para validación
       PATTERNS: {
@@ -746,12 +813,15 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         deleteProducto: (id: string) => void;
         confirmDelete: () => Promise<void>;
         saveProducto: () => Promise<void>;
+        openCategoriaModal: () => void;
+        saveCategoria: () => Promise<void>;
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       var bootstrap: any;
     }
 
     let productos: Product[] = [];
+    let categorias: Category[] = []; // Categorías cargadas desde Firebase
     let editingId: string | null = null;
     let deleteId: string | null = null;
     let filteredProducts: Product[] = [];
@@ -1042,7 +1112,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     // ============================================
     // FUNCIÓN: Validar categoría
-    // Verifica que sea una categoría de la whitelist
+    // Verifica que sea una categoría válida de la colección categories
     // ============================================
     function validateCategory(category: string): {
       isValid: boolean;
@@ -1052,7 +1122,9 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         return { isValid: false, error: "Categoría es requerida" };
       }
 
-      if (!VALIDATION_CONFIG.ALLOWED_CATEGORIES.includes(category)) {
+      // Validar contra las categorías cargadas desde Firebase
+      const categoryNames = categorias.map(c => c.name);
+      if (!categoryNames.includes(category)) {
         console.warn(`[SEGURIDAD] Categoría no válida intentada: ${category}`);
         return {
           isValid: false,
@@ -1061,6 +1133,82 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       }
 
       return { isValid: true };
+    }
+
+    // ============================================
+    // FUNCIÓN: Validar nombre de categoría
+    // Verifica longitud y caracteres seguros para nueva categoría
+    // ============================================
+    function validateCategoryName(name: string): {
+      isValid: boolean;
+      value: string;
+      error?: string;
+    } {
+      if (!name || typeof name !== "string") {
+        return { isValid: false, value: "", error: "Nombre de categoría es requerido" };
+      }
+
+      const trimmedName = name.trim();
+
+      // Verificar longitud mínima
+      if (trimmedName.length < VALIDATION_CONFIG.CATEGORY_NAME_MIN_LENGTH) {
+        return {
+          isValid: false,
+          value: "",
+          error: `Nombre debe tener al menos ${VALIDATION_CONFIG.CATEGORY_NAME_MIN_LENGTH} caracteres`,
+        };
+      }
+
+      // Verificar longitud máxima
+      if (trimmedName.length > VALIDATION_CONFIG.CATEGORY_NAME_MAX_LENGTH) {
+        return {
+          isValid: false,
+          value: "",
+          error: `Nombre no puede exceder ${VALIDATION_CONFIG.CATEGORY_NAME_MAX_LENGTH} caracteres`,
+        };
+      }
+
+      // Detectar posibles inyecciones de script (XSS)
+      if (VALIDATION_CONFIG.PATTERNS.SCRIPT_INJECTION.test(trimmedName)) {
+        console.warn("[SEGURIDAD] Intento de inyección de script detectado en nombre de categoría");
+        return {
+          isValid: false,
+          value: "",
+          error: "El nombre contiene contenido no permitido",
+        };
+      }
+
+      // Detectar HTML peligroso
+      if (VALIDATION_CONFIG.PATTERNS.HTML_INJECTION.test(trimmedName)) {
+        console.warn("[SEGURIDAD] Intento de inyección HTML detectado en nombre de categoría");
+        return {
+          isValid: false,
+          value: "",
+          error: "El nombre contiene HTML no permitido",
+        };
+      }
+
+      // Validar caracteres seguros
+      const safePattern = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.,\-()]+$/;
+      if (!safePattern.test(trimmedName)) {
+        return {
+          isValid: false,
+          value: "",
+          error: "El nombre contiene caracteres no permitidos",
+        };
+      }
+
+      // Verificar si la categoría ya existe
+      const categoryNames = categorias.map(c => c.name.toLowerCase());
+      if (categoryNames.includes(trimmedName.toLowerCase())) {
+        return {
+          isValid: false,
+          value: "",
+          error: "Ya existe una categoría con este nombre",
+        };
+      }
+
+      return { isValid: true, value: sanitizeText(trimmedName) };
     }
 
     // ============================================
@@ -1295,6 +1443,186 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       });
     }
 
+    // ============================================
+    // COLECCIÓN DE CATEGORÍAS
+    // ============================================
+    const categoriesCollection = collection(db, "categories");
+    const categoriesQuery = query(categoriesCollection, orderBy("name"));
+
+    // ============================================
+    // FUNCIÓN: Renderizar opciones de categorías en selectores
+    // Actualiza todos los selectores de categorías con las categorías cargadas
+    // ============================================
+    function renderCategoryOptions(): void {
+      // Actualizar selector del formulario
+      const categoriaSelect = document.getElementById("categoria") as HTMLSelectElement;
+      if (categoriaSelect) {
+        // Mantener la opción vacía inicial
+        categoriaSelect.innerHTML = '<option value="">Seleccionar...</option>';
+        categorias.forEach((cat) => {
+          const option = document.createElement("option");
+          option.value = cat.name;
+          option.textContent = cat.name;
+          categoriaSelect.appendChild(option);
+        });
+      }
+
+      // Actualizar filtro de categorías
+      const categoryFilter = document.getElementById("categoryFilter") as HTMLSelectElement;
+      if (categoryFilter) {
+        categoryFilter.innerHTML = '<option value="">Todas las categorías</option>';
+        categorias.forEach((cat) => {
+          const option = document.createElement("option");
+          option.value = cat.name;
+          option.textContent = cat.name;
+          categoryFilter.appendChild(option);
+        });
+      }
+
+      // Actualizar contador de categorías en estadísticas
+      const categoriasCount = document.getElementById("categorias");
+      if (categoriasCount) {
+        categoriasCount.textContent = categorias.length.toString();
+      }
+    }
+
+    // ============================================
+    // CATEGORÍAS POR DEFECTO
+    // Se crean si la colección está vacía
+    // ============================================
+    const DEFAULT_CATEGORIES = ["Pizza", "Ensalada", "Bebidas", "Desayuno", "Carnes"];
+
+    // ============================================
+    // FUNCIÓN: Crear categorías por defecto
+    // Se ejecuta solo si no hay categorías en Firebase
+    // ============================================
+    async function createDefaultCategories(): Promise<void> {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        console.warn("[CATEGORÍAS] No hay usuario autenticado para crear categorías por defecto");
+        return;
+      }
+
+      console.log("[CATEGORÍAS] Creando categorías por defecto...");
+      
+      for (const categoryName of DEFAULT_CATEGORIES) {
+        try {
+          await addDoc(categoriesCollection, {
+            name: categoryName,
+            createdAt: serverTimestamp(),
+            createdBy: currentUser.uid,
+          });
+          console.log(`[CATEGORÍAS] Categoría "${categoryName}" creada`);
+        } catch (error) {
+          console.error(`[CATEGORÍAS] Error al crear categoría "${categoryName}":`, error);
+        }
+      }
+      
+      showToast("Categorías por defecto creadas exitosamente", "success");
+    }
+
+    // ============================================
+    // LISTENER: Cargar categorías en tiempo real
+    // ============================================
+    onSnapshot(categoriesQuery, (snapshot) => {
+      categorias = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Category[];
+      
+      // Renderizar opciones en selectores
+      renderCategoryOptions();
+      
+      // Si no hay categorías, crear las por defecto
+      if (categorias.length === 0) {
+        console.log("[CATEGORÍAS] No hay categorías, creando por defecto...");
+        createDefaultCategories();
+      }
+      
+      console.log(`[CATEGORÍAS] Cargadas ${categorias.length} categorías desde Firebase`);
+    });
+
+    // ============================================
+    // FUNCIÓN: Abrir modal de nueva categoría
+    // ============================================
+    function openCategoriaModal(): void {
+      // Limpiar el formulario
+      const form = document.getElementById("categoriaForm") as HTMLFormElement;
+      if (form) {
+        form.reset();
+      }
+      
+      // Limpiar errores previos
+      clearFieldErrors();
+      
+      console.log("[CATEGORÍAS] Modal de nueva categoría abierto");
+    }
+
+    // ============================================
+    // FUNCIÓN: Guardar categoría en Firebase
+    // Incluye validación XSS y seguridad
+    // ============================================
+    async function saveCategoria(): Promise<void> {
+      try {
+        // Obtener el valor del input
+        const nombreInput = document.getElementById("categoriaNombre") as HTMLInputElement;
+        if (!nombreInput) {
+          showToast("Error: No se encontró el campo de nombre", "danger");
+          return;
+        }
+
+        const nombreRaw = nombreInput.value;
+
+        // Validar el nombre de la categoría (incluye sanitización XSS)
+        const validation = validateCategoryName(nombreRaw);
+        if (!validation.isValid) {
+          showValidationErrors([validation.error!]);
+          nombreInput.classList.add("is-invalid");
+          return;
+        }
+
+        // Verificar que el usuario esté autenticado
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          showToast("Error: Debes iniciar sesión para crear categorías", "danger");
+          return;
+        }
+
+        // Crear el documento de categoría
+        const categoriaData = {
+          name: validation.value,
+          createdAt: serverTimestamp(),
+          createdBy: currentUser.uid,
+        };
+
+        console.log("[CATEGORÍAS] Guardando categoría:", categoriaData);
+
+        // Guardar en Firebase
+        await addDoc(categoriesCollection, categoriaData);
+
+        // Cerrar el modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("categoriaModal"));
+        if (modal) {
+          modal.hide();
+        }
+
+        // Mostrar toast de éxito
+        showToast(`Categoría "${validation.value}" creada exitosamente`, "success");
+
+        // Limpiar el formulario
+        nombreInput.value = "";
+        nombreInput.classList.remove("is-invalid");
+
+      } catch (error) {
+        console.error("[CATEGORÍAS] Error al guardar categoría:", error);
+        showToast("Error al guardar la categoría. Verifica tus permisos.", "danger");
+      }
+    }
+
+    // Exponer funciones de categorías al scope global
+    window.openCategoriaModal = openCategoriaModal;
+    window.saveCategoria = saveCategoria;
+
     // Paginación
     const ITEMS_PER_PAGE = 10;
     let currentPage = 1;
@@ -1439,8 +1767,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     function updateStats() {
       const totalProductos = document.getElementById("total-productos");
       const productosActivos = document.getElementById("productos-activos");
-      const categorias = document.getElementById("categorias");
-      const precioPromedio = document.getElementById("precio-promedio");
+      const categoriasElement = document.getElementById("categorias");
+      const productosSinStock = document.getElementById("productos-sin-stock");
 
       if (totalProductos)
         totalProductos.textContent = productos.length.toString();
@@ -1450,16 +1778,12 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           .length.toString();
 
       const uniqueCategories = new Set(productos.map((p) => p.categoria));
-      if (categorias) categorias.textContent = uniqueCategories.size.toString();
+      if (categoriasElement) categoriasElement.textContent = uniqueCategories.size.toString();
 
-      if (precioPromedio && productos.length > 0) {
-        const total = productos.reduce((sum, p) => {
-          const priceVal =
-            parseFloat(p.price.toString().replace(/[^0-9]/g, "")) || 0;
-          return sum + priceVal;
-        }, 0);
-        const avg = Math.round(total / productos.length);
-        precioPromedio.textContent = "$" + avg.toLocaleString("es-CL");
+      // Contar productos sin stock (stock = 0)
+      if (productosSinStock) {
+        const sinStock = productos.filter((p) => p.stock <= 0).length;
+        productosSinStock.textContent = sinStock.toString();
       }
     }
 

@@ -113,6 +113,8 @@ service cloud.firestore {
       
       // Función de validación para productos
       // Valida todos los campos requeridos y sus restricciones
+      // NOTA: La categoría ya no se valida contra whitelist fija
+      // Se valida en el cliente contra la colección categories
       function isValidProduct(data) {
         return data.keys().hasAll(['name', 'categoria', 'description', 'price', 'stock', 'image', 'alt', 'activo', 'destacado']) &&
                // Validar nombre: string, 3-100 caracteres, seguro
@@ -120,8 +122,11 @@ service cloud.firestore {
                hasMinLength(data.name, 3) &&
                isValidStringLength(data.name, 100) &&
                isSafeString(data.name) &&
-               // Validar categoría: debe ser una de las permitidas (whitelist)
-               data.categoria in ['Pizza', 'Ensalada', 'Bebidas', 'Desayuno', 'Carnes'] &&
+               // Validar categoría: string, 2-50 caracteres, seguro (validación dinámica)
+               data.categoria is string &&
+               hasMinLength(data.categoria, 2) &&
+               isValidStringLength(data.categoria, 50) &&
+               isSafeString(data.categoria) &&
                // Validar descripción: string, 10-1000 caracteres, seguro
                data.description is string &&
                hasMinLength(data.description, 10) &&
@@ -143,6 +148,34 @@ service cloud.firestore {
                // Validar campos booleanos
                data.activo is bool &&
                data.destacado is bool;
+      }
+    }
+
+    // ============================================
+    // COLECCIÓN: categories
+    // Lectura pública, escritura solo admin
+    // ============================================
+    match /categories/{categoryId} {
+      // Lectura pública para que los selectores puedan cargar las categorías
+      allow read: if true;
+      
+      // Solo admin puede crear/modificar/eliminar categorías
+      allow create: if isAdmin() && isValidCategory(request.resource.data);
+      allow update: if isAdmin() && isValidCategory(request.resource.data);
+      allow delete: if isAdmin();
+      
+      // Función de validación para categorías
+      // Valida el nombre y previene inyección de código
+      function isValidCategory(data) {
+        return data.keys().hasAll(['name', 'createdAt', 'createdBy']) &&
+               // Validar nombre: string, 2-50 caracteres, seguro
+               data.name is string &&
+               hasMinLength(data.name, 2) &&
+               isValidStringLength(data.name, 50) &&
+               isSafeString(data.name) &&
+               // Validar createdBy: debe ser el UID del admin que crea
+               data.createdBy is string &&
+               data.createdBy == request.auth.uid;
       }
     }
 

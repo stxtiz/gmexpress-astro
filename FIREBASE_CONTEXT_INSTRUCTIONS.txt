@@ -91,14 +91,15 @@ iniciando sesión y bloqueando la creación de nuevos usuarios con el mismo emai
                           COLECCIONES EN FIRESTORE
 ================================================================================
 
-El proyecto utiliza 6 colecciones principales:
+El proyecto utiliza 7 colecciones principales:
 
 1. users
 2. products
 3. services
 4. solicitudes
 5. notifications
-6. pedidos (NUEVO)
+6. pedidos
+7. categories (NUEVO)
 
 ================================================================================
                         1. COLECCIÓN: users
@@ -193,7 +194,7 @@ RUTA: /products/{productId}
 ESTRUCTURA DEL DOCUMENTO:
 {
   name: string,                // Nombre del producto (ej: "Pizza Suprema de la Casa")
-  categoria: string,           // Categoría: "Pizza" | "Ensalada" | "Bebidas" | "Desayuno" | "Carnes"
+  categoria: string,           // Nombre de la categoría (referencia a colección categories)
   description: string,         // Descripción detallada del producto
   price: string,               // Precio formateado con $ (ej: "$16.990")
   stock: number,               // Cantidad en inventario (número entero)
@@ -221,12 +222,10 @@ REGLAS DE SEGURIDAD:
 - READ: Público (cualquiera puede leer)
 - WRITE: Solo administradores
 
-CATEGORÍAS DISPONIBLES:
-1. Pizza
-2. Ensalada
-3. Bebidas
-4. Desayuno
-5. Carnes
+CATEGORÍAS:
+- Las categorías se cargan dinámicamente desde la colección "categories"
+- Ver sección 7. COLECCIÓN: categories para más detalles
+- Categorías por defecto: Pizza, Ensalada, Bebidas, Desayuno, Carnes
 
 ================================================================================
                         3. COLECCIÓN: services
@@ -385,9 +384,11 @@ RESUMEN DE PERMISOS POR COLECCIÓN:
 ├─────────────────┼────────────────┼────────────────────────────────┤
 │ products        │ Público        │ Solo Admin                     │
 │ services        │ Público        │ Solo Admin                     │
+│ categories      │ Público        │ Solo Admin                     │
 │ users           │ Owner o Admin  │ Owner o Admin                  │
 │ solicitudes     │ Solo Admin     │ CREATE: Público, resto Admin   │
 │ notifications   │ Solo Admin     │ CREATE: Público, resto Admin   │
+│ pedidos         │ Owner o Admin  │ CREATE: Autenticado, resto Admin│
 └─────────────────┴────────────────┴────────────────────────────────┘
 
 ================================================================================
@@ -891,7 +892,63 @@ REGLAS DE SEGURIDAD:
 - DELETE: Solo Admin
 
 ================================================================================
-                        7. CARRITO DE COMPRAS (STORE)
+                        7. COLECCIÓN: categories (NUEVO)
+================================================================================
+
+PROPÓSITO: Almacenar las categorías disponibles para clasificar productos.
+
+RUTA: /categories/{categoryId}
+
+ESTRUCTURA DEL DOCUMENTO:
+{
+  name: string,                // Nombre de la categoría (ej: "Pizza", "Bebidas")
+  createdAt: Timestamp,        // Fecha de creación (serverTimestamp())
+  createdBy: string            // UID del admin que creó la categoría
+}
+
+CÓMO SE GESTIONA:
+- Archivo: src/pages/admin/productos/index.astro
+- Operaciones:
+  - CREATE: addDoc(collection(db, "categories"), categoriaData)
+  - READ: onSnapshot con query ordenado por "name"
+  - Los selectores de categoría en el panel admin se llenan dinámicamente
+
+FLUJO DE CREACIÓN:
+1. Admin hace clic en botón "Nueva Categoría" (a la izquierda de "Nuevo Producto")
+2. Se abre modal con campo de nombre
+3. Se valida el nombre:
+   - Mínimo 2, máximo 50 caracteres
+   - Sin caracteres especiales peligrosos (prevención XSS)
+   - No puede duplicar una categoría existente
+4. Se guarda en Firebase con addDoc()
+5. onSnapshot actualiza automáticamente los selectores
+
+CATEGORÍAS POR DEFECTO (insertadas por migración):
+1. Pizza
+2. Ensalada
+3. Bebidas
+4. Desayuno
+5. Carnes
+
+SCRIPT DE MIGRACIÓN:
+- Archivo: scripts/insert-default-categories.ts
+- Ejecutar: npx tsx scripts/insert-default-categories.ts
+- Propósito: Insertar categorías por defecto si la colección está vacía
+
+REGLAS DE SEGURIDAD:
+- READ: Público (para que los selectores puedan cargar las opciones)
+- CREATE/UPDATE/DELETE: Solo administradores
+
+VALIDACIONES EN CLIENTE (JavaScript):
+- sanitizeText(): Elimina HTML y escapa caracteres especiales
+- validateCategoryName(): Valida longitud, caracteres seguros, y duplicados
+
+VALIDACIONES EN SERVIDOR (Firestore Rules):
+- Nombre: string, 2-50 caracteres, seguro (sin scripts)
+- createdBy: debe coincidir con UID del usuario autenticado
+
+================================================================================
+                        8. CARRITO DE COMPRAS (STORE)
 ================================================================================
 
 PROPÓSITO: Estado local para gestionar el carrito de compras del usuario.
