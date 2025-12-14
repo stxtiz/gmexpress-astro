@@ -247,6 +247,115 @@ try {
   import { db } from "../../firebase/client";
   import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
+  // ============================================
+  // CONFIGURACIÓN DE TOASTS
+  // ============================================
+  const toastConfig = {
+    success: {
+      icon: `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+      bgColor: "bg-green-50",
+      borderColor: "border-green-400",
+      textColor: "text-green-800"
+    },
+    danger: {
+      icon: `<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+      bgColor: "bg-red-50",
+      borderColor: "border-red-400",
+      textColor: "text-red-800"
+    },
+    warning: {
+      icon: `<svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`,
+      bgColor: "bg-amber-50",
+      borderColor: "border-amber-400",
+      textColor: "text-amber-800"
+    }
+  };
+
+  // ============================================
+  // FUNCIÓN: Mostrar toast personalizado
+  // Reemplaza alert() nativo
+  // ============================================
+  function showFormToast(
+    message: string,
+    type: "success" | "danger" | "warning" = "success"
+  ): void {
+    const { icon, bgColor, borderColor, textColor } = toastConfig[type];
+
+    // Crear contenedor si no existe
+    let container = document.getElementById("form-toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "form-toast-container";
+      container.style.cssText = "position:fixed;top:1rem;right:1rem;z-index:10000;display:flex;flex-direction:column;gap:0.5rem;";
+      document.body.appendChild(container);
+    }
+
+    // Crear toast
+    const toast = document.createElement("div");
+    toast.className = `${bgColor} ${borderColor} border-l-4 rounded-lg shadow-lg p-4 max-w-md`;
+    toast.style.cssText = "animation:slideInRight 0.3s ease-out;";
+    toast.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0">${icon}</div>
+        <div class="flex-1">
+          <p class="${textColor} text-sm font-medium">${message}</p>
+        </div>
+        <button onclick="this.closest('div').parentElement.remove()" class="flex-shrink-0 text-gray-400 hover:text-gray-600">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+    `;
+
+    container.appendChild(toast);
+
+    // Auto-remover después de 6 segundos
+    setTimeout(() => {
+      toast.style.animation = "slideOutRight 0.3s ease-in forwards";
+      setTimeout(() => toast.remove(), 300);
+    }, 6000);
+  }
+
+  // Agregar estilos de animación
+  if (!document.getElementById("form-toast-styles")) {
+    const style = document.createElement("style");
+    style.id = "form-toast-styles";
+    style.textContent = `
+      @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // ============================================
+  // FUNCIÓN: Sanitizar texto para prevenir XSS
+  // ============================================
+  function sanitizeText(input: string): string {
+    if (!input) return "";
+    return input
+      .replace(/<[^>]*>/g, "")           // Elimina tags HTML
+      .replace(/&/g, "&amp;")            // Escapa &
+      .replace(/</g, "&lt;")             // Escapa <
+      .replace(/>/g, "&gt;")             // Escapa >
+      .replace(/"/g, "&quot;")           // Escapa "
+      .replace(/'/g, "&#x27;")           // Escapa '
+      .replace(/[\x00-\x1F\x7F]/g, "")   // Elimina caracteres de control
+      .trim();
+  }
+
+  // ============================================
+  // FUNCIÓN: Detectar contenido XSS en texto
+  // ============================================
+  function containsXSS(input: string): boolean {
+    if (!input) return false;
+    const lower = input.toLowerCase();
+    return /<script[\s\S]*?>|javascript:|on\w+\s*=/i.test(lower) ||
+           /<(iframe|object|embed|form|meta|link|style)/i.test(lower) ||
+           lower.includes('<script') ||
+           lower.includes('javascript:') ||
+           lower.includes('onerror=') ||
+           lower.includes('onclick=');
+  }
+
   // Manejar envío del formulario
   const form = document.getElementById("solicitudForm");
   const submitBtn = form?.querySelector("button[type='submit']") as HTMLButtonElement | null;
@@ -257,10 +366,7 @@ try {
 
     if (!submitBtn) return;
 
-    // Loading state
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando...`;
-
+    // Obtener datos del formulario
     const formData = new FormData(form as HTMLFormElement);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: Record<string, any> = {};
@@ -269,36 +375,73 @@ try {
       data[key] = value;
     });
 
+    // ============================================
+    // VALIDACIÓN XSS ANTES DE GUARDAR
+    // ============================================
+    const textFieldsToValidate = [
+      { key: "nombre", label: "Nombre" },
+      { key: "empresa", label: "Empresa" },
+      { key: "descripcion", label: "Descripción de necesidades" },
+      { key: "ciudad", label: "Ciudad" }
+    ];
+
+    for (const field of textFieldsToValidate) {
+      if (data[field.key] && containsXSS(data[field.key] as string)) {
+        showFormToast(
+          `Error en Cotización: Se han detectado caracteres no permitidos en el campo "${field.label}". Por favor usa solo texto normal.`,
+          "danger"
+        );
+        return;
+      }
+    }
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando...`;
+
     try {
-      // Guardar en Firestore
+      // Guardar datos sanitizados en Firestore
       await addDoc(collection(db, "solicitudes"), {
-        ...data,
-        fecha: new Date().toISOString().split('T')[0], // Fecha de creación
+        servicio: data.servicio,
+        numeroPersonas: parseInt(data.numeroPersonas as string, 10),
+        fechaEstimada: data.fechaEstimada,
+        descripcion: sanitizeText(data.descripcion as string),
+        nombre: sanitizeText(data.nombre as string),
+        empresa: sanitizeText(data.empresa as string),
+        email: data.email,
+        telefono: data.telefono,
+        ciudad: sanitizeText(data.ciudad as string),
+        fecha: new Date().toISOString().split('T')[0],
         createdAt: serverTimestamp(),
-        estado: "Pendiente", // Estado inicial
-        id: `SOL-${Date.now().toString().slice(-6)}` // ID simple generado
+        estado: "Pendiente",
+        id: `SOL-${Date.now().toString().slice(-6)}`
       });
 
       // Crear notificación para el admin
       await addDoc(collection(db, "notifications"), {
         title: "Nueva Solicitud de Cotización",
-        message: `Nueva solicitud de ${data.servicio} por ${data.nombre} (${data.empresa})`,
-        type: "warning", // Warning para destacar (amarillo)
+        message: `Nueva solicitud de ${sanitizeText(data.servicio as string)} por ${sanitizeText(data.nombre as string)} (${sanitizeText(data.empresa as string)})`,
+        type: "warning",
         read: false,
         createdAt: serverTimestamp()
       });
 
-      // Éxito
-      alert(
-        "¡Solicitud enviada exitosamente!\n\n" +
-          "Nos pondremos en contacto contigo en las próximas 24 horas."
+      // Éxito - Toast en lugar de alert
+      showFormToast(
+        "¡Solicitud de Cotización Enviada! Nos pondremos en contacto contigo en las próximas 24 horas.",
+        "success"
       );
 
-      // Redirigir
-      window.location.href = "/servicios";
+      // Redirigir después de mostrar el toast
+      setTimeout(() => {
+        window.location.href = "/servicios";
+      }, 2000);
     } catch (error) {
       console.error("Error al enviar solicitud:", error);
-      alert("Hubo un error al enviar la solicitud. Por favor intenta nuevamente.");
+      showFormToast(
+        "Error en Cotización: No pudimos enviar tu solicitud. Por favor intenta nuevamente.",
+        "danger"
+      );
     } finally {
       // Reset button
       submitBtn.disabled = false;

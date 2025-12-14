@@ -326,7 +326,108 @@
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      alert("Error al iniciar sesión. Verifique sus credenciales.");
+      const err = error as Error & { code?: string };
+      let errorMsg = "Error en Login: Credenciales incorrectas. Verifica tu email y contraseña.";
+      if (err.code === "auth/user-not-found") {
+        errorMsg = "Error en Login: No existe una cuenta con este correo electrónico.";
+      } else if (err.code === "auth/wrong-password") {
+        errorMsg = "Error en Login: Contraseña incorrecta.";
+      } else if (err.code === "auth/too-many-requests") {
+        errorMsg = "Error en Login: Demasiados intentos fallidos. Intenta más tarde.";
+      } else if (err.code === "auth/invalid-email") {
+        errorMsg = "Error en Login: El formato del correo electrónico no es válido.";
+      }
+      showLoginToast(errorMsg, "danger");
     }
   });
+
+  // ============================================
+  // FUNCIÓN: Mostrar toast para mensajes de login
+  // Reemplaza alert() nativo por UI personalizada
+  // ============================================
+  function showLoginToast(
+    message: string,
+    type: "success" | "danger" | "warning" | "info" = "info"
+  ): void {
+    const config = {
+      success: {
+        icon: `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+        bgColor: "bg-green-50",
+        borderColor: "border-green-400",
+        textColor: "text-green-800"
+      },
+      danger: {
+        icon: `<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+        bgColor: "bg-red-50",
+        borderColor: "border-red-400",
+        textColor: "text-red-800"
+      },
+      warning: {
+        icon: `<svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`,
+        bgColor: "bg-amber-50",
+        borderColor: "border-amber-400",
+        textColor: "text-amber-800"
+      },
+      info: {
+        icon: `<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-400",
+        textColor: "text-blue-800"
+      }
+    };
+
+    const { icon, bgColor, borderColor, textColor } = config[type];
+
+    // Crear contenedor si no existe
+    let toastContainer = document.getElementById("login-toast-container");
+    if (!toastContainer) {
+      toastContainer = document.createElement("div");
+      toastContainer.id = "login-toast-container";
+      toastContainer.style.cssText = "position:fixed;top:1rem;right:1rem;z-index:10000;display:flex;flex-direction:column;gap:0.5rem;";
+      document.body.appendChild(toastContainer);
+    }
+
+    // Crear toast
+    const toastId = `toast-${Date.now()}`;
+    const toast = document.createElement("div");
+    toast.id = toastId;
+    toast.className = `${bgColor} ${borderColor} border-l-4 rounded-lg shadow-lg p-4 max-w-sm`;
+    toast.style.cssText = "animation:slideInRight 0.3s ease-out;";
+    toast.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0">${icon}</div>
+        <div class="flex-1">
+          <p class="${textColor} text-sm font-medium">${message}</p>
+        </div>
+        <button onclick="this.closest('div[id^=toast]').remove()" class="flex-shrink-0 text-gray-400 hover:text-gray-600">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // Auto-remover después de 5 segundos
+    setTimeout(() => {
+      toast.style.animation = "slideOutRight 0.3s ease-in forwards";
+      setTimeout(() => toast.remove(), 300);
+    }, 5000);
+  }
+
+  // Agregar keyframes si no existen
+  if (!document.getElementById("login-toast-styles")) {
+    const style = document.createElement("style");
+    style.id = "login-toast-styles";
+    style.textContent = `
+      @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
 </script>

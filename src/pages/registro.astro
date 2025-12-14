@@ -523,6 +523,20 @@ import "../styles/global.css";
       transform: translateY(0);
     }
   }
+
+  /* Animación de spinner para botón de carga */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  :global(.animate-spin) {
+    animation: spin 1s linear infinite;
+  }
 </style>
 
 <script>
@@ -1270,10 +1284,97 @@ import "../styles/global.css";
     };
   }
 
+  // ============================================
+  // FUNCIÓN: Sanitizar texto para prevenir XSS
+  // Reutiliza lógica de validación del panel admin
+  // ============================================
+  function sanitizeText(input: string): string {
+    if (!input) return "";
+    return input
+      .replace(/<[^>]*>/g, "")           // Elimina tags HTML
+      .replace(/&/g, "&amp;")            // Escapa &
+      .replace(/</g, "&lt;")             // Escapa <
+      .replace(/>/g, "&gt;")             // Escapa >
+      .replace(/"/g, "&quot;")           // Escapa "
+      .replace(/'/g, "&#x27;")           // Escapa '
+      .replace(/[\x00-\x1F\x7F]/g, "")   // Elimina caracteres de control
+      .trim();
+  }
+
+  // ============================================
+  // PATRONES DE DETECCIÓN XSS
+  // Detecta inyección de scripts y HTML peligroso
+  // ============================================
+  const XSS_PATTERNS = {
+    SCRIPT_INJECTION: /<script[\s\S]*?>[\s\S]*?<\/script>|javascript:|on\w+\s*=/gi,
+    HTML_INJECTION: /<[^>]*(iframe|object|embed|form|input|button|meta|link|style)[^>]*>/gi,
+    EVENT_HANDLERS: /\bon\w+\s*=\s*["']?[^"']*["']?/gi
+  };
+
+  // ============================================
+  // FUNCIÓN: Detectar contenido XSS en texto
+  // @param input - Texto a verificar
+  // @returns true si se detecta contenido malicioso
+  // ============================================
+  function containsXSS(input: string): boolean {
+    if (!input) return false;
+    const lowerInput = input.toLowerCase();
+    return XSS_PATTERNS.SCRIPT_INJECTION.test(lowerInput) || 
+           XSS_PATTERNS.HTML_INJECTION.test(lowerInput) ||
+           XSS_PATTERNS.EVENT_HANDLERS.test(lowerInput) ||
+           lowerInput.includes('<script') ||
+           lowerInput.includes('javascript:') ||
+           lowerInput.includes('onerror=') ||
+           lowerInput.includes('onclick=') ||
+           lowerInput.includes('onload=');
+  }
+
+  // ============================================
+  // FUNCIÓN: Validar campo de texto contra XSS
+  // @param value - Valor del campo
+  // @param fieldName - Nombre del campo para mensaje de error
+  // @returns Objeto con resultado de validación
+  // ============================================
+  function validateTextFieldXSS(
+    value: string, 
+    fieldName: string
+  ): { isValid: boolean; error?: string } {
+    if (containsXSS(value)) {
+      return { 
+        isValid: false, 
+        error: `Error de Seguridad: Se han detectado caracteres no permitidos en el campo "${fieldName}". Por favor usa solo texto normal.`
+      };
+    }
+    return { isValid: true };
+  }
+
   // Form Submit
+  const submitBtn = form?.querySelector("button[type='submit']") as HTMLButtonElement | null;
+  const originalBtnContent = submitBtn?.innerHTML;
+  
   form?.addEventListener("submit", async (e: Event) => {
     e.preventDefault();
     clearFieldErrors();
+
+    // ============================================
+    // FUNCIÓN HELPER: Mostrar/ocultar estado de carga
+    // ============================================
+    const setLoadingState = (loading: boolean) => {
+      if (!submitBtn) return;
+      if (loading) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Creando cuenta...</span>
+        `;
+      } else {
+        submitBtn.disabled = false;
+        if (originalBtnContent) submitBtn.innerHTML = originalBtnContent;
+      }
+    };
 
     // Null checks for required elements
     if (
@@ -1381,11 +1482,46 @@ import "../styles/global.css";
     }
 
     // ============================================
-    // VERIFICAR RUT DUPLICADO EN BASE DE DATOS
+    // VALIDACIÓN XSS - ANTES DE CUALQUIER OPERACIÓN FIREBASE
+    // Esto previene crear usuarios "zombies" en Auth
     // ============================================
+    const textFieldsToValidate = [
+      { value: firstNameInput.value, name: "Nombre" },
+      { value: lastNamePaternoInput.value, name: "Apellido Paterno" },
+      { value: lastNameMaternoInput.value, name: "Apellido Materno" },
+      { value: addressInput.value, name: "Dirección" },
+      { value: apartmentInput.value, name: "Departamento/Oficina" },
+    ];
+
+    const xssErrors: string[] = [];
+    for (const field of textFieldsToValidate) {
+      if (field.value) {
+        const xssValidation = validateTextFieldXSS(field.value, field.name);
+        if (!xssValidation.isValid && xssValidation.error) {
+          xssErrors.push(xssValidation.error);
+        }
+      }
+    }
+
+    // Si hay errores de XSS, detener ANTES de crear usuario en Auth
+    if (xssErrors.length > 0) {
+      showValidationErrors([
+        "Error en Formulario de Registro: Se han detectado caracteres no permitidos.",
+        ...xssErrors
+      ]);
+      return;
+    }
+
+    // ============================================
+    // VERIFICAR RUT DUPLICADO EN BASE DE DATOS
+    // Activar estado de carga para operaciones asíncronas
+    // ============================================
+    setLoadingState(true);
+    
     try {
       const rutExists = await checkRutExists(rutInput.value);
       if (rutExists) {
+        setLoadingState(false);
         showValidationErrors([
           "El RUT ingresado ya está registrado en el sistema. Si ya tienes una cuenta, inicia sesión.",
         ]);
@@ -1393,6 +1529,7 @@ import "../styles/global.css";
       }
     } catch (error) {
       console.error("Error verificando RUT:", error);
+      setLoadingState(false);
       showToast(
         "Error al verificar disponibilidad del RUT. Intente nuevamente.",
         "danger",
@@ -1400,36 +1537,45 @@ import "../styles/global.css";
       return;
     }
 
+    // ============================================
+    // CREAR USUARIO EN FIREBASE
+    // Orden: Auth -> Profile -> Firestore
+    // IMPORTANTE: Si CUALQUIER paso falla después de crear Auth,
+    // se ejecuta rollback para eliminar el usuario zombie
+    // ============================================
+    let createdUser: import("firebase/auth").User | null = null;
+    
     try {
-      // Create User in Firebase Auth
+      // Paso 1: Crear usuario en Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         emailInput.value,
         password.value,
       );
-      const user = userCredential.user;
+      createdUser = userCredential.user;
 
-      // Update Profile
-      await updateProfile(user, {
-        displayName: `${firstNameInput.value} ${lastNamePaternoInput.value}`,
+      // Paso 2: Actualizar perfil (displayName)
+      await updateProfile(createdUser, {
+        displayName: `${sanitizeText(firstNameInput.value)} ${sanitizeText(lastNamePaternoInput.value)}`,
       });
 
-      // Save additional data to Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        firstName: firstNameInput.value,
-        lastNamePaterno: lastNamePaternoInput.value,
-        lastNameMaterno: lastNameMaternoInput.value,
+      // Paso 3: Guardar datos sanitizados en Firestore
+      await setDoc(doc(db, "users", createdUser.uid), {
+        firstName: sanitizeText(firstNameInput.value),
+        lastNamePaterno: sanitizeText(lastNamePaternoInput.value),
+        lastNameMaterno: sanitizeText(lastNameMaternoInput.value),
         rut: rutInput.value,
         email: emailInput.value,
         phone: phoneInput.value,
-        address: addressInput.value,
+        address: sanitizeText(addressInput.value),
         region: regionSelect.value,
         comuna: comunaSelect.value,
-        apartment: apartmentInput.value,
+        apartment: sanitizeText(apartmentInput.value),
         createdAt: new Date(),
-        role: "user", // Default role
+        role: "user",
       });
 
+      // ¡Éxito! Todos los pasos completados
       showToast(
         "¡Registro exitoso! Bienvenido a GMEXPRESS. Redirigiendo...",
         "success",
@@ -1438,13 +1584,39 @@ import "../styles/global.css";
         window.location.href = "/";
       }, 2000);
     } catch (error) {
-      console.error("Error registering:", error);
+      console.error("Error en registro:", error);
+      
+      // ============================================
+      // ROLLBACK: Si el usuario fue creado en Auth pero algo falló después,
+      // eliminarlo para no dejar usuarios zombies
+      // ============================================
+      if (createdUser) {
+        console.log("Ejecutando rollback: eliminando usuario de Auth...");
+        try {
+          await createdUser.delete();
+          console.log("Rollback exitoso: usuario eliminado de Auth");
+        } catch (deleteError) {
+          console.error("Error en rollback (no se pudo eliminar usuario de Auth):", deleteError);
+          // Si el rollback falla, registrar para limpieza manual
+        }
+      }
+      
+      // Mostrar mensaje de error apropiado
       const err = error as Error & { code?: string };
-      let msg = "Error al registrar usuario.";
-      if (err.code === "auth/email-already-in-use")
-        msg = "El correo ya está registrado.";
-      if (err.code === "auth/weak-password")
-        msg = "La contraseña es muy débil.";
+      let msg = "Error al registrar usuario. Por favor intente nuevamente.";
+      
+      if (err.code === "auth/email-already-in-use") {
+        msg = "Error en Registro: El correo electrónico ya está registrado.";
+      } else if (err.code === "auth/weak-password") {
+        msg = "Error en Registro: La contraseña es muy débil.";
+      } else if (err.code === "auth/invalid-email") {
+        msg = "Error en Registro: El formato del correo electrónico no es válido.";
+      } else if (err.message && !err.code) {
+        // Error de Firestore u otro error personalizado
+        msg = `Error en Registro: ${err.message}`;
+      }
+      
+      setLoadingState(false);
       showToast(msg, "danger");
     }
   });
