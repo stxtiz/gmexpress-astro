@@ -624,13 +624,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
               cliente: data.cliente || "Cliente",
               email: data.email || "",
               telefono: data.telefono || "",
-              fecha:
-                data.fecha ||
-                (data.createdAt
-                  ? new Date(data.createdAt.seconds * 1000)
-                      .toISOString()
-                      .split("T")[0]
-                  : new Date().toISOString().split("T")[0]),
+              // Usar directamente el campo fecha de Firebase
+              fecha: data.fecha || "-",
               estado: data.estado || "En Proceso",
               subtotal: formatPrecio(data.subtotal),
               iva: formatPrecio(data.iva),
@@ -822,15 +817,16 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       });
     }
 
-    // Formatear fecha
+    // Formatear fecha - devuelve directamente el valor de Firebase
     function formatFechaPedido(fecha: string | Date | null): string {
       if (!fecha) return "-";
-      const date = new Date(fecha);
-      return date.toLocaleDateString("es-CL", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      });
+      // Si es string, devolverlo directamente (Firebase guarda la fecha correcta)
+      if (typeof fecha === 'string') return fecha;
+      // Si es Date, extraer componentes locales
+      const day = String(fecha.getDate()).padStart(2, '0');
+      const month = String(fecha.getMonth() + 1).padStart(2, '0');
+      const year = fecha.getFullYear();
+      return `${year}-${month}-${day}`;
     }
 
     // Update pedidos statistics
@@ -1597,15 +1593,16 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       `;
     }
 
-    // Formatear fecha
+    // Formatear fecha - devuelve directamente el valor de Firebase
     function formatFecha(fecha: string | Date): string {
       if (!fecha) return "-";
-      const date = new Date(fecha);
-      return date.toLocaleDateString("es-CL", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+      // Si es string, devolverlo directamente (Firebase guarda la fecha correcta)
+      if (typeof fecha === 'string') return fecha;
+      // Si es Date, extraer componentes locales
+      const day = String(fecha.getDate()).padStart(2, '0');
+      const month = String(fecha.getMonth() + 1).padStart(2, '0');
+      const year = fecha.getFullYear();
+      return `${year}-${month}-${day}`;
     }
 
     // Contactar cliente

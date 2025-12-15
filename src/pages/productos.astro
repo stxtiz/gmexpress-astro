@@ -830,8 +830,15 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
             // Metadatos
             metodoPago: "Pendiente",
             notas: "",
-            // Usar fecha local (no UTC) para evitar problema de zona horaria
-            fecha: new Date().toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('-').reverse().join('-'),
+            // Construir fecha local manualmente para evitar problema de zona horaria
+            // Usamos los componentes de fecha local (getDate, getMonth, getFullYear)
+            fecha: (() => {
+              const now = new Date();
+              const day = String(now.getDate()).padStart(2, '0');
+              const month = String(now.getMonth() + 1).padStart(2, '0');
+              const year = now.getFullYear();
+              return `${year}-${month}-${day}`;
+            })(),
             createdAt: serverTimestamp(),
           };
 
@@ -889,8 +896,8 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
         document
           .getElementById("close-success-modal")
           ?.addEventListener("click", () => {
-            closeCheckoutModal();
-            closeCart();
+            // Refrescar la página para actualizar el stock visible
+            window.location.reload();
           });
       }
 
