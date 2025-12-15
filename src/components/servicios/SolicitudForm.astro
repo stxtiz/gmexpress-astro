@@ -411,7 +411,8 @@ try {
         email: data.email,
         telefono: data.telefono,
         ciudad: sanitizeText(data.ciudad as string),
-        fecha: new Date().toISOString().split('T')[0],
+        // Usar fecha local (no UTC) para evitar problema de zona horaria
+        fecha: new Date().toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('-').reverse().join('-'),
         createdAt: serverTimestamp(),
         estado: "Pendiente",
         id: `SOL-${Date.now().toString().slice(-6)}`

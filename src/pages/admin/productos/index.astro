@@ -476,7 +476,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     </div>
   </div>
 
-  <!-- Modal para Nueva Categoría -->
+  <!-- Modal para Gestionar Categorías -->
   <div
     class="modal fade"
     id="categoriaModal"
@@ -488,7 +488,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       <div class="modal-content">
         <div class="modal-header border-0 pb-0">
           <h5 class="modal-title fw-bold" id="categoriaModalLabel">
-            <i class="bi bi-tags me-2 text-primary"></i>Nueva Categoría
+            <i class="bi bi-tags me-2 text-primary"></i>Gestionar Categorías
           </h5>
           <button
             type="button"
@@ -497,28 +497,88 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
             aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="categoriaForm">
-            <div class="mb-3">
-              <label for="categoriaNombre" class="form-label fw-semibold"
-                >Nombre de la Categoría <span class="text-danger">*</span></label
-              >
-              <!-- Validación: mínimo 2, máximo 50 caracteres. Pattern previene caracteres peligrosos -->
+          <!-- Formulario para nueva categoría -->
+          <form id="categoriaForm" class="mb-4">
+            <label for="categoriaNombre" class="form-label fw-semibold"
+              >Nueva Categoría <span class="text-danger">*</span></label
+            >
+            <div class="input-group">
+              <!-- Validación: mínimo 2, máximo 50 caracteres -->
               <input
                 type="text"
                 class="form-control"
                 id="categoriaNombre"
-                placeholder="Ej: Postres, Bebidas Calientes, etc."
+                placeholder="Ej: Postres, Bebidas, etc."
                 required
                 minlength="2"
                 maxlength="50"
                 pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.,\-()]+$"
                 title="Solo letras, números y caracteres básicos permitidos"
               />
-              <div class="form-text text-muted">
-                <i class="bi bi-info-circle me-1"></i>Mínimo 2, máximo 50 caracteres. Sin caracteres especiales.
-              </div>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="saveCategoria()"
+              >
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </div>
+            <div class="form-text text-muted">
+              <i class="bi bi-info-circle me-1"></i>Mínimo 2, máximo 50 caracteres.
             </div>
           </form>
+
+          <!-- Lista de categorías existentes -->
+          <div class="border-top pt-3">
+            <h6 class="fw-semibold mb-3">
+              <i class="bi bi-list-ul me-2"></i>Categorías Existentes
+              <span class="badge bg-secondary ms-2" id="categoriasCountBadge">0</span>
+            </h6>
+            <div id="categoriasListContainer" style="max-height: 250px; overflow-y: auto;">
+              <!-- Se llena dinámicamente -->
+              <div class="text-center text-muted py-3">
+                <small>Cargando categorías...</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+            >Cerrar</button
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Eliminación de Categoría -->
+  <div
+    class="modal fade"
+    id="deleteCategoriaModal"
+    tabindex="-1"
+    aria-labelledby="deleteCategoriaModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-danger" id="deleteCategoriaModalLabel">
+            <i class="bi bi-exclamation-triangle me-2"></i>Eliminar Categoría
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">
+            ¿Estás seguro de que deseas eliminar la categoría <strong id="deleteCategoriaName"></strong>?
+          </p>
+          <div class="alert alert-warning py-2 small mb-0">
+            <i class="bi bi-exclamation-circle me-1"></i>
+            Los productos con esta categoría mantendrán la categoría asignada pero ya no aparecerá en los selectores.
+          </div>
         </div>
         <div class="modal-footer border-0">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal"
@@ -526,10 +586,10 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           >
           <button
             type="button"
-            class="btn btn-primary"
-            onclick="saveCategoria()"
+            class="btn btn-danger"
+            onclick="confirmDeleteCategoria()"
           >
-            <i class="bi bi-save me-2"></i>Guardar Categoría
+            <i class="bi bi-trash me-2"></i>Eliminar
           </button>
         </div>
       </div>
@@ -815,6 +875,8 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         saveProducto: () => Promise<void>;
         openCategoriaModal: () => void;
         saveCategoria: () => Promise<void>;
+        deleteCategoria: (id: string) => void;
+        confirmDeleteCategoria: () => Promise<void>;
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       var bootstrap: any;
@@ -824,6 +886,7 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
     let categorias: Category[] = []; // Categorías cargadas desde Firebase
     let editingId: string | null = null;
     let deleteId: string | null = null;
+    let deleteCategoriaId: string | null = null; // ID de categoría a eliminar
     let filteredProducts: Product[] = [];
 
     // ============================================
@@ -1484,6 +1547,9 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       if (categoriasCount) {
         categoriasCount.textContent = categorias.length.toString();
       }
+      
+      // Actualizar lista de categorías en el modal de gestión
+      renderCategoriasList();
     }
 
     // ============================================
@@ -1619,9 +1685,104 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
       }
     }
 
+    // ============================================
+    // FUNCIÓN: Renderizar lista de categorías en el modal
+    // ============================================
+    function renderCategoriasList(): void {
+      const container = document.getElementById("categoriasListContainer");
+      const countBadge = document.getElementById("categoriasCountBadge");
+      
+      if (!container) return;
+      
+      // Actualizar badge de conteo
+      if (countBadge) {
+        countBadge.textContent = categorias.length.toString();
+      }
+      
+      if (categorias.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-muted py-3">
+            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+            <small>No hay categorías creadas</small>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = categorias
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(cat => `
+          <div class="d-flex justify-content-between align-items-center py-2 px-3 border-bottom hover-bg-light">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-tag me-2 text-primary"></i>
+              <span>${cat.name}</span>
+            </div>
+            <button 
+              class="btn btn-sm btn-outline-danger" 
+              onclick="deleteCategoria('${cat.id}')"
+              title="Eliminar categoría"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        `).join("");
+    }
+
+    // ============================================
+    // FUNCIÓN: Iniciar eliminación de categoría
+    // Muestra modal de confirmación
+    // ============================================
+    function deleteCategoria(id: string): void {
+      const categoria = categorias.find(c => c.id === id);
+      if (!categoria) return;
+      
+      deleteCategoriaId = id;
+      
+      const nameEl = document.getElementById("deleteCategoriaName");
+      if (nameEl) {
+        nameEl.textContent = categoria.name;
+      }
+      
+      const modal = new bootstrap.Modal(document.getElementById("deleteCategoriaModal"));
+      modal.show();
+    }
+
+    // ============================================
+    // FUNCIÓN: Confirmar eliminación de categoría
+    // Elimina la categoría de Firebase
+    // ============================================
+    async function confirmDeleteCategoria(): Promise<void> {
+      if (!deleteCategoriaId) return;
+      
+      try {
+        const categoria = categorias.find(c => c.id === deleteCategoriaId);
+        const categoriaName = categoria?.name || "Categoría";
+        
+        // Eliminar de Firebase
+        await deleteDoc(doc(db, "categories", deleteCategoriaId));
+        
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("deleteCategoriaModal"));
+        if (modal) {
+          modal.hide();
+        }
+        
+        showToast(`Categoría "${categoriaName}" eliminada exitosamente`, "success");
+        console.log(`[CATEGORÍAS] Categoría "${categoriaName}" eliminada`);
+        
+        deleteCategoriaId = null;
+        
+      } catch (error) {
+        console.error("[CATEGORÍAS] Error al eliminar categoría:", error);
+        showToast("Error al eliminar la categoría. Verifica tus permisos.", "danger");
+      }
+    }
+
     // Exponer funciones de categorías al scope global
     window.openCategoriaModal = openCategoriaModal;
     window.saveCategoria = saveCategoria;
+    window.deleteCategoria = deleteCategoria;
+    window.confirmDeleteCategoria = confirmDeleteCategoria;
 
     // Paginación
     const ITEMS_PER_PAGE = 10;

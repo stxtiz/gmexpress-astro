@@ -109,6 +109,9 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                 </div>
                 <h2 class="fw-bold mb-1" id="total-users-count">...</h2>
                 <p class="text-muted mb-0 small">Usuarios Registrados</p>
+                <a
+                  href="/admin/usuarios"
+                  class="stretched-link text-decoration-none"></a>
               </div>
             </div>
           </div>
@@ -126,6 +129,9 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                 </div>
                 <h2 class="fw-bold mb-1" id="total-pedidos-mes">...</h2>
                 <p class="text-muted mb-0 small">Pedidos del Mes</p>
+                <a
+                  href="/admin/pedidos"
+                  class="stretched-link text-decoration-none"></a>
               </div>
             </div>
           </div>
@@ -219,16 +225,77 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                   <canvas id="salesChart"></canvas>
                 </div>
 
-                <!-- Resumen de ventas -->
-                <div id="salesSummary" class="mt-3 d-none">
-                  <div class="row text-center">
-                    <div class="col">
-                      <h4 class="fw-bold text-success mb-0" id="totalVentas">$0</h4>
-                      <small class="text-muted">Total Ventas</small>
+                <!-- Resumen de ganancias por estado -->
+                <div id="salesSummary" class="mt-4 d-none">
+                  <!-- Ganancias Reales y Estimadas -->
+                  <div class="row g-2 mb-3 pb-3 border-bottom">
+                    <!-- Ganancias Reales (Completados) -->
+                    <div class="col-6">
+                      <div class="text-center">
+                        <small class="text-success text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 1px;">
+                          <i class="bi bi-check-circle-fill me-1"></i>Ganancias Reales
+                        </small>
+                        <h4 class="fw-bold text-success mb-0" id="gananciasReales">$0</h4>
+                        <small class="text-muted" style="font-size: 0.7rem;"><span id="pedidosReales">0</span> completados</small>
+                      </div>
                     </div>
-                    <div class="col">
-                      <h4 class="fw-bold text-primary mb-0" id="cantidadPedidos">0</h4>
-                      <small class="text-muted">Pedidos Totales</small>
+                    <!-- Ganancia Estimada (Pendientes + En Proceso + Enviados) -->
+                    <div class="col-6">
+                      <div class="text-center">
+                        <small class="text-primary text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 1px;">
+                          <i class="bi bi-graph-up-arrow me-1"></i>Ganancia Estimada
+                        </small>
+                        <h4 class="fw-bold text-primary mb-0" id="gananciaEstimada">$0</h4>
+                        <small class="text-muted" style="font-size: 0.7rem;"><span id="pedidosEstimados">0</span> en curso</small>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Ganancias por Estado -->
+                  <div class="row g-2">
+                    <!-- Completados -->
+                    <div class="col-6">
+                      <div class="bg-success bg-opacity-10 rounded-3 p-2 text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-1 mb-1">
+                          <i class="bi bi-check-circle-fill text-success" style="font-size: 0.8rem;"></i>
+                          <small class="text-success fw-semibold" style="font-size: 0.7rem;">Completados</small>
+                        </div>
+                        <h5 class="fw-bold text-success mb-0" id="gananciaCompletado">$0</h5>
+                        <small class="text-muted" style="font-size: 0.65rem;"><span id="cantCompletados">0</span> pedidos</small>
+                      </div>
+                    </div>
+                    <!-- Pendientes -->
+                    <div class="col-6">
+                      <div class="bg-warning bg-opacity-10 rounded-3 p-2 text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-1 mb-1">
+                          <i class="bi bi-clock-fill text-warning" style="font-size: 0.8rem;"></i>
+                          <small class="text-warning fw-semibold" style="font-size: 0.7rem;">Pendientes</small>
+                        </div>
+                        <h5 class="fw-bold text-warning mb-0" id="gananciaPendiente">$0</h5>
+                        <small class="text-muted" style="font-size: 0.65rem;"><span id="cantPendientes">0</span> pedidos</small>
+                      </div>
+                    </div>
+                    <!-- En Proceso -->
+                    <div class="col-6">
+                      <div class="bg-info bg-opacity-10 rounded-3 p-2 text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-1 mb-1">
+                          <i class="bi bi-arrow-repeat text-info" style="font-size: 0.8rem;"></i>
+                          <small class="text-info fw-semibold" style="font-size: 0.7rem;">En Proceso</small>
+                        </div>
+                        <h5 class="fw-bold text-info mb-0" id="gananciaEnProceso">$0</h5>
+                        <small class="text-muted" style="font-size: 0.65rem;"><span id="cantEnProceso">0</span> pedidos</small>
+                      </div>
+                    </div>
+                    <!-- Enviados -->
+                    <div class="col-6">
+                      <div class="bg-secondary bg-opacity-10 rounded-3 p-2 text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-1 mb-1">
+                          <i class="bi bi-truck text-secondary" style="font-size: 0.8rem;"></i>
+                          <small class="text-secondary fw-semibold" style="font-size: 0.7rem;">Enviados</small>
+                        </div>
+                        <h5 class="fw-bold text-secondary mb-0" id="gananciaEnviado">$0</h5>
+                        <small class="text-muted" style="font-size: 0.65rem;"><span id="cantEnviados">0</span> pedidos</small>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -238,10 +305,10 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
 
           <!-- Recent Activity -->
           <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm">
               <div class="card-body">
-                <h5 class="fw-bold mb-4">Actividad Reciente</h5>
-                <div class="activity-list" id="activity-list">
+                <h5 class="fw-bold mb-3">Actividad Reciente</h5>
+                <div class="activity-list" id="activity-list" style="max-height: 420px; overflow: hidden;">
                   <!-- Se carga dinámicamente -->
                   <div class="text-center py-4 text-muted">
                     <div
@@ -310,20 +377,22 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
                     </a>
                   </div>
                   <div class="col-6">
-                    <button
+                    <a
+                      href="/admin/pedidos"
                       class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3"
                     >
                       <i class="bi bi-file-earmark-bar-graph fs-4 mb-2"></i>
                       <span class="small">Ver Reportes</span>
-                    </button>
+                    </a>
                   </div>
                   <div class="col-6">
-                    <button
+                    <a
+                      href="/admin/usuarios"
                       class="btn btn-outline-info w-100 d-flex flex-column align-items-center py-3"
                     >
-                      <i class="bi bi-gear fs-4 mb-2"></i>
-                      <span class="small">Configuración</span>
-                    </button>
+                      <i class="bi bi-person-plus fs-4 mb-2"></i>
+                      <span class="small">Nuevo Usuario</span>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -404,6 +473,15 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
       justify-content: center;
       align-items: center;
     }
+
+    /* Estilos para Actividad Reciente */
+    .activity-item {
+      transition: background-color 0.2s ease;
+    }
+
+    .activity-item:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
   </style>
 
   <script>
@@ -481,7 +559,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
     const qNotifications = query(
       notificationsCol,
       orderBy("createdAt", "desc"),
-      limit(5),
+      limit(15),
     );
 
     onSnapshot(
@@ -857,20 +935,80 @@ import AdminSidebar from "../../components/admin/AdminSidebar.astro";
             containerEl?.classList.remove("d-none");
             summaryEl?.classList.remove("d-none");
 
-            // Actualizar resumen - Solo mostrar ventas y pedidos COMPLETADOS
-            const totalEl = document.getElementById("totalVentas");
-            const cantidadEl = document.getElementById("cantidadPedidos");
-            const ventasCompletadas = ventasPorEstado["Completado"] || 0;
-            const pedidosCompletados = pedidosFiltrados.filter(
-              (doc) => {
-                let estado = doc.data().estado || "Pendiente";
-                if (estado === "Recibido") estado = "Completado";
-                return estado === "Completado";
-              }
-            ).length;
+            // ============================================
+            // ACTUALIZAR RESUMEN DE GANANCIAS POR ESTADO
+            // ============================================
             
-            if (totalEl) totalEl.textContent = formatCurrency(ventasCompletadas);
-            if (cantidadEl) cantidadEl.textContent = pedidosCompletados.toString();
+            // Elementos del DOM - Ganancias principales
+            const gananciasRealesEl = document.getElementById("gananciasReales");
+            const pedidosRealesEl = document.getElementById("pedidosReales");
+            const gananciaEstimadaEl = document.getElementById("gananciaEstimada");
+            const pedidosEstimadosEl = document.getElementById("pedidosEstimados");
+            
+            // Elementos del DOM - Por estado
+            const gananciaCompletadoEl = document.getElementById("gananciaCompletado");
+            const cantCompletadosEl = document.getElementById("cantCompletados");
+            const gananciaPendienteEl = document.getElementById("gananciaPendiente");
+            const cantPendientesEl = document.getElementById("cantPendientes");
+            const gananciaEnProcesoEl = document.getElementById("gananciaEnProceso");
+            const cantEnProcesoEl = document.getElementById("cantEnProceso");
+            const gananciaEnviadoEl = document.getElementById("gananciaEnviado");
+            const cantEnviadosEl = document.getElementById("cantEnviados");
+            
+            // Contar pedidos por estado
+            let pedidosCompletados = 0;
+            let pedidosPendientes = 0;
+            let pedidosEnProceso = 0;
+            let pedidosEnviados = 0;
+            
+            pedidosFiltrados.forEach((doc) => {
+              const data = doc.data();
+              let estado = data.estado || "Pendiente";
+              if (estado === "Recibido") estado = "Completado";
+              
+              switch (estado) {
+                case "Completado":
+                  pedidosCompletados++;
+                  break;
+                case "Pendiente":
+                  pedidosPendientes++;
+                  break;
+                case "En Proceso":
+                  pedidosEnProceso++;
+                  break;
+                case "Enviado":
+                case "En Tránsito":
+                  pedidosEnviados++;
+                  break;
+              }
+            });
+            
+            // Calcular ganancias reales (completados) y estimadas (resto)
+            const gananciasReales = ventasPorEstado["Completado"] || 0;
+            const gananciaEstimada = 
+              (ventasPorEstado["Pendiente"] || 0) + 
+              (ventasPorEstado["En Proceso"] || 0) + 
+              (ventasPorEstado["Enviado"] || 0);
+            const pedidosEnCurso = pedidosPendientes + pedidosEnProceso + pedidosEnviados;
+            
+            // Actualizar elementos principales
+            if (gananciasRealesEl) gananciasRealesEl.textContent = formatCurrency(gananciasReales);
+            if (pedidosRealesEl) pedidosRealesEl.textContent = pedidosCompletados.toString();
+            if (gananciaEstimadaEl) gananciaEstimadaEl.textContent = formatCurrency(gananciaEstimada);
+            if (pedidosEstimadosEl) pedidosEstimadosEl.textContent = pedidosEnCurso.toString();
+            
+            // Ganancias por estado individual
+            if (gananciaCompletadoEl) gananciaCompletadoEl.textContent = formatCurrency(ventasPorEstado["Completado"] || 0);
+            if (cantCompletadosEl) cantCompletadosEl.textContent = pedidosCompletados.toString();
+            
+            if (gananciaPendienteEl) gananciaPendienteEl.textContent = formatCurrency(ventasPorEstado["Pendiente"] || 0);
+            if (cantPendientesEl) cantPendientesEl.textContent = pedidosPendientes.toString();
+            
+            if (gananciaEnProcesoEl) gananciaEnProcesoEl.textContent = formatCurrency(ventasPorEstado["En Proceso"] || 0);
+            if (cantEnProcesoEl) cantEnProcesoEl.textContent = pedidosEnProceso.toString();
+            
+            if (gananciaEnviadoEl) gananciaEnviadoEl.textContent = formatCurrency(ventasPorEstado["Enviado"] || 0);
+            if (cantEnviadosEl) cantEnviadosEl.textContent = pedidosEnviados.toString();
 
             // Renderizar gráfico
             renderSalesChart(ventasPorEstado);

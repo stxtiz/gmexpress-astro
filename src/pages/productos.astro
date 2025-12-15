@@ -806,7 +806,8 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
             // Metadatos
             metodoPago: "Pendiente",
             notas: "",
-            fecha: new Date().toISOString().split("T")[0],
+            // Usar fecha local (no UTC) para evitar problema de zona horaria
+            fecha: new Date().toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('-').reverse().join('-'),
             createdAt: serverTimestamp(),
           };
 

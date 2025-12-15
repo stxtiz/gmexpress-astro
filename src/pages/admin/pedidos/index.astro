@@ -1070,11 +1070,16 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         (document.getElementById("fechaPedidoFilter") as HTMLSelectElement)
           ?.value || "";
 
-      // Calcular rangos de fecha
+      // Calcular rangos de fecha usando hora local
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      // Inicio de semana (lunes = 1, ajustar si el día es domingo = 0)
+      const dayOfWeek = now.getDay(); // 0=domingo, 1=lunes, ..., 6=sábado
+      const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Si es domingo, retroceder 6 días
       const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - today.getDay());
+      weekStart.setDate(today.getDate() - daysFromMonday);
+      
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
       filteredPedidos = pedidos.filter((pedido) => {
@@ -1084,19 +1089,22 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
           pedido.email.toLowerCase().includes(searchTerm);
         const matchEstado = !estadoFilter || pedido.estado === estadoFilter;
 
-        // Filtro de fecha
+        // Filtro de fecha - parsear fecha YYYY-MM-DD como hora local, no UTC
         let matchFecha = true;
-        if (fechaFilter) {
-          const pedidoFecha = new Date(pedido.fecha);
+        if (fechaFilter && pedido.fecha) {
+          // Parsear la fecha como hora local (evita el problema de UTC)
+          const [year, month, day] = pedido.fecha.split('-').map(Number);
+          const pedidoFecha = new Date(year, month - 1, day); // month es 0-indexed
+          
           switch (fechaFilter) {
             case "hoy":
-              matchFecha = pedidoFecha >= today;
+              matchFecha = pedidoFecha.getTime() >= today.getTime();
               break;
             case "semana":
-              matchFecha = pedidoFecha >= weekStart;
+              matchFecha = pedidoFecha.getTime() >= weekStart.getTime();
               break;
             case "mes":
-              matchFecha = pedidoFecha >= monthStart;
+              matchFecha = pedidoFecha.getTime() >= monthStart.getTime();
               break;
           }
         }
@@ -1371,6 +1379,18 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         (document.getElementById("servicioFilter") as HTMLSelectElement)
           ?.value || "";
 
+      // Calcular rangos de fecha usando hora local
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      // Inicio de semana desde lunes
+      const dayOfWeek = now.getDay();
+      const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromMonday);
+      
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
       filteredSolicitudes = solicitudes.filter((sol) => {
         const matchSearch =
           sol.cliente.toLowerCase().includes(searchTerm) ||
@@ -1382,19 +1402,22 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
         const matchServicio =
           !servicioFilter || sol.servicio === servicioFilter;
 
+        // Filtro de fecha - parsear fecha YYYY-MM-DD como hora local
         let matchFecha = true;
-        if (fechaFilter) {
-          const solDate = new Date(sol.fecha);
-          const today = new Date();
-          if (fechaFilter === "hoy") {
-            matchFecha = solDate.toDateString() === today.toDateString();
-          } else if (fechaFilter === "semana") {
-            const weekAgo = new Date(today.setDate(today.getDate() - 7));
-            matchFecha = solDate >= weekAgo;
-          } else if (fechaFilter === "mes") {
-            matchFecha =
-              solDate.getMonth() === new Date().getMonth() &&
-              solDate.getFullYear() === new Date().getFullYear();
+        if (fechaFilter && sol.fecha) {
+          const [year, month, day] = sol.fecha.split('-').map(Number);
+          const solDate = new Date(year, month - 1, day);
+          
+          switch (fechaFilter) {
+            case "hoy":
+              matchFecha = solDate.getTime() >= today.getTime();
+              break;
+            case "semana":
+              matchFecha = solDate.getTime() >= weekStart.getTime();
+              break;
+            case "mes":
+              matchFecha = solDate.getTime() >= monthStart.getTime();
+              break;
           }
         }
 
@@ -1709,6 +1732,9 @@ import AdminSidebar from "../../../components/admin/AdminSidebar.astro";
 
     // Filtros - ahora usa applySolicitudesFilters para mantener paginación
     document.getElementById("estadoFilter")?.addEventListener("change", () => {
+      applySolicitudesFilters();
+    });
+    document.getElementById("fechaFilter")?.addEventListener("change", () => {
       applySolicitudesFilters();
     });
 
