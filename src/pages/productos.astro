@@ -9,13 +9,24 @@ import ProductGrid from "../components/productos/ProductGrid.astro";
 import Pagination from "../components/productos/Pagination.astro";
 import "../styles/global.css";
 import { db } from "../firebase/client";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+
+// Fetch categories from Firebase
+const categoriesCollection = collection(db, "categories");
+const categoriesQuery = query(categoriesCollection, orderBy("name"));
+const categoriesSnapshot = await getDocs(categoriesQuery);
+const categories = categoriesSnapshot.docs.map((doc) => ({
+  name: doc.data().name,
+}));
+
+// Get selected category from URL params
+const selectedCategory = Astro.url.searchParams.get("categoria") || "";
 
 // Fetch all active products with ID and stock for cart functionality
 const productsCollection = collection(db, "products");
 const q = query(productsCollection, where("activo", "==", true));
 const querySnapshot = await getDocs(q);
-const allProducts = querySnapshot.docs.map((doc) => ({
+let allProducts = querySnapshot.docs.map((doc) => ({
   id: doc.id, // ID del documento para el carrito
   name: doc.data().name,
   price: doc.data().price,
@@ -26,8 +37,13 @@ const allProducts = querySnapshot.docs.map((doc) => ({
   stock: doc.data().stock || 0, // Stock para verificación de disponibilidad
 }));
 
-// Pagination Logic
-const itemsPerPage = 6;
+// Filter products by category if selected
+if (selectedCategory) {
+  allProducts = allProducts.filter((p) => p.category === selectedCategory);
+}
+
+// Pagination Logic - 8 productos por página (4x2 grid)
+const itemsPerPage = 8;
 const currentPage = Number(Astro.url.searchParams.get("page") || 1);
 const totalPages = Math.ceil(allProducts.length / itemsPerPage);
 
@@ -57,7 +73,7 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
       </div>
 
       <!-- Filtros de Categoría -->
-      <CategoryFilter />
+      <CategoryFilter categories={categories} selectedCategory={selectedCategory} />
 
       <!-- Grid de Productos -->
       <ProductGrid products={paginatedProducts} />
@@ -66,7 +82,7 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        baseUrl="/productos"
+        baseUrl={selectedCategory ? `/productos?categoria=${encodeURIComponent(selectedCategory)}&` : "/productos"}
       />
     </main>
 

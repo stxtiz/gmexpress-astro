@@ -15,6 +15,7 @@
  * - alt: Texto alternativo
  * - description: Descripción del producto
  * - stock: Cantidad disponible
+ * - category: Categoría del producto
  */
 
 interface Props {
@@ -25,9 +26,10 @@ interface Props {
   alt: string;
   description: string;
   stock?: number; // Stock disponible
+  category?: string; // Categoría del producto
 }
 
-const { id, name, price, image, description, stock = 0 } = Astro.props;
+const { id, name, price, image, description, stock = 0, category } = Astro.props;
 
 // Determinar si hay stock disponible
 const hasStock = stock > 0;
@@ -46,6 +48,14 @@ const hasStock = stock > 0;
       style={`background-image: url('${image}');`}
     >
     </div>
+    <!-- Badge de categoría -->
+    {
+      category && (
+        <div class="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+          {category}
+        </div>
+      )
+    }
     <!-- Badge de stock -->
     {
       !hasStock && (

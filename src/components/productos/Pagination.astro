@@ -7,11 +7,14 @@ interface Props {
 
 const { currentPage, totalPages, baseUrl } = Astro.props;
 
-const prevUrl = currentPage > 1 ? `${baseUrl}?page=${currentPage - 1}` : "#";
-const nextUrl = currentPage < totalPages ? `${baseUrl}?page=${currentPage + 1}` : "#";
+// Determinar el separador correcto según si baseUrl ya tiene parámetros
+const separator = baseUrl.includes("?") ? "&" : "?";
+
+const prevUrl = currentPage > 1 ? `${baseUrl}${separator}page=${currentPage - 1}` : "#";
+const nextUrl = currentPage < totalPages ? `${baseUrl}${separator}page=${currentPage + 1}` : "#";
 
 function getPageUrl(page: number) {
-  return `${baseUrl}?page=${page}`;
+  return `${baseUrl}${separator}page=${page}`;
 }
 ---
 
