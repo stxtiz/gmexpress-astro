@@ -705,6 +705,13 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
         ) as HTMLButtonElement;
         if (!confirmBtn) return;
 
+        // Verificar que el usuario esté autenticado antes de procesar
+        if (!currentUser) {
+          showNotification("Debes iniciar sesión para completar la compra", "error");
+          closeCheckoutModal();
+          return;
+        }
+
         // Mostrar estado de carga
         confirmBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Procesando...`;
         confirmBtn.disabled = true;
@@ -791,11 +798,12 @@ const paginatedProducts = allProducts.slice(startIndex, endIndex);
             id: `PED-${Date.now().toString().slice(-8)}`,
 
             // Información del cliente (asociado al usuario autenticado)
-            userId: currentUser.uid,
+            // Nota: currentUser está garantizado no-null por el early return al inicio de la función
+            userId: currentUser!.uid,
             cliente: userData?.firstName
               ? `${userData.firstName} ${userData.lastNamePaterno || ""} ${userData.lastNameMaterno || ""}`.trim()
-              : currentUser.displayName || currentUser.email,
-            email: currentUser.email,
+              : currentUser!.displayName || currentUser!.email,
+            email: currentUser!.email,
             telefono: userData?.phone || "",
             direccion: userData
               ? `${userData.address || ""}, ${userData.comuna || ""}, ${userData.region || ""}`.trim()
